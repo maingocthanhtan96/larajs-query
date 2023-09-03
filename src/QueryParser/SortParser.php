@@ -1,0 +1,20 @@
+<?php
+
+namespace LaraJS\QueryParser\QueryParser;
+
+class SortParser implements SortParserInterface
+{
+    public function parse(array $sorts): array
+    {
+        $parsedArray = [];
+        foreach ($sorts as $sort) {
+            $parsedArray[] = [
+                'fx' => 'orderByRelationship',
+                'isNested' => false,
+                'parameters' => $sort,
+            ];
+        }
+
+        return $parsedArray;
+    }
+}
