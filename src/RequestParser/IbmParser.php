@@ -82,10 +82,11 @@ class IbmParser implements IbmParserInterface
                     break;
 
                 case IbmOperator::NOT->value:
-                    $objOperand = array_pop($stack);
-                    $stack[] = [$this->mapOperator($token) => $objOperand];
+                    $stack[] = [$this->mapOperator($token) => array_pop($stack)];
                     break;
-
+                case IbmOperator::HAS->value:
+                    $stack[] = [$this->mapOperator($token) => array_pop($stack)];
+                    break;
                 case IbmOperator::AND->value:
                 case IbmOperator::OR->value:
                     $objOperandA = array_pop($stack);
@@ -154,6 +155,7 @@ class IbmParser implements IbmParserInterface
             IbmOperator::NOT->value => SqlOperator::NOT->value,
             IbmOperator::AND->value => SqlOperator::AND->value,
             IbmOperator::OR->value => SqlOperator::OR->value,
+            IbmOperator::HAS->value => SqlOperator::HAS->value,
         ];
 
         return $operatorMappings[$operator];

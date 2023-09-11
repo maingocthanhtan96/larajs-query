@@ -10,6 +10,7 @@ enum Method: string
     case IN = 'whereIn';
     case IS_NULL = 'whereNull';
     case IS_NOT_NULL = 'whereNotNull';
+    case HAS = 'has';
 
     public static function fromName(string $name): Method
     {

@@ -42,6 +42,7 @@ class FilterParser implements FilterParserInterface
             Operator::NOT->value,
             Operator::IS_NULL->value,
             Operator::IS_NOT_NULL->value,
+            Operator::HAS->value,
         ];
 
         $isSpecialOperator = in_array(strtolower($operator), array_map('strtolower', $specialOperators), true);
@@ -77,7 +78,6 @@ class FilterParser implements FilterParserInterface
     public function sortNestedFilters($filters, $isOr = false): array
     {
         $parsedArray = [];
-        $errors = [];
         foreach (Arr::wrap($filters) as $i => $filter) {
             // Use the "orWhere" only from the second iteration.
             $useOr = $isOr && $i > 0;

@@ -16,4 +16,5 @@ enum IbmOperator: string
     case NOT = 'not';
     case AND = 'and';
     case OR = 'or';
+    case HAS = 'has';
 }

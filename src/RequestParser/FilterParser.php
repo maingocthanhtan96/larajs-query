@@ -3,6 +3,7 @@
 namespace LaraJS\QueryParser\RequestParser;
 
 use Exception;
+use Illuminate\Support\Arr;
 
 class FilterParser implements FilterParserInterface
 {
@@ -13,8 +14,8 @@ class FilterParser implements FilterParserInterface
     /**
      * @throws Exception
      */
-    public function parse(array $queryString): array
+    public function parse(string|array $queryString): array
     {
-        return $this->ibmParser->parse($queryString);
+        return $this->ibmParser->parse(Arr::wrap($queryString));
     }
 }

@@ -4,12 +4,11 @@ namespace LaraJS\QueryParser\RequestParser;
 
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 
 class RequestParser implements RequestParserInterface
 {
+    protected string|array $filter;
     protected array $include;
-    protected array $filter;
     protected array $search;
     protected array $date;
     protected array $sort;
@@ -26,7 +25,7 @@ class RequestParser implements RequestParserInterface
     {
         $option = $this->parseOption($request, $option);
         $this->setInclude($this->includeParser->parse($option['include']))
-            ->setFilter($this->filterParser->parse(Arr::wrap($option['filter'])))
+            ->setFilter($this->filterParser->parse($option['filter']))
             ->setSort($this->sortParser->parse($option['orderBy']))
             ->setSearch($option['search'])
             ->setDate($option['date'])
@@ -38,9 +37,9 @@ class RequestParser implements RequestParserInterface
     public function parseOption(Request $request, array $option): array
     {
         $parseOptions['include'] = $option['include'] ?? $request->get('include', []);
-        $parseOptions['filter'] = $option['filter'] ?? $request->get('filter', []);
         $parseOptions['search'] = $option['search'] ?? $request->get('search', []);
         $parseOptions['date'] = $option['date'] ?? $request->get('date', []);
+        $parseOptions['filter'] = $option['filter'] ?? $request->get('filter', '');
         $parseOptions['select'] = $option['select'] ?? $request->get('select', '');
         $parseOptions['orderBy'] = $option['orderBy'] ?? $request->get('orderBy', '');
 
@@ -68,7 +67,7 @@ class RequestParser implements RequestParserInterface
     /**
      * @return array
      */
-    public function getFilter(): array
+    public function getFilter(): string|array
     {
         return $this->filter;
     }
