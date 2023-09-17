@@ -11,9 +11,9 @@ class FilterParser implements FilterParserInterface
     {
         $parsedArray = [];
         foreach (array_keys($filters) as $key) {
-            if (in_array($key, [Operator::AND->value, Operator::OR->value, Operator::NOT->value])) {
+            if (in_array($key, [Operator::AND->value, Operator::OR->value, Operator::NOT->value]) || ($key === Operator::HAS->value && is_array($filters[$key]))) {
                 $parameters = $this->sortNestedFilters($filters[$key], $key === Operator::OR->value);
-                $fx = $key === Operator::NOT->value ? Method::fromName(Operator::NOT->value)->value : Method::DEFAULT->value;
+                $fx =$this->getMethod($key);
                 $parsedArray[] = [
                     'fx' => $isOr ? convertToOrFormat($fx) : $fx,
                     'isNested' => true,
@@ -54,7 +54,13 @@ class FilterParser implements FilterParserInterface
                 // HANDLE IN AND NOT IN
                 $fx = Method::fromName($operator)->value;
                 $sequelizeValue = array_slice($value, 1);
-                $parameters = [$sequelizeKey, $sequelizeValue];
+                if ($fx === Method::HAS->value) {
+                    $value = array_pop($sequelizeValue);
+                    $key = key($value);
+                    $parameters = [$sequelizeKey, [$this->parseParametersForObjection($key, $value[$key], $isOr)]];
+                } else {
+                    $parameters = [$sequelizeKey, $sequelizeValue];
+                }
             } else {
                 $fx = Method::DEFAULT->value;
                 $sequelizeValue = count($value) > 2 ? array_slice($value, 1) : $value[1];
@@ -68,7 +74,7 @@ class FilterParser implements FilterParserInterface
         }
 
         return [
-            'fx' => $isOr ? convertToOrFormat($fx) : $fx,
+            'fx' => $fx,
             'parameters' => $parameters,
         ];
     }
@@ -81,10 +87,19 @@ class FilterParser implements FilterParserInterface
         foreach ($filters as $i => $filter) {
             // Use the "orWhere" only from the second iteration.
             $useOr = $isOr && $i > 0;
-            $parseFilterResponse = $this->parse($filter ?? [], $useOr);
+            $filter = $filter ?? [];
+            $parseFilterResponse = is_array($filter) ? $this->parse($filter, $useOr) : [$filter];
             $parsedArray = [...$parsedArray, ...$parseFilterResponse];
         }
 
         return $parsedArray;
+    }
+
+    public function getMethod(string $key)
+    {
+        return match ($key) {
+            Operator::NOT->value, Operator::HAS->value => Method::fromName($key)->value,
+            default => Method::DEFAULT->value,
+        };
     }
 }

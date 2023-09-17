@@ -82,16 +82,16 @@ class IbmParser implements IbmParserInterface
                     break;
 
                 case IbmOperator::NOT->value:
-                case IbmOperator::HAS->value:
                     $stack[] = [$this->mapOperator($token) => array_pop($stack)];
                     break;
+                case IbmOperator::HAS->value:
                 case IbmOperator::AND->value:
                 case IbmOperator::OR->value:
                     $objOperandA = array_pop($stack);
                     $objOperandB = array_pop($stack);
-                    $stack[] = [$this->mapOperator($token) => [$objOperandA, $objOperandB]];
+                    $operands = $objOperandB ? [$objOperandA, $objOperandB] : $objOperandA;
+                    $stack[] = [$this->mapOperator($token) => $operands];
                     break;
-
                 default:
                     $attributeRef = $this->coerceValue(array_pop($stack), $token);
                     $value = $this->coerceValue(array_pop($stack), $token);

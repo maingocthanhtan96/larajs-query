@@ -5,6 +5,7 @@ namespace LaraJS\QueryParser\QueryParser;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use LaraJS\QueryParser\Enum\Method;
 use LaraJS\QueryParser\RequestParser\RequestParser;
 
 class QueryParser implements QueryParserInterface
@@ -27,14 +28,12 @@ class QueryParser implements QueryParserInterface
     public function parse(Builder $query, Request $request, array $option): Builder
     {
         $requestParser = $this->requestParser->parse($request, $option);
-
         $field = $this->fieldParser->parse($requestParser->getSelect());
         $search = $this->searchParser->parse($requestParser->getSearch());
         $date = $this->dateParser->parse($requestParser->getDate());
         $include = $this->aggregateParser->parse($requestParser->getInclude());
         $filter = $this->filterParser->parse($requestParser->getFilter());
         $sort = $this->sortParser->parse($requestParser->getSort());
-
         $data = [
             ...$field,
             ...$include,
@@ -50,7 +49,15 @@ class QueryParser implements QueryParserInterface
     private function handleQuery(Builder $query, array $data): Builder {
         foreach ($data as $d) {
             if ($d['isNested']) {
-                $query->{$d['fx']}(fn (Builder $query) => $this->handleQuery($query, $d['parameters']));
+                switch ($d['fx']) {
+                    case Method::HAS->value:
+                        $parameters = $d['parameters'][1];
+                        $parameters = \Arr::isAssoc($parameters) ? [$parameters] : $parameters;
+                        $query->{$d['fx']}($d['parameters'][0], fn (Builder $query) => $this->handleQuery($query, $parameters));
+                        break;
+                    default:
+                        $query->{$d['fx']}(fn (Builder $query) => $this->handleQuery($query, $d['parameters']));
+                }
             } else {
                 switch ($d['fx']) {
                     case Method::SPECIAL_LIKE->value:
@@ -61,7 +68,6 @@ class QueryParser implements QueryParserInterface
                 }
             }
         }
-
         return $query;
     }
 }
