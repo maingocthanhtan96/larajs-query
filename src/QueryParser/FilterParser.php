@@ -10,23 +10,14 @@ class FilterParser implements FilterParserInterface
     public function parse(array $filters, bool $isOr = false): array
     {
         $parsedArray = [];
-        foreach (array_keys($filters) as $key) {
-            if (in_array($key, [Operator::AND->value, Operator::OR->value, Operator::NOT->value]) || ($key === Operator::HAS->value && is_array($filters[$key]))) {
-                $parameters = $this->sortNestedFilters($filters[$key], $key === Operator::OR->value);
-                $fx =$this->getMethod($key);
-                $parsedArray[] = [
-                    'fx' => $isOr ? convertToOrFormat($fx) : $fx,
-                    'isNested' => true,
-                    'parameters' => $parameters,
-                ];
-            } else {
-                $parsed = $this->parseParametersForObjection($key, $filters[$key], $isOr);
-                $parsedArray[] = [
-                    'fx' => $parsed['fx'],
-                    'isNested' => false,
-                    'parameters' => $parsed['parameters'],
-                ];
-            }
+        foreach ($filters as $operator => $filter) {
+            $isNested = in_array($operator, [Operator::AND->value, Operator::OR->value, Operator::NOT->value]) || ($operator === Operator::HAS->value && is_array($filter));
+            $parameters = $isNested ? $this->sortNestedFilters($filter, $operator === Operator::OR->value) : $this->parseParametersForObjection($operator, $filter, $isOr);
+            $parsedArray[] = [
+                'fx' => $isOr ? convertToOrFormat($this->getMethod($operator)) : $this->getMethod($operator),
+                'isNested' => $isNested,
+                'parameters' => $parameters,
+            ];
         }
 
         return $parsedArray;
@@ -52,9 +43,8 @@ class FilterParser implements FilterParserInterface
 
             if ($isSpecialOperator) {
                 // HANDLE IN AND NOT IN
-                $fx = Method::fromName($operator)->value;
                 $sequelizeValue = array_slice($value, 1);
-                if ($fx === Method::HAS->value) {
+                if ($operator === Operator::HAS->value) {
                     $value = array_pop($sequelizeValue);
                     $key = key($value);
                     $parameters = [$sequelizeKey, [$this->parseParametersForObjection($key, $value[$key], $isOr)]];
@@ -62,21 +52,16 @@ class FilterParser implements FilterParserInterface
                     $parameters = [$sequelizeKey, $sequelizeValue];
                 }
             } else {
-                $fx = Method::DEFAULT->value;
                 $sequelizeValue = count($value) > 2 ? array_slice($value, 1) : $value[1];
                 $parameters = [$sequelizeKey, $sequelizeOperator, $sequelizeValue];
             }
         } else {
             // HANDLE NULL AND NOT NULL
             $sequelizeKey = removeHashFromString($value);
-            $fx = Method::fromName($operator)->value;
             $parameters = [$sequelizeKey];
         }
 
-        return [
-            'fx' => $fx,
-            'parameters' => $parameters,
-        ];
+        return $parameters;
     }
 
     //To handle "OR" AND "AND" recursively
@@ -95,7 +80,7 @@ class FilterParser implements FilterParserInterface
         return $parsedArray;
     }
 
-    public function getMethod(string $key)
+    public function getMethod(string $key): string
     {
         return match ($key) {
             Operator::NOT->value, Operator::HAS->value => Method::fromName($key)->value,

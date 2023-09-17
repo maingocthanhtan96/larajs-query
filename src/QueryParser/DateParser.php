@@ -2,8 +2,6 @@
 
 namespace LaraJS\QueryParser\QueryParser;
 
-use Illuminate\Support\Str;
-
 class DateParser implements DateParserInterface
 {
     public function parse(array $queryString): array
@@ -22,7 +20,7 @@ class DateParser implements DateParserInterface
                     $column,
                     $value,
                 ],
-            ]
+            ],
         ];
     }
 }

@@ -8,10 +8,15 @@ use Illuminate\Http\Request;
 class RequestParser implements RequestParserInterface
 {
     protected string|array $filter;
+
     protected array $include;
+
     protected array $search;
+
     protected array $date;
+
     protected array $sort;
+
     protected string $select;
 
     public function __construct(private readonly FilterParser $filterParser, private readonly SortParser $sortParser, private readonly IncludeParser $includeParser)
@@ -39,7 +44,7 @@ class RequestParser implements RequestParserInterface
         $parseOptions['include'] = $option['include'] ?? $request->get('include', []);
         $parseOptions['search'] = $option['search'] ?? $request->get('search', []);
         $parseOptions['date'] = $option['date'] ?? $request->get('date', []);
-        $parseOptions['filter'] = $option['filter'] ?? $request->get('filter', '');
+        $parseOptions['filter'] = $option['filter'] ?? $request->get('filter', []);
         $parseOptions['select'] = $option['select'] ?? $request->get('select', '');
         $parseOptions['orderBy'] = $option['orderBy'] ?? $request->get('orderBy', '');
 
@@ -55,12 +60,13 @@ class RequestParser implements RequestParserInterface
     }
 
     /**
-     * @param array $include
+     * @param  array  $include
      * @return RequestParser
      */
     public function setInclude(array $include): RequestParser
     {
         $this->include = $include;
+
         return $this;
     }
 
@@ -73,12 +79,13 @@ class RequestParser implements RequestParserInterface
     }
 
     /**
-     * @param string|array $filter
+     * @param  string|array  $filter
      * @return RequestParser
      */
     public function setFilter(string|array $filter): RequestParser
     {
         $this->filter = $filter;
+
         return $this;
     }
 
@@ -91,12 +98,13 @@ class RequestParser implements RequestParserInterface
     }
 
     /**
-     * @param array $search
+     * @param  array  $search
      * @return RequestParser
      */
     public function setSearch(array $search): RequestParser
     {
         $this->search = $search;
+
         return $this;
     }
 
@@ -109,12 +117,13 @@ class RequestParser implements RequestParserInterface
     }
 
     /**
-     * @param array $date
+     * @param  array  $date
      * @return RequestParser
      */
     public function setDate(array $date): RequestParser
     {
         $this->date = $date;
+
         return $this;
     }
 
@@ -127,12 +136,13 @@ class RequestParser implements RequestParserInterface
     }
 
     /**
-     * @param string $select
+     * @param  string  $select
      * @return RequestParser
      */
     public function setSelect(string $select): RequestParser
     {
         $this->select = $select;
+
         return $this;
     }
 
@@ -145,12 +155,13 @@ class RequestParser implements RequestParserInterface
     }
 
     /**
-     * @param array $sort
+     * @param  array  $sort
      * @return RequestParser
      */
     public function setSort(array $sort): RequestParser
     {
         $this->sort = $sort;
+
         return $this;
     }
 }

@@ -17,7 +17,7 @@ class FieldParser implements FieldParserInterface
                 'fx' => 'select',
                 'isNested' => false,
                 'parameters' => Str::of($queryString)->explode(',')->map(fn ($value) => trim($value))->all(),
-            ]
+            ],
         ];
     }
 }

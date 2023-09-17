@@ -47,17 +47,10 @@ if (!function_exists('removeHashFromString')) {
     }
 }
 
-if (!function_exists('capitalizeFirstLetter')) {
-    function capitalizeFirstLetter($string): string
-    {
-        return ucfirst($string);
-    }
-}
-
 if (!function_exists('convertToOrFormat')) {
     function convertToOrFormat($str): string
     {
-        $capStr = capitalizeFirstLetter($str);
+        $capStr = ucfirst($str);
 
         return "or$capStr";
     }

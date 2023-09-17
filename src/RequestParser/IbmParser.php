@@ -102,6 +102,7 @@ class IbmParser implements IbmParserInterface
                     break;
             }
         }
+
         return array_pop($stack);
     }
 

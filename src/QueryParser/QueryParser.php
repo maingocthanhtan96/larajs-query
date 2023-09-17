@@ -68,6 +68,7 @@ class QueryParser implements QueryParserInterface
                 }
             }
         }
+
         return $query;
     }
 }

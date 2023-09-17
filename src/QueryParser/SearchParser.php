@@ -26,7 +26,7 @@ class SearchParser implements SearchParserInterface
                         ->all(),
                     $value,
                 ],
-            ]
+            ],
         ];
     }
 }

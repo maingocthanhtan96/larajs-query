@@ -16,6 +16,9 @@ class FilterParser implements FilterParserInterface
      */
     public function parse(string|array $queryString): array
     {
+        if (!$queryString) {
+            return [];
+        }
         return $this->ibmParser->parse(Arr::wrap($queryString));
     }
 }
