@@ -3,6 +3,7 @@
 namespace LaraJS\QueryParser\QueryParser;
 
 use Illuminate\Support\Str;
+use LaraJS\QueryParser\Enum\Method;
 
 class SearchParser implements SearchParserInterface
 {
@@ -16,7 +17,7 @@ class SearchParser implements SearchParserInterface
 
         return [
             [
-                'fx' => 'whereLike',
+                'fx' => Method::SPECIAL_LIKE->value,
                 'isNested' => false,
                 'parameters' => [
                     Str::of($column)

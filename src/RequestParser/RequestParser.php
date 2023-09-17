@@ -65,7 +65,7 @@ class RequestParser implements RequestParserInterface
     }
 
     /**
-     * @return array
+     * @return string|array
      */
     public function getFilter(): string|array
     {
@@ -73,10 +73,10 @@ class RequestParser implements RequestParserInterface
     }
 
     /**
-     * @param array $filter
+     * @param string|array $filter
      * @return RequestParser
      */
-    public function setFilter(array $filter): RequestParser
+    public function setFilter(string|array $filter): RequestParser
     {
         $this->filter = $filter;
         return $this;

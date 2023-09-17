@@ -47,13 +47,13 @@ class QueryParser implements QueryParserInterface
         return $this->handleQuery($query, $data);
     }
 
-    private function handleQuery(Builder $query, $data): Builder {
+    private function handleQuery(Builder $query, array $data): Builder {
         foreach ($data as $d) {
             if ($d['isNested']) {
-                $query->{$d['fx']}(fn () => $this->handleQuery($query, $d['parameters']));
+                $query->{$d['fx']}(fn (Builder $query) => $this->handleQuery($query, $d['parameters']));
             } else {
                 switch ($d['fx']) {
-                    case 'whereLike':
+                    case Method::SPECIAL_LIKE->value:
                         $query->when($d['parameters'][0] && $d['parameters'][1], fn(Builder $q) => $query->{$d['fx']}(...$d['parameters']));
                         break;
                     default:

@@ -2,7 +2,6 @@
 
 namespace LaraJS\QueryParser\QueryParser;
 
-use Illuminate\Support\Arr;
 use LaraJS\QueryParser\Enum\Method;
 use LaraJS\QueryParser\Enum\Operator;
 
@@ -78,7 +77,8 @@ class FilterParser implements FilterParserInterface
     public function sortNestedFilters($filters, $isOr = false): array
     {
         $parsedArray = [];
-        foreach (Arr::wrap($filters) as $i => $filter) {
+        $filters = \Arr::isAssoc($filters) ? [$filters] : $filters;
+        foreach ($filters as $i => $filter) {
             // Use the "orWhere" only from the second iteration.
             $useOr = $isOr && $i > 0;
             $parseFilterResponse = $this->parse($filter ?? [], $useOr);

@@ -22,8 +22,6 @@ class IbmParser implements IbmParserInterface
      */
     public function parseIbmFilter(array $qsFilter): array
     {
-        $results = [];
-
         $subResults = [];
         foreach ($qsFilter as $expression) {
             try {
@@ -32,11 +30,13 @@ class IbmParser implements IbmParserInterface
                 throw new Exception($e->getMessage());
             }
         }
-        if ($subResults) {
-            $results = array_reduce($subResults, fn ($prev, $current) => $subResults ? ['OR' => [$prev, $current]] : $results);
+        if (count($subResults) > 1) {
+            $subResults = array_reduce($subResults, fn ($prev, $current) => ['OR' => [$prev, $current]]);
+        } else {
+            $subResults = array_pop($subResults);
         }
 
-        return $results;
+        return $subResults;
     }
 
     /**
@@ -82,8 +82,6 @@ class IbmParser implements IbmParserInterface
                     break;
 
                 case IbmOperator::NOT->value:
-                    $stack[] = [$this->mapOperator($token) => array_pop($stack)];
-                    break;
                 case IbmOperator::HAS->value:
                     $stack[] = [$this->mapOperator($token) => array_pop($stack)];
                     break;
@@ -104,7 +102,6 @@ class IbmParser implements IbmParserInterface
                     break;
             }
         }
-
         return array_pop($stack);
     }
 
