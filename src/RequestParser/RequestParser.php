@@ -41,12 +41,12 @@ class RequestParser implements RequestParserInterface
 
     public function parseOption(Request $request, array $option): array
     {
-        $parseOptions['include'] = $option['include'] ?? $request->get('include', []);
-        $parseOptions['search'] = $option['search'] ?? $request->get('search', []);
-        $parseOptions['date'] = $option['date'] ?? $request->get('date', []);
-        $parseOptions['filter'] = $option['filter'] ?? $request->get('filter', []);
-        $parseOptions['select'] = $option['select'] ?? $request->get('select', '');
-        $parseOptions['orderBy'] = $option['orderBy'] ?? $request->get('orderBy', '');
+        $parseOptions['include'] = $option['include'] ?? $request->query('include', []);
+        $parseOptions['search'] = $option['search'] ?? $request->query('search', []);
+        $parseOptions['date'] = $option['date'] ?? $request->query('date', []);
+        $parseOptions['filter'] = $option['filter'] ?? $request->query('filter', []);
+        $parseOptions['select'] = $option['select'] ?? $request->query('select', '');
+        $parseOptions['orderBy'] = $option['orderBy'] ?? $request->query('orderBy', '');
 
         return $parseOptions;
     }

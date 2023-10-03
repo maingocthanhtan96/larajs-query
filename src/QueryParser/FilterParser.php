@@ -11,7 +11,7 @@ class FilterParser implements FilterParserInterface
     {
         $parsedArray = [];
         foreach ($filters as $operator => $filter) {
-            $isNested = in_array($operator, [Operator::AND->value, Operator::OR->value, Operator::NOT->value]) || ($operator === Operator::HAS->value && is_array($filter));
+            $isNested = in_array($operator, [Operator::AND->value, Operator::OR->value, Operator::NOT->value]);
             $parameters = $isNested ? $this->sortNestedFilters($filter, $operator === Operator::OR->value) : $this->parseParametersForObjection($operator, $filter, $isOr);
             $parsedArray[] = [
                 'fx' => $isOr ? convertToOrFormat($this->getMethod($operator)) : $this->getMethod($operator),
@@ -32,28 +32,21 @@ class FilterParser implements FilterParserInterface
             Operator::NOT->value,
             Operator::IS_NULL->value,
             Operator::IS_NOT_NULL->value,
-            Operator::HAS->value,
         ];
-
+        $operatorMap = [
+            Operator::HAS->value => Operator::GREATER_OR_EQUAL->value,
+        ];
         $isSpecialOperator = in_array(strtolower($operator), array_map('strtolower', $specialOperators), true);
-
-        $sequelizeOperator = $operator;
+        $operator = $operatorMap[$operator] ?? $operator;
         if (is_array($value)) {
             $sequelizeKey = removeHashFromString($value[0]);
-
             if ($isSpecialOperator) {
                 // HANDLE IN AND NOT IN
                 $sequelizeValue = array_slice($value, 1);
-                if ($operator === Operator::HAS->value) {
-                    $value = array_pop($sequelizeValue);
-                    $key = key($value);
-                    $parameters = [$sequelizeKey, [$this->parseParametersForObjection($key, $value[$key], $isOr)]];
-                } else {
-                    $parameters = [$sequelizeKey, $sequelizeValue];
-                }
+                $parameters = [$sequelizeKey, $sequelizeValue];
             } else {
                 $sequelizeValue = count($value) > 2 ? array_slice($value, 1) : $value[1];
-                $parameters = [$sequelizeKey, $sequelizeOperator, $sequelizeValue];
+                $parameters = [$sequelizeKey, $operator , $sequelizeValue];
             }
         } else {
             // HANDLE NULL AND NOT NULL
@@ -83,7 +76,12 @@ class FilterParser implements FilterParserInterface
     public function getMethod(string $key): string
     {
         return match ($key) {
-            Operator::NOT->value, Operator::HAS->value => Method::fromName($key)->value,
+            Operator::HAS->value,
+            Operator::NOT->value,
+            Operator::NOT_IN->value,
+            Operator::IN->value,
+            Operator::IS_NULL->value,
+            Operator::IS_NOT_NULL->value => Method::fromName($key)->value,
             default => Method::DEFAULT->value,
         };
     }
