@@ -12,10 +12,11 @@ class SortParser implements SortParserInterface
             return [];
         }
 
-        return Str::of($queryString)->explode(',')->map(function ($pair) {
-            [$field, $direction] = explode(' ', trim($pair)) + ['', 'asc'];
-
-            return [$field, convert_direction($direction)];
+        return Str::of($queryString)->explode(',')->filter(fn ($pair) => $pair)->map(function ($pair) {
+            if (str_starts_with($pair, '-')) {
+                return [substr($pair, 1), 'desc'];
+            }
+            return [$pair, 'asc'];
         })->all();
     }
 }
