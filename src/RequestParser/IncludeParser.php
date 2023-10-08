@@ -9,6 +9,9 @@ class IncludeParser implements IncludeParserInterface
     public function parse(array $queryString): array
     {
         $parsedArray = [];
+        if (!$queryString) {
+            return $parsedArray;
+        }
         foreach ($queryString as $aggregate) {
             if (Str::contains($aggregate, '|')) {
                 [$relationColumn, $method] = explode('|', $aggregate);

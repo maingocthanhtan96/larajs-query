@@ -17,9 +17,9 @@ class RequestParser implements RequestParserInterface
 
     protected array $sort;
 
-    protected string $select;
+    protected array $select;
 
-    public function __construct(private readonly FilterParser $filterParser, private readonly SortParser $sortParser, private readonly IncludeParser $includeParser)
+    public function __construct(private readonly FilterParser $filterParser, private readonly SortParser $sortParser, private readonly IncludeParser $includeParser, private readonly FieldParser $fieldParser)
     {
     }
 
@@ -34,7 +34,7 @@ class RequestParser implements RequestParserInterface
             ->setSort($this->sortParser->parse($option['orderBy']))
             ->setSearch($option['search'])
             ->setDate($option['date'])
-            ->setSelect($option['select']);
+            ->setSelect($this->fieldParser->parse($option['select']));
 
         return $this;
     }
@@ -128,18 +128,18 @@ class RequestParser implements RequestParserInterface
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function getSelect(): string
+    public function getSelect(): array
     {
         return $this->select;
     }
 
     /**
-     * @param  string  $select
+     * @param  array  $select
      * @return RequestParser
      */
-    public function setSelect(string $select): RequestParser
+    public function setSelect(array $select): RequestParser
     {
         $this->select = $select;
 

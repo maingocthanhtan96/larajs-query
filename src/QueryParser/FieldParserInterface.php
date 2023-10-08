@@ -4,5 +4,5 @@ namespace LaraJS\QueryParser\QueryParser;
 
 interface FieldParserInterface
 {
-    public function parse(string $queryString): array;
+    public function parse(array $fields): array;
 }

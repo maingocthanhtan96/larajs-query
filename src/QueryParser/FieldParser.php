@@ -6,9 +6,9 @@ use Illuminate\Support\Str;
 
 class FieldParser implements FieldParserInterface
 {
-    public function parse(string $queryString): array
+    public function parse(array $fields): array
     {
-        if (!$queryString) {
+        if (!$fields) {
             return [];
         }
 
@@ -16,7 +16,7 @@ class FieldParser implements FieldParserInterface
             [
                 'fx' => 'select',
                 'isNested' => false,
-                'parameters' => Str::of($queryString)->explode(',')->map(fn ($value) => trim($value))->all(),
+                'parameters' => $fields,
             ],
         ];
     }
