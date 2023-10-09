@@ -31,7 +31,7 @@ class IbmParser implements IbmParserInterface
             }
         }
         if (count($subResults) > 1) {
-            $subResults = array_reduce($subResults, fn ($prev, $current) => ['OR' => [$prev, $current]]);
+            $subResults = array_reduce($subResults, fn($prev, $current) => ['OR' => [$prev, $current]]);
         } else {
             $subResults = array_pop($subResults);
         }
@@ -86,11 +86,13 @@ class IbmParser implements IbmParserInterface
                     break;
 
                 case IbmOperator::HAS->value:
-                case IbmOperator::AND->value:
-                case IbmOperator::OR->value:
                     $objOperandA = array_pop($stack);
                     $objOperandB = array_pop($stack);
                     $stack[] = [$this->mapOperator($token) => [$objOperandA, $objOperandB]];
+                    break;
+                case IbmOperator::AND->value:
+                case IbmOperator::OR->value:
+                    $stack[] = [$this->mapOperator($token) => array_splice($stack, 0)];
                     break;
 
                 default:
@@ -114,9 +116,15 @@ class IbmParser implements IbmParserInterface
         } elseif (str_starts_with($value, "'") && str_ends_with($value, "'")) {
             // constant value
             $value = substr($value, 1, -1);
-            if (isBooleanString($value)) { return strtolower($value) === 'true'; }
-            if (isNumberString($value)) { return (int) $value; }
-            if (isDateString($value)) { return $value; }
+            if (isBooleanString($value)) {
+                return strtolower($value) === 'true';
+            }
+            if (isNumberString($value)) {
+                return (int) $value;
+            }
+            if (isDateString($value)) {
+                return $value;
+            }
 
             return wildCardString($value, $parentOperator); // string
         } else {
@@ -131,16 +139,14 @@ class IbmParser implements IbmParserInterface
         $tokens = [$expression];
 
         foreach ($delimiters as $delimiter) {
-            $tokens = array_reduce($tokens, fn ($carry, $token) => array_merge(
-                $carry,
-                array_map('trim', explode($delimiter, $token))
-            ), []);
+            $tokens = array_reduce($tokens, fn($carry, $token) => array_merge($carry, array_map('trim', explode($delimiter, $token))), []);
         }
 
         return array_values(array_filter($tokens));
     }
 
-    public function mapOperator($operator, $valueIsNull = false) {
+    public function mapOperator($operator, $valueIsNull = false)
+    {
         $operatorMappings = [
             IbmOperator::EQUALS->value => $valueIsNull ? SqlOperator::IS_NULL->value : SqlOperator::EQUALS->value,
             IbmOperator::GREATER_THAN->value => SqlOperator::GREATER_THAN->value,
@@ -171,24 +177,9 @@ class IbmParser implements IbmParserInterface
             IbmOperator::GREATER_OR_EQUAL->value => [IbmValueType::NULL],
             IbmOperator::LESS_THAN->value => [IbmValueType::NULL],
             IbmOperator::LESS_OR_EQUAL->value => [IbmValueType::NULL],
-            IbmOperator::CONTAINS->value => [
-                IbmValueType::NUMBER,
-                IbmValueType::DATE,
-                IbmValueType::ATTRIBUTE_REF,
-                IbmValueType::NULL,
-            ],
-            IbmOperator::STARTS_WITH->value => [
-                IbmValueType::NUMBER,
-                IbmValueType::DATE,
-                IbmValueType::ATTRIBUTE_REF,
-                IbmValueType::NULL,
-            ],
-            IbmOperator::ENDS_WITH->value => [
-                IbmValueType::NUMBER,
-                IbmValueType::DATE,
-                IbmValueType::ATTRIBUTE_REF,
-                IbmValueType::NULL,
-            ],
+            IbmOperator::CONTAINS->value => [IbmValueType::NUMBER, IbmValueType::DATE, IbmValueType::ATTRIBUTE_REF, IbmValueType::NULL],
+            IbmOperator::STARTS_WITH->value => [IbmValueType::NUMBER, IbmValueType::DATE, IbmValueType::ATTRIBUTE_REF, IbmValueType::NULL],
+            IbmOperator::ENDS_WITH->value => [IbmValueType::NUMBER, IbmValueType::DATE, IbmValueType::ATTRIBUTE_REF, IbmValueType::NULL],
             IbmOperator::ANY->value => [IbmValueType::ATTRIBUTE_REF],
         ];
 
@@ -197,9 +188,7 @@ class IbmParser implements IbmParserInterface
             foreach ($invalidTypeMap[$operator] as $valueType) {
                 foreach ($operands as $operand) {
                     if ($this->typeOfValue($operand) === $valueType) {
-                        throw new Exception(
-                            '"' . $operator . '" operator should not be used with ' . $valueType . ' value'
-                        );
+                        throw new Exception('"' . $operator . '" operator should not be used with ' . $valueType . ' value');
                     }
                 }
             }
@@ -207,7 +196,7 @@ class IbmParser implements IbmParserInterface
 
         // Throw error if "ANY" operator has multiple types
         if ($operator === IbmOperator::ANY->value) {
-            $valueTypes = array_map(fn ($operand) => $this->typeOfValue($operand), $operands);
+            $valueTypes = array_map(fn($operand) => $this->typeOfValue($operand), $operands);
             $valueTypes = array_filter($valueTypes, function ($v) {
                 return $v !== IbmValueType::NULL;
             });

@@ -16,6 +16,7 @@ class SortParser implements SortParserInterface
             if (str_starts_with($pair, '-')) {
                 return [substr($pair, 1), 'desc'];
             }
+
             return [$pair, 'asc'];
         })->all();
     }

@@ -46,7 +46,7 @@ class FilterParser implements FilterParserInterface
                 $parameters = [$sequelizeKey, $sequelizeValue];
             } else {
                 $sequelizeValue = count($value) > 2 ? array_slice($value, 1) : $value[1];
-                $parameters = [$sequelizeKey, $operator , $sequelizeValue];
+                $parameters = [$sequelizeKey, $operator, $sequelizeValue];
             }
         } else {
             // HANDLE NULL AND NOT NULL

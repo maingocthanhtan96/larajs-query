@@ -18,8 +18,7 @@ class QueryParser implements QueryParserInterface
         private readonly FieldParser $fieldParser,
         private readonly SearchParser $searchParser,
         private readonly DateParser $dateParser,
-    )
-    {
+    ) {
     }
 
     /**
@@ -34,29 +33,23 @@ class QueryParser implements QueryParserInterface
         $include = $this->aggregateParser->parse($requestParser->getInclude());
         $filter = $this->filterParser->parse($requestParser->getFilter());
         $sort = $this->sortParser->parse($requestParser->getSort());
-        $data = [
-            ...$field,
-            ...$include,
-            ...$filter,
-            ...$search,
-            ...$date,
-            ...$sort,
-        ];
+        $data = [...$field, ...$include, ...$filter, ...$search, ...$date, ...$sort];
 
         return $this->handleQuery($query, $data);
     }
 
-    private function handleQuery(Builder $query, array $data): Builder {
+    private function handleQuery(Builder $query, array $data): Builder
+    {
         foreach ($data as $d) {
             if ($d['isNested']) {
                 switch ($d['fx']) {
                     case Method::HAS->value:
                         $parameters = $d['parameters'][1];
                         $parameters = \Arr::isAssoc($parameters) ? [$parameters] : $parameters;
-                        $query->{$d['fx']}($d['parameters'][0], fn (Builder $query) => $this->handleQuery($query, $parameters));
+                        $query->{$d['fx']}($d['parameters'][0], fn(Builder $query) => $this->handleQuery($query, $parameters));
                         break;
                     default:
-                        $query->{$d['fx']}(fn (Builder $query) => $this->handleQuery($query, $d['parameters']));
+                        $query->{$d['fx']}(fn(Builder $query) => $this->handleQuery($query, $d['parameters']));
                 }
             } else {
                 switch ($d['fx']) {
