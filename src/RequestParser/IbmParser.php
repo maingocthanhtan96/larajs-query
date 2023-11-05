@@ -65,6 +65,30 @@ class IbmParser implements IbmParserInterface
                     $this->errorCheck($token, array_slice($anyOperands, 1));
                     $stack[] = [$this->mapOperator($token) => $anyOperands];
                     break;
+                case IbmOperator::EQUALS_RELATION->value:
+                case IbmOperator::GREATER_OR_EQUAL_RELATION->value:
+                case IbmOperator::GREATER_THAN_RELATION->value:
+                case IbmOperator::LESS_OR_EQUAL_RELATION->value:
+                case IbmOperator::LESS_THAN_RELATION->value:
+                case IbmOperator::CONTAINS_RELATION->value:
+                case IbmOperator::STARTS_WITH_RELATION->value:
+                case IbmOperator::ENDS_WITH_RELATION->value:
+                    $attributeRefRelation = $this->coerceValue(array_pop($stack), $token);
+                    $attributeRefField = $this->coerceValue(array_pop($stack), $token);
+                    $operator = match ($token) {
+                        IbmOperator::EQUALS_RELATION->value => SqlOperator::EQUALS->value,
+                        IbmOperator::GREATER_OR_EQUAL_RELATION->value => SqlOperator::GREATER_OR_EQUAL->value,
+                        IbmOperator::GREATER_THAN_RELATION->value => SqlOperator::GREATER_THAN->value,
+                        IbmOperator::LESS_OR_EQUAL_RELATION->value => SqlOperator::LESS_OR_EQUAL->value,
+                        IbmOperator::LESS_THAN_RELATION->value => SqlOperator::LESS_THAN->value,
+                        IbmOperator::CONTAINS_RELATION->value, IbmOperator::ENDS_WITH_RELATION->value, IbmOperator::STARTS_WITH_RELATION->value => SqlOperator::LIKE->value,
+                        default => str_replace('_RELATION', '', $token)
+                    };
+                    $value = $this->coerceValue(array_pop($stack), $token);
+                    $stack[] = [
+                        $this->mapOperator($token, $value === null) => [$attributeRefRelation, $attributeRefField, $operator, $value],
+                    ];
+                    break;
 
                 case IbmOperator::EQUALS->value:
                     if (isNullString($stack[count($stack) - 2])) {
@@ -147,23 +171,27 @@ class IbmParser implements IbmParserInterface
 
     public function mapOperator($operator, $valueIsNull = false)
     {
-        $operatorMappings = [
+        return match ($operator) {
             IbmOperator::EQUALS->value => $valueIsNull ? SqlOperator::IS_NULL->value : SqlOperator::EQUALS->value,
+            IbmOperator::EQUALS_RELATION->value,
+            IbmOperator::GREATER_OR_EQUAL_RELATION->value,
+            IbmOperator::GREATER_THAN_RELATION->value,
+            IbmOperator::LESS_OR_EQUAL_RELATION->value,
+            IbmOperator::LESS_THAN_RELATION->value,
+            IbmOperator::CONTAINS_RELATION->value,
+            IbmOperator::STARTS_WITH_RELATION->value,
+            IbmOperator::ENDS_WITH_RELATION->value => SqlOperator::RELATION->value,
             IbmOperator::GREATER_THAN->value => SqlOperator::GREATER_THAN->value,
             IbmOperator::GREATER_OR_EQUAL->value => SqlOperator::GREATER_OR_EQUAL->value,
             IbmOperator::LESS_THAN->value => SqlOperator::LESS_THAN->value,
             IbmOperator::LESS_OR_EQUAL->value => SqlOperator::LESS_OR_EQUAL->value,
-            IbmOperator::CONTAINS->value => SqlOperator::LIKE->value,
-            IbmOperator::STARTS_WITH->value => SqlOperator::LIKE->value,
-            IbmOperator::ENDS_WITH->value => SqlOperator::LIKE->value,
+            IbmOperator::CONTAINS->value, IbmOperator::STARTS_WITH->value, IbmOperator::ENDS_WITH->value => SqlOperator::LIKE->value,
             IbmOperator::ANY->value => SqlOperator::IN->value,
             IbmOperator::NOT->value => SqlOperator::NOT->value,
             IbmOperator::AND->value => SqlOperator::AND->value,
             IbmOperator::OR->value => SqlOperator::OR->value,
             IbmOperator::HAS->value => SqlOperator::HAS->value,
-        ];
-
-        return $operatorMappings[$operator];
+        };
     }
 
     /**

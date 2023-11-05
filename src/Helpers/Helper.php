@@ -32,9 +32,9 @@ if (!function_exists('wildCardString')) {
     function wildCardString($value, $operator = null): string
     {
         return match ($operator) {
-            'contains' => '%' . $value . '%',
-            'startsWith' => $value . '%',
-            'endsWith' => '%' . $value,
+            'contains', 'containsRelation' => '%' . $value . '%',
+            'startsWith', 'startsWithRelation' => $value . '%',
+            'endsWith', 'endsWithRelation' => '%' . $value,
             default => $value,
         };
     }

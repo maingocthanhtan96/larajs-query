@@ -19,8 +19,12 @@ class RequestParser implements RequestParserInterface
 
     protected array $select;
 
-    public function __construct(private readonly FilterParser $filterParser, private readonly SortParser $sortParser, private readonly IncludeParser $includeParser, private readonly FieldParser $fieldParser)
-    {
+    public function __construct(
+        private readonly FilterParser $filterParser,
+        private readonly SortParser $sortParser,
+        private readonly IncludeParser $includeParser,
+        private readonly FieldParser $fieldParser,
+    ) {
     }
 
     /**

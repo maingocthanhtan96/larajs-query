@@ -46,7 +46,10 @@ class QueryParser implements QueryParserInterface
                     case Method::HAS->value:
                         $parameters = $d['parameters'][1];
                         $parameters = \Arr::isAssoc($parameters) ? [$parameters] : $parameters;
-                        $query->{$d['fx']}($d['parameters'][0], fn(Builder $query) => $this->handleQuery($query, $parameters));
+                        $query->{$d['fx']}(
+                            $d['parameters'][0],
+                            fn(Builder $query) => $this->handleQuery($query, $parameters),
+                        );
                         break;
                     default:
                         $query->{$d['fx']}(fn(Builder $query) => $this->handleQuery($query, $d['parameters']));
@@ -54,7 +57,10 @@ class QueryParser implements QueryParserInterface
             } else {
                 switch ($d['fx']) {
                     case Method::SPECIAL_LIKE->value:
-                        $query->when($d['parameters'][0] && $d['parameters'][1], fn(Builder $q) => $query->{$d['fx']}(...$d['parameters']));
+                        $query->when(
+                            $d['parameters'][0] && $d['parameters'][1],
+                            fn(Builder $q) => $query->{$d['fx']}(...$d['parameters']),
+                        );
                         break;
                     default:
                         $query->when($d['parameters'], fn(Builder $q) => $query->{$d['fx']}(...$d['parameters']));
