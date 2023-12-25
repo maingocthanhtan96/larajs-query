@@ -2,6 +2,7 @@
 
 namespace LaraJS\QueryParser\Providers;
 
+use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -55,15 +56,20 @@ class LaraJSQueryParserServiceProvider extends ServiceProvider
                     foreach (Arr::wrap($attributes) as $attribute) {
                         $query->when(
                             // Check if the attribute is not an expression and contains a dot (indicating a related model)
-                            !($attribute instanceof \Illuminate\Contracts\Database\Query\Expression) &&
-                            str_contains((string) $attribute, '.'),
+                            !($attribute instanceof Expression) && str_contains((string) $attribute, '.'),
                             function (Builder $query) use ($attribute, $searchTerm) {
                                 // Split the attribute into a relation and related attribute
                                 [$relation, $relatedAttribute] = explode('.', (string) $attribute);
 
                                 // Perform a 'LIKE' search on the related model's attribute
-                                $query->orWhereHas($relation, function (Builder $query) use ($relatedAttribute, $searchTerm) {
-                                    $query->where($relatedAttribute, 'LIKE', "%{$searchTerm}%");
+                                $relationModel = $this->getRelation($relation)->getModel();
+                                $relationTable = $relationModel->getTable();
+                                $query->orWhereHas($relation, function (Builder $query) use (
+                                    $relatedAttribute,
+                                    $searchTerm,
+                                    $relationTable,
+                                ) {
+                                    $query->where("$relationTable.$relatedAttribute", 'LIKE', "%{$searchTerm}%");
                                 });
                             },
                             function (Builder $query) use ($attribute, $searchTerm) {
@@ -71,7 +77,7 @@ class LaraJSQueryParserServiceProvider extends ServiceProvider
                                 // also attribute can be an expression
                                 $table = $this->getModel()->getTable();
                                 $query->orWhere("$table.$attribute", 'LIKE', "%{$searchTerm}%");
-                            }
+                            },
                         );
                     }
                 });
