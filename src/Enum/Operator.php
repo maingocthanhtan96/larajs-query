@@ -12,12 +12,12 @@ enum Operator: string
     case LESS_OR_EQUAL = '<=';
     case LIKE = 'LIKE';
     case IN = 'IN';
-    case NOT_IN = 'NOT IN';
+    case NOT_IN = 'NOT_IN';
     case NOT = 'NOT';
     case AND = 'AND';
     case OR = 'OR';
-    case IS_NULL = 'IS NULL';
-    case IS_NOT_NULL = 'IS NOT NULL';
+    case IS_NULL = 'IS_NULL';
+    case IS_NOT_NULL = 'IS_NOT_NULL';
     case HAS = 'HAS';
     case RELATION = 'RELATION';
 }

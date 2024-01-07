@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use LaraJS\QueryParser\Enum\Method;
 use LaraJS\QueryParser\RequestParser\RequestParser;
+use Illuminate\Support\Arr;
 
 class QueryParser implements QueryParserInterface
 {
@@ -45,7 +46,7 @@ class QueryParser implements QueryParserInterface
                 switch ($d['fx']) {
                     case Method::HAS->value:
                         $parameters = $d['parameters'][1];
-                        $parameters = \Arr::isAssoc($parameters) ? [$parameters] : $parameters;
+                        $parameters = Arr::isAssoc($parameters) ? [$parameters] : $parameters;
                         $query->{$d['fx']}(
                             $d['parameters'][0],
                             fn(Builder $query) => $this->handleQuery($query, $parameters),

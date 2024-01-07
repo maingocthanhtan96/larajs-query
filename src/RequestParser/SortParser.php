@@ -12,7 +12,7 @@ class SortParser implements SortParserInterface
             return [];
         }
 
-        return Str::of($queryString)->explode(',')->filter(fn ($pair) => $pair)->map(function ($pair) {
+        return Str::of($queryString)->trim(',')->explode(',')->filter(fn ($pair) => $pair)->map(function ($pair) {
             if (str_starts_with($pair, '-')) {
                 return [substr($pair, 1), 'desc'];
             }

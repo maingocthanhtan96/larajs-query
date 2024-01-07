@@ -144,7 +144,7 @@ class LaraJSQueryParserServiceProvider extends ServiceProvider
                             $where = $join->wheres[0];
                             if ($i === 0) {
                                 $modelParent = $relation->getParent();
-                                $modelFirst = \Arr::first(
+                                $modelFirst = Arr::first(
                                     $relation->getThroughParents(),
                                     fn(Model $model) => $model->getTable() === $join->table,
                                 );

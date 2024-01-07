@@ -12,6 +12,6 @@ class FieldParser implements FieldParserInterface
             return [];
         }
 
-        return Str::of($queryString)->explode(',')->map(fn ($value) => trim($value))->all();
+        return Str::of($queryString)->trim(',')->explode(',')->map(fn ($value) => trim($value))->all();
     }
 }
