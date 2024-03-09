@@ -53,7 +53,10 @@ class FilterParser implements FilterParserInterface
         $stack = [];
 
         foreach (array_reverse($tokens) as $token) {
-            $isOperator = in_array($token, array_map(fn(IbmOperator $operator) => $operator->value, IbmOperator::cases()));
+            $isOperator = in_array(
+                $token,
+                array_map(fn(IbmOperator $operator) => $operator->value, IbmOperator::cases()),
+            );
             if (!$isOperator) {
                 // Token is an operand
                 $stack[] = $token;
@@ -86,12 +89,19 @@ class FilterParser implements FilterParserInterface
                         IbmOperator::GREATER_THAN_RELATION->value => SqlOperator::GREATER_THAN->value,
                         IbmOperator::LESS_OR_EQUAL_RELATION->value => SqlOperator::LESS_OR_EQUAL->value,
                         IbmOperator::LESS_THAN_RELATION->value => SqlOperator::LESS_THAN->value,
-                        IbmOperator::CONTAINS_RELATION->value, IbmOperator::ENDS_WITH_RELATION->value, IbmOperator::STARTS_WITH_RELATION->value => SqlOperator::LIKE->value,
+                        IbmOperator::CONTAINS_RELATION->value,
+                        IbmOperator::ENDS_WITH_RELATION->value,
+                        IbmOperator::STARTS_WITH_RELATION->value => SqlOperator::LIKE->value,
                         default => str_replace('_RELATION', '', $token)
                     };
                     $value = $this->coerceValue(array_pop($stack), $token);
                     $stack[] = [
-                        $this->mapOperator($token, $value === null) => [$attributeRefRelation, $attributeRefField, $operator, $value],
+                        $this->mapOperator($token, $value === null) => [
+                            $attributeRefRelation,
+                            $attributeRefField,
+                            $operator,
+                            $value,
+                        ],
                     ];
                     break;
 
@@ -168,7 +178,11 @@ class FilterParser implements FilterParserInterface
         $tokens = [$expression];
 
         foreach ($delimiters as $delimiter) {
-            $tokens = array_reduce($tokens, fn($carry, $token) => array_merge($carry, array_map('trim', explode($delimiter, $token))), []);
+            $tokens = array_reduce(
+                $tokens,
+                fn($carry, $token) => array_merge($carry, array_map('trim', explode($delimiter, $token))),
+                []
+            );
         }
 
         return array_values(array_filter($tokens));
@@ -190,7 +204,9 @@ class FilterParser implements FilterParserInterface
             IbmOperator::GREATER_OR_EQUAL->value => SqlOperator::GREATER_OR_EQUAL->value,
             IbmOperator::LESS_THAN->value => SqlOperator::LESS_THAN->value,
             IbmOperator::LESS_OR_EQUAL->value => SqlOperator::LESS_OR_EQUAL->value,
-            IbmOperator::CONTAINS->value, IbmOperator::STARTS_WITH->value, IbmOperator::ENDS_WITH->value => SqlOperator::LIKE->value,
+            IbmOperator::CONTAINS->value,
+            IbmOperator::STARTS_WITH->value,
+            IbmOperator::ENDS_WITH->value => SqlOperator::LIKE->value,
             IbmOperator::ANY->value => SqlOperator::IN->value,
             IbmOperator::NOT->value => SqlOperator::NOT->value,
             IbmOperator::AND->value => SqlOperator::AND->value,
@@ -210,9 +226,24 @@ class FilterParser implements FilterParserInterface
             IbmOperator::GREATER_OR_EQUAL->value => [IbmValueType::NULL],
             IbmOperator::LESS_THAN->value => [IbmValueType::NULL],
             IbmOperator::LESS_OR_EQUAL->value => [IbmValueType::NULL],
-            IbmOperator::CONTAINS->value => [IbmValueType::NUMBER, IbmValueType::DATE, IbmValueType::ATTRIBUTE_REF, IbmValueType::NULL],
-            IbmOperator::STARTS_WITH->value => [IbmValueType::NUMBER, IbmValueType::DATE, IbmValueType::ATTRIBUTE_REF, IbmValueType::NULL],
-            IbmOperator::ENDS_WITH->value => [IbmValueType::NUMBER, IbmValueType::DATE, IbmValueType::ATTRIBUTE_REF, IbmValueType::NULL],
+            IbmOperator::CONTAINS->value => [
+                IbmValueType::NUMBER,
+                IbmValueType::DATE,
+                IbmValueType::ATTRIBUTE_REF,
+                IbmValueType::NULL,
+            ],
+            IbmOperator::STARTS_WITH->value => [
+                IbmValueType::NUMBER,
+                IbmValueType::DATE,
+                IbmValueType::ATTRIBUTE_REF,
+                IbmValueType::NULL,
+            ],
+            IbmOperator::ENDS_WITH->value => [
+                IbmValueType::NUMBER,
+                IbmValueType::DATE,
+                IbmValueType::ATTRIBUTE_REF,
+                IbmValueType::NULL,
+            ],
             IbmOperator::ANY->value => [IbmValueType::ATTRIBUTE_REF],
         ];
 
@@ -221,7 +252,9 @@ class FilterParser implements FilterParserInterface
             foreach ($invalidTypeMap[$operator] as $valueType) {
                 foreach ($operands as $operand) {
                     if ($this->typeOfValue($operand) === $valueType) {
-                        throw new Exception('"' . $operator . '" operator should not be used with ' . $valueType . ' value');
+                        throw new Exception(
+                            '"' . $operator . '" operator should not be used with ' . $valueType . ' value'
+                        );
                     }
                 }
             }
@@ -256,9 +289,9 @@ class FilterParser implements FilterParserInterface
         if (is_string($value)) {
             if ($value[0] === '#') {
                 return IbmValueType::ATTRIBUTE_REF->name;
-            } else {
-                return IbmValueType::STRING->name;
             }
+
+            return IbmValueType::STRING->name;
         }
 
         // Return null for unsupported types

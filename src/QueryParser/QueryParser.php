@@ -5,9 +5,9 @@ namespace LaraJS\QueryParser\QueryParser;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use LaraJS\QueryParser\Enum\Method;
 use LaraJS\QueryParser\RequestParser\RequestParser;
-use Illuminate\Support\Arr;
 
 class QueryParser implements QueryParserInterface
 {

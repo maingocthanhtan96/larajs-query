@@ -2,7 +2,6 @@
 
 namespace Tests\RequestParser;
 
-use Exception;
 use LaraJS\QueryParser\RequestParser\SortParser;
 use PHPUnit\Framework\TestCase;
 

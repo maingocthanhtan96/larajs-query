@@ -2,9 +2,9 @@
 
 namespace LaraJS\QueryParser\QueryParser;
 
+use Illuminate\Support\Arr;
 use LaraJS\QueryParser\Enum\Method;
 use LaraJS\QueryParser\Enum\Operator;
-use Illuminate\Support\Arr;
 
 class FilterParser implements FilterParserInterface
 {
@@ -29,7 +29,14 @@ class FilterParser implements FilterParserInterface
     //To reconstruct the parameters to objections format
     public function parseParametersForObjection($operator, $value, $isOr): array
     {
-        $specialOperators = [Operator::IN->value, Operator::NOT_IN->value, Operator::NOT->value, Operator::IS_NULL->value, Operator::IS_NOT_NULL->value, Operator::RELATION->value];
+        $specialOperators = [
+            Operator::IN->value,
+            Operator::NOT_IN->value,
+            Operator::NOT->value,
+            Operator::IS_NULL->value,
+            Operator::IS_NOT_NULL->value,
+            Operator::RELATION->value,
+        ];
         $operatorMap = [
             Operator::HAS->value => Operator::GREATER_OR_EQUAL->value,
         ];
