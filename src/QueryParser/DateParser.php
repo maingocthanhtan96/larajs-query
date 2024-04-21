@@ -2,6 +2,8 @@
 
 namespace LaraJS\QueryParser\QueryParser;
 
+use Carbon\Carbon;
+
 class DateParser implements DateParserInterface
 {
     public function parse(array $queryString): array
@@ -18,7 +20,10 @@ class DateParser implements DateParserInterface
                 'isNested' => false,
                 'parameters' => [
                     $column,
-                    $value,
+                    [
+                        Carbon::createFromFormat('Y-m-d', $value[0])->startOfDay(),
+                        Carbon::createFromFormat('Y-m-d', $value[1])->endOfDay(),
+                    ],
                 ],
             ],
         ];
