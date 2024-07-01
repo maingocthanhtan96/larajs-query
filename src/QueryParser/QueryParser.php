@@ -27,7 +27,7 @@ class QueryParser implements QueryParserInterface
      */
     public function parse(Builder $query, Request $request, array $option): Builder
     {
-        $requestParser = $this->requestParser->parse($request, $option);
+        $requestParser = $this->requestParser->parse($query, $request, $option);
         $field = $this->fieldParser->parse($requestParser->getSelect());
         $search = $this->searchParser->parse($requestParser->getSearch());
         $date = $this->dateParser->parse($requestParser->getDate());

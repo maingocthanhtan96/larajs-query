@@ -10,8 +10,6 @@ trait LaraJSQueryParser
 {
     public function applyQueryBuilder(Builder $queryBuilder, Request $request, array $option = []): Builder
     {
-        $parser = app(QueryParserInterface::class);
-
-        return $parser->parse($queryBuilder, $request, $option);
+        return app(QueryParserInterface::class)->parse($queryBuilder, $request, $option);
     }
 }
