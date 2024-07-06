@@ -4,7 +4,7 @@ namespace LaraJS\QueryParser\RequestParser;
 
 use Illuminate\Database\Eloquent\Builder;
 
-interface IncludeParserInterface
+interface DateParserInterface
 {
     public function parse(Builder $query, array $queryString): array;
 }

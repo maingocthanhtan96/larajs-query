@@ -2,6 +2,7 @@
 
 namespace Tests\QueryParser;
 
+use Carbon\Carbon;
 use LaraJS\QueryParser\QueryParser\DateParser;
 use PHPUnit\Framework\TestCase;
 
@@ -25,10 +26,16 @@ class DateParserTest extends TestCase
             [
                 'fx' => 'whereBetween',
                 'isNested' => false,
-                'parameters' => ['updated_at', $queryString['value']],
+                'parameters' => [
+                    'updated_at',
+                    [
+                        Carbon::createFromFormat('Y-m-d', $queryString['value'][0])->startOfDay(),
+                        Carbon::createFromFormat('Y-m-d', $queryString['value'][1])->endOfDay(),
+                    ],
+                ],
             ],
         ];
 
-        $this->assertSame($expect, $this->parser->parse($queryString));
+        $this->assertEquals($expect, $this->parser->parse($queryString));
     }
 }

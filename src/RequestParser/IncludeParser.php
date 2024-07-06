@@ -2,30 +2,24 @@
 
 namespace LaraJS\QueryParser\RequestParser;
 
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Builder;
 
 class IncludeParser implements IncludeParserInterface
 {
-    public function parse(array $queryString): array
+    public function parse(Builder $query, array $queryString): array
     {
         $parsedArray = [];
         if (!$queryString) {
             return $parsedArray;
         }
+        $filterable = method_exists($query->getModel(), 'allowQueryParsers')
+            ? $query->getModel()->allowQueryParsers()['include']
+            : [];
+
         foreach ($queryString as $aggregate) {
-            if (Str::contains($aggregate, '|')) {
-                [$relationColumn, $method] = explode('|', $aggregate);
-                [$relation, $column] = explode('.', $relationColumn) + [null, null];
-                $method = strtolower($method);
-                $parsedArray[] = [
-                    'fx' => 'withAggregate',
-                    'parameters' => [$relation, in_array($method, ['count', 'exists']) ? '*' : $column, $method],
-                ];
-            } else {
-                $parsedArray[] = [
-                    'fx' => 'with',
-                    'parameters' => [$aggregate],
-                ];
+            $field = explode('.', explode('|', $aggregate)[0])[0];
+            if (!$filterable || in_array($field, $filterable, true)) {
+                $parsedArray[] = $aggregate;
             }
         }
 

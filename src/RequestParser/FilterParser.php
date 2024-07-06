@@ -2,7 +2,7 @@
 
 namespace LaraJS\QueryParser\RequestParser;
 
-use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use LaraJS\QueryParser\Enum\IbmOperator;
 use LaraJS\QueryParser\Enum\IbmValueType;
@@ -10,30 +10,24 @@ use LaraJS\QueryParser\Enum\SqlOperator;
 
 class FilterParser implements FilterParserInterface
 {
-    /**
-     * @throws Exception
-     */
-    public function parse(string|array $queryString): array
+    public function parse(Builder $query, string|array $queryString): array
     {
         if (!$queryString) {
             return [];
         }
 
-        return $this->parseFilter(Arr::wrap($queryString));
+        return $this->parseFilter($query, Arr::wrap($queryString));
     }
 
-    /**
-     * @throws Exception
-     */
-    public function parseFilter(array $qsFilter): array
+    public function parseFilter(Builder $query, array $qsFilter): array
     {
+        $filterable = method_exists($query->getModel(), 'allowQueryParsers')
+            ? $query->getModel()->allowQueryParsers()['filter']
+            : [];
+
         $subResults = [];
         foreach ($qsFilter as $expression) {
-            try {
-                $subResults[] = $this->parseExpression($expression);
-            } catch (Exception $e) {
-                throw new Exception($e->getMessage());
-            }
+            $subResults[] = $this->parseExpression($expression, $filterable);
         }
         if (count($subResults) > 1) {
             $subResults = array_reduce($subResults, fn($prev, $current) => ['OR' => [$prev, $current]]);
@@ -41,22 +35,16 @@ class FilterParser implements FilterParserInterface
             $subResults = array_pop($subResults);
         }
 
-        return $subResults;
+        return $subResults ?? [];
     }
 
-    /**
-     * @throws Exception
-     */
-    public function parseExpression(string $expression)
+    public function parseExpression(string $expression, ?array $filterable)
     {
         $tokens = $this->tokenizeExpression($expression);
         $stack = [];
 
         foreach (array_reverse($tokens) as $token) {
-            $isOperator = in_array(
-                $token,
-                array_map(fn(IbmOperator $operator) => $operator->value, IbmOperator::cases()),
-            );
+            $isOperator = in_array($token, array_map(fn(IbmOperator $operator) => $operator->value, IbmOperator::cases()), false);
             if (!$isOperator) {
                 // Token is an operand
                 $stack[] = $token;
@@ -70,8 +58,9 @@ class FilterParser implements FilterParserInterface
                     while (is_string(end($stack))) {
                         $anyOperands[] = $this->coerceValue(array_pop($stack));
                     }
-                    $this->errorCheck($token, array_slice($anyOperands, 1));
-                    $stack[] = [$this->mapOperator($token) => $anyOperands];
+                    if ($this->checkAllowFilter($anyOperands[0], $filterable)) {
+                        $stack[] = [$this->mapOperator($token) => $anyOperands];
+                    }
                     break;
                 case IbmOperator::EQUALS_RELATION->value:
                 case IbmOperator::GREATER_OR_EQUAL_RELATION->value:
@@ -95,39 +84,49 @@ class FilterParser implements FilterParserInterface
                         default => str_replace('_RELATION', '', $token)
                     };
                     $value = $this->coerceValue(array_pop($stack), $token);
-                    $stack[] = [
-                        $this->mapOperator($token, $value === null) => [
-                            $attributeRefRelation,
-                            $attributeRefField,
-                            $operator,
-                            $value,
-                        ],
-                    ];
+                    if ($this->checkAllowFilter($attributeRefRelation, $filterable)) {
+                        $stack[] = [
+                            $this->mapOperator($token, $value === null) => [
+                                $attributeRefRelation,
+                                $attributeRefField,
+                                $operator,
+                                $value,
+                            ],
+                        ];
+                    }
+
                     break;
 
                 case IbmOperator::EQUALS->value:
+                    $attributeRef = $this->coerceValue(array_pop($stack), $token);
                     if (isNullString($stack[count($stack) - 2])) {
-                        $attributeRef = $this->coerceValue(array_pop($stack), $token);
                         array_pop($stack); // Null - not included in output
-                        $stack[] = [$this->mapOperator($token, true) => $attributeRef];
+                        if ($this->checkAllowFilter($attributeRef, $filterable)) {
+                            $stack[] = [$this->mapOperator($token, true) => $attributeRef];
+                        }
                     } else {
-                        $attributeRef = $this->coerceValue(array_pop($stack), $token);
                         $value = $this->coerceValue(array_pop($stack), $token);
-                        $this->errorCheck($token, [$value]);
-                        $stack[] = [
-                            $this->mapOperator($token, $value === null) => [$attributeRef, $value],
-                        ];
+                        if ($this->checkAllowFilter($attributeRef, $filterable)) {
+                            $stack[] = [
+                                $this->mapOperator($token, $value === null) => [$attributeRef, $value],
+                            ];
+                        }
                     }
                     break;
 
                 case IbmOperator::NOT->value:
-                    $stack[] = [$this->mapOperator($token) => array_pop($stack)];
+                    $attributeRef = array_pop($stack);
+                    if ($attributeRef) {
+                        $stack[] = [$this->mapOperator($token) => $attributeRef];
+                    }
                     break;
 
                 case IbmOperator::HAS->value:
-                    $objOperandA = array_pop($stack);
-                    $objOperandB = $this->coerceValue(array_pop($stack));
-                    $stack[] = [$this->mapOperator($token) => [$objOperandA, $objOperandB]];
+                    $attributeRef = array_pop($stack);
+                    $value = $this->coerceValue(array_pop($stack));
+                    if ($this->checkAllowFilter($attributeRef, $filterable)) {
+                        $stack[] = [$this->mapOperator($token) => [$attributeRef, $value]];
+                    }
                     break;
                 case IbmOperator::AND->value:
                 case IbmOperator::OR->value:
@@ -137,10 +136,11 @@ class FilterParser implements FilterParserInterface
                 default:
                     $attributeRef = $this->coerceValue(array_pop($stack), $token);
                     $value = $this->coerceValue(array_pop($stack), $token);
-                    $this->errorCheck($token, [$value]);
-                    $stack[] = [
-                        $this->mapOperator($token, $value === null) => [$attributeRef, $value],
-                    ];
+                    if ($this->checkAllowFilter($attributeRef, $filterable)) {
+                        $stack[] = [
+                            $this->mapOperator($token, $value === null) => [$attributeRef, $value],
+                        ];
+                    }
                     break;
             }
         }
@@ -215,66 +215,6 @@ class FilterParser implements FilterParserInterface
         };
     }
 
-    /**
-     * @throws Exception
-     */
-    public function errorCheck($operator, $operands): void
-    {
-        // Blacklist of invalid value types per operator
-        $invalidTypeMap = [
-            IbmOperator::GREATER_THAN->value => [IbmValueType::NULL],
-            IbmOperator::GREATER_OR_EQUAL->value => [IbmValueType::NULL],
-            IbmOperator::LESS_THAN->value => [IbmValueType::NULL],
-            IbmOperator::LESS_OR_EQUAL->value => [IbmValueType::NULL],
-            IbmOperator::CONTAINS->value => [
-                IbmValueType::NUMBER,
-                IbmValueType::DATE,
-                IbmValueType::ATTRIBUTE_REF,
-                IbmValueType::NULL,
-            ],
-            IbmOperator::STARTS_WITH->value => [
-                IbmValueType::NUMBER,
-                IbmValueType::DATE,
-                IbmValueType::ATTRIBUTE_REF,
-                IbmValueType::NULL,
-            ],
-            IbmOperator::ENDS_WITH->value => [
-                IbmValueType::NUMBER,
-                IbmValueType::DATE,
-                IbmValueType::ATTRIBUTE_REF,
-                IbmValueType::NULL,
-            ],
-            IbmOperator::ANY->value => [IbmValueType::ATTRIBUTE_REF],
-        ];
-
-        // Throw error for any invalid operator / value type combos
-        if (array_key_exists($operator, $invalidTypeMap)) {
-            foreach ($invalidTypeMap[$operator] as $valueType) {
-                foreach ($operands as $operand) {
-                    if ($this->typeOfValue($operand) === $valueType) {
-                        throw new Exception(
-                            '"' . $operator . '" operator should not be used with ' . $valueType . ' value'
-                        );
-                    }
-                }
-            }
-        }
-
-        // Throw error if "ANY" operator has multiple types
-        if ($operator === IbmOperator::ANY->value) {
-            $valueTypes = array_map(fn($operand) => $this->typeOfValue($operand), $operands);
-            $valueTypes = array_filter($valueTypes, function ($v) {
-                return $v !== IbmValueType::NULL;
-            });
-
-            $hasMultipleTypes = count($valueTypes) > 0 && count(array_unique($valueTypes)) !== 1;
-
-            if ($hasMultipleTypes) {
-                throw new Exception('"any" operator should not be used with multiple value types');
-            }
-        }
-    }
-
     public function typeOfValue($value): ?string
     {
         if ($value === null) {
@@ -296,5 +236,15 @@ class FilterParser implements FilterParserInterface
 
         // Return null for unsupported types
         return null;
+    }
+
+    private function checkAllowFilter($field, $filterable): bool
+    {
+        $field = removeHashFromString($field);
+        if (!$filterable) {
+            return true;
+        }
+
+        return in_array($field, $filterable, true);
     }
 }
