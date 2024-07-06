@@ -1,23 +1,23 @@
 <?php
 
-namespace Tests\RequestParser;
+namespace RequestParser;
 
 use Illuminate\Database\Eloquent\Builder;
-use LaraJS\QueryParser\RequestParser\FieldParser;
+use LaraJS\QueryParser\RequestParser\DateParser;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Tests\ModelTest;
 
-class FieldParserTest extends TestCase
+class DateParserTest extends TestCase
 {
-    private FieldParser $parser;
+    private DateParser $parser;
 
     private Builder $query;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->parser = new FieldParser();
+        $this->parser = new DateParser();
         $model = new ModelTest();
         $this->query = Mockery::mock(Builder::class);
         $this->query->shouldReceive('getModel')->andReturn($model);
@@ -25,16 +25,25 @@ class FieldParserTest extends TestCase
 
     public function testParser()
     {
-        $queryString = 'id,name,email,';
-        $expect = ['id', 'name', 'email'];
+        $queryString = [
+            'column' => 'updated_at',
+            'value' => ['2024-01-01', '2024-12-01'],
+        ];
+        $expect = [
+            'column' => 'updated_at',
+            'value' => ['2024-01-01', '2024-12-01'],
+        ];
 
         $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
     }
 
     public function testParserFilterable()
     {
-        $queryString = 'id,name,age,';
-        $expect = ['id', 'name'];
+        $queryString = [
+            'column' => 'created_at',
+            'value' => ['2024-01-01', '2024-12-01'],
+        ];
+        $expect = [];
 
         $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
     }

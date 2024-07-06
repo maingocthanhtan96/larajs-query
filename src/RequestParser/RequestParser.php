@@ -2,7 +2,6 @@
 
 namespace LaraJS\QueryParser\RequestParser;
 
-use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
@@ -25,20 +24,25 @@ class RequestParser implements RequestParserInterface
         private readonly SortParser $sortParser,
         private readonly IncludeParser $includeParser,
         private readonly FieldParser $fieldParser,
+        private readonly SearchParser $searchParser,
+        private readonly DateParser $dateParser,
     ) {
     }
 
     /**
-     * @throws Exception|\Throwable
+     * @param  Builder  $query
+     * @param  Request  $request
+     * @param  array  $option
+     * @return $this
      */
     public function parse(Builder $query, Request $request, array $option): RequestParser
     {
         $option = $this->parseOption($request, $option);
-        $this->setInclude($this->includeParser->parse($option['include']))
-            ->setFilter($this->filterParser->parse($option['filter']))
-            ->setSort($this->sortParser->parse($option['orderBy']))
-            ->setSearch($option['search'])
-            ->setDate($option['date'])
+        $this->setInclude($this->includeParser->parse($query, $option['include']))
+            ->setFilter($this->filterParser->parse($query, $option['filter']))
+            ->setSort($this->sortParser->parse($query, $option['orderBy']))
+            ->setSearch($this->searchParser->parse($query, $option['search']))
+            ->setDate($this->dateParser->parse($query, $option['date']))
             ->setSelect($this->fieldParser->parse($query, $option['select']));
 
         return $this;

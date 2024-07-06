@@ -2,7 +2,6 @@
 
 namespace LaraJS\QueryParser\QueryParser;
 
-use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -23,7 +22,10 @@ class QueryParser implements QueryParserInterface
     }
 
     /**
-     * @throws Exception
+     * @param  Builder  $query
+     * @param  Request  $request
+     * @param  array  $option
+     * @return Builder
      */
     public function parse(Builder $query, Request $request, array $option): Builder
     {

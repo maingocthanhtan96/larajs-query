@@ -12,7 +12,7 @@ class FilterParser implements FilterParserInterface
     {
         $parsedArray = [];
         foreach ($filters as $operator => $filter) {
-            $isNested = in_array($operator, [Operator::AND->value, Operator::OR->value, Operator::NOT->value]);
+            $isNested = in_array($operator, [Operator::AND->value, Operator::OR->value, Operator::NOT->value], false);
             $parameters = $isNested
                 ? $this->sortNestedFilters($filter, $operator === Operator::OR->value)
                 : $this->parseParametersForObjection($operator, $filter, $isOr);
