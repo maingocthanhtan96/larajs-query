@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 interface RequestParserInterface
 {
-    public function parse(Builder $query, Request $request, array $option): RequestParser;
+    public function parse(Builder $query, Request $request): RequestParser;
 
-    public function parseOption(Request $request, array $option): array;
+    public function parseOption(Request $request): array;
 }

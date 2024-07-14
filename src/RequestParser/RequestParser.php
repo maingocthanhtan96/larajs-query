@@ -32,12 +32,11 @@ class RequestParser implements RequestParserInterface
     /**
      * @param  Builder  $query
      * @param  Request  $request
-     * @param  array  $option
      * @return $this
      */
-    public function parse(Builder $query, Request $request, array $option): RequestParser
+    public function parse(Builder $query, Request $request): RequestParser
     {
-        $option = $this->parseOption($request, $option);
+        $option = $this->parseOption($request);
         $this->setInclude($this->includeParser->parse($query, $option['include']))
             ->setFilter($this->filterParser->parse($query, $option['filter']))
             ->setSort($this->sortParser->parse($query, $option['orderBy']))
@@ -48,14 +47,14 @@ class RequestParser implements RequestParserInterface
         return $this;
     }
 
-    public function parseOption(Request $request, array $option): array
+    public function parseOption(Request $request): array
     {
-        $parseOptions['include'] = $option['include'] ?? $request->query('include', []);
-        $parseOptions['search'] = $option['search'] ?? $request->query('search', []);
-        $parseOptions['date'] = $option['date'] ?? $request->query('date', []);
-        $parseOptions['filter'] = $option['filter'] ?? $request->query('filter', []);
-        $parseOptions['select'] = $option['select'] ?? $request->query('select', '');
-        $parseOptions['orderBy'] = $option['orderBy'] ?? $request->query('orderBy', '');
+        $parseOptions['include'] = $request->query('include', []);
+        $parseOptions['search'] = $request->query('search', []);
+        $parseOptions['date'] = $request->query('date', []);
+        $parseOptions['filter'] = $request->query('filter', []);
+        $parseOptions['select'] = $request->query('select', '');
+        $parseOptions['orderBy'] = $request->query('orderBy', '');
 
         return $parseOptions;
     }

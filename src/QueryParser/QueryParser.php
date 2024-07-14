@@ -24,12 +24,11 @@ class QueryParser implements QueryParserInterface
     /**
      * @param  Builder  $query
      * @param  Request  $request
-     * @param  array  $option
      * @return Builder
      */
-    public function parse(Builder $query, Request $request, array $option): Builder
+    public function parse(Builder $query, Request $request): Builder
     {
-        $requestParser = $this->requestParser->parse($query, $request, $option);
+        $requestParser = $this->requestParser->parse($query, $request);
         $field = $this->fieldParser->parse($requestParser->getSelect());
         $search = $this->searchParser->parse($requestParser->getSearch());
         $date = $this->dateParser->parse($requestParser->getDate());
@@ -44,33 +43,32 @@ class QueryParser implements QueryParserInterface
     private function handleQuery(Builder $query, array $data): Builder
     {
         foreach ($data as $d) {
+            $fx = $d['fx'];
+            $parameters = $d['parameters'];
+
             if ($d['isNested']) {
-                switch ($d['fx']) {
-                    case Method::HAS->value:
-                        $parameters = $d['parameters'][1];
-                        $parameters = Arr::isAssoc($parameters) ? [$parameters] : $parameters;
-                        $query->{$d['fx']}(
-                            $d['parameters'][0],
-                            fn(Builder $query) => $this->handleQuery($query, $parameters),
-                        );
-                        break;
-                    default:
-                        $query->{$d['fx']}(fn(Builder $query) => $this->handleQuery($query, $d['parameters']));
-                }
+                $parameters = Arr::isAssoc($parameters[1]) ? [$parameters[1]] : $parameters[1];
+                $query->{$fx}(
+                    $parameters[0],
+                    fn(Builder $q) => $this->handleQuery($q, $parameters)
+                );
             } else {
-                switch ($d['fx']) {
-                    case Method::SPECIAL_LIKE->value:
-                        $query->when(
-                            $d['parameters'][0] && $d['parameters'][1],
-                            fn(Builder $q) => $query->{$d['fx']}(...$d['parameters']),
-                        );
-                        break;
-                    default:
-                        $query->when($d['parameters'], fn(Builder $q) => $query->{$d['fx']}(...$d['parameters']));
-                }
+                $query->when($parameters, fn(Builder $q) => $this->applyFunction($q, $fx, $parameters));
             }
         }
 
         return $query;
+    }
+
+    private function applyFunction(Builder $query, string $fx, array $parameters): void
+    {
+        if ($fx === Method::SPECIAL_LIKE->value) {
+            $query->when(
+                $parameters[0] && $parameters[1],
+                fn(Builder $q) => $q->{$fx}(...$parameters)
+            );
+        } else {
+            $query->{$fx}(...$parameters);
+        }
     }
 }

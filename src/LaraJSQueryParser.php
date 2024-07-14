@@ -8,8 +8,8 @@ use LaraJS\QueryParser\QueryParser\QueryParserInterface;
 
 trait LaraJSQueryParser
 {
-    public function applyQueryBuilder(Builder $queryBuilder, Request $request, array $option = []): Builder
+    public function applyQueryBuilder(Builder $queryBuilder, Request $request): Builder
     {
-        return app(QueryParserInterface::class)->parse($queryBuilder, $request, $option);
+        return app(QueryParserInterface::class)->parse($queryBuilder, $request);
     }
 }
