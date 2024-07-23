@@ -135,7 +135,9 @@ class LaraJSQueryParserServiceProvider extends ServiceProvider
                                 $relationModel->getQualifiedKeyName(),
                             )
                             ->orderBy("$relationTable.$column", $direction);
-                    } elseif ($relation instanceof BelongsToThrough) {
+                    }
+
+                    if ($relation instanceof BelongsToThrough) {
                         $queryTable = $this->getModel()->getTable();
                         $joins = array_reverse($relation->getQuery()->getQuery()->joins);
                         $queryTableRelated = $relation->getRelated()->getTable();
@@ -158,20 +160,20 @@ class LaraJSQueryParserServiceProvider extends ServiceProvider
                         }
 
                         return $query->orderBy("$queryTableRelated.$column", $direction);
-                    } else {
-                        $mainTable = $this->getModel()->getTable();
-                        $relationForeignKey = $relation->getForeignKeyName();
-                        $relationModel = $relation->getModel();
-                        $relationTable = $relationModel->getTable();
-
-                        return $this->select("$mainTable.*")
-                            ->leftJoin(
-                                $relationTable,
-                                "$mainTable.$relationForeignKey",
-                                $relationModel->getQualifiedKeyName(),
-                            )
-                            ->orderBy("$relationTable.$column", $direction);
                     }
+
+                    $mainTable = $this->getModel()->getTable();
+                    $relationForeignKey = $relation->getForeignKeyName();
+                    $relationModel = $relation->getModel();
+                    $relationTable = $relationModel->getTable();
+
+                    return $this->select("$mainTable.*")
+                        ->leftJoin(
+                            $relationTable,
+                            "$mainTable.$relationForeignKey",
+                            $relationModel->getQualifiedKeyName(),
+                        )
+                        ->orderBy("$relationTable.$column", $direction);
                 }
 
                 return $this->orderBy($searchColumn, $direction);
