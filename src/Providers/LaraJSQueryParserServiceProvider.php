@@ -42,16 +42,16 @@ class LaraJSQueryParserServiceProvider extends ServiceProvider
                 $app->make(DateParser::class),
             );
         });
-        $this->whereLike();
+        $this->whereLikeRelationship();
         $this->paginate();
         $this->orderByRelationship();
     }
 
-    private function whereLike(): void
+    private function whereLikeRelationship(): void
     {
         // whereLike
-        if (!Builder::hasGlobalMacro('whereLike')) {
-            Builder::macro('whereLike', function ($attributes, string $searchTerm) {
+        if (!Builder::hasGlobalMacro('whereLikeRelationship')) {
+            Builder::macro('whereLikeRelationship', function ($attributes, string $searchTerm) {
                 $this->where(function (Builder $query) use ($attributes, $searchTerm) {
                     foreach (Arr::wrap($attributes) as $attribute) {
                         $query->when(

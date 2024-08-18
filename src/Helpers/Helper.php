@@ -17,7 +17,7 @@ if (!function_exists('isBooleanString')) {
 if (!function_exists('isNumberString')) {
     function isNumberString($value): bool
     {
-        return is_string($value) && strlen(trim($value)) > 0 && is_numeric($value);
+        return is_string($value) && trim($value) !== '' && is_numeric($value);
     }
 }
 
