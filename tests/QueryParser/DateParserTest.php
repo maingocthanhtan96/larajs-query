@@ -3,7 +3,7 @@
 namespace Tests\QueryParser;
 
 use Carbon\Carbon;
-use LaraJS\QueryParser\QueryParser\DateParser;
+use LaraJS\Query\QueryParser\DateParser;
 use PHPUnit\Framework\TestCase;
 
 class DateParserTest extends TestCase
@@ -13,7 +13,7 @@ class DateParserTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->parser = new DateParser();
+        $this->parser = new DateParser;
     }
 
     public function testParser()

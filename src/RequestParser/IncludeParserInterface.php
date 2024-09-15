@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraJS\QueryParser\RequestParser;
+namespace LaraJS\Query\RequestParser;
 
 use Illuminate\Database\Eloquent\Builder;
 

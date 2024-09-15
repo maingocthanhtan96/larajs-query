@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraJS\QueryParser\Repositories;
+namespace LaraJS\Query\Repositories;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -14,9 +14,7 @@ class WriteRepository implements WriteRepositoryInterface
     /**
      * @param  Model  $model
      */
-    public function __construct(protected readonly Model $model)
-    {
-    }
+    public function __construct(protected readonly Model $model) {}
 
     /**
      * @param  array  $data
@@ -24,7 +22,7 @@ class WriteRepository implements WriteRepositoryInterface
      */
     public function create(array $data)
     {
-        $model = new $this->model();
+        $model = new $this->model;
         $model->fill($data)->save();
 
         return $model;

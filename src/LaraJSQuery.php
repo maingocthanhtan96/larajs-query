@@ -1,12 +1,12 @@
 <?php
 
-namespace LaraJS\QueryParser;
+namespace LaraJS\Query;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use LaraJS\QueryParser\QueryParser\QueryParserInterface;
+use LaraJS\Query\QueryParser\QueryParserInterface;
 
-trait LaraJSQueryParser
+trait LaraJSQuery
 {
     /**
      * @param  Builder  $queryBuilder

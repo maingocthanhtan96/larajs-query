@@ -1,12 +1,12 @@
 <?php
 
-namespace LaraJS\QueryParser\QueryParser;
+namespace LaraJS\Query\QueryParser;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use LaraJS\QueryParser\Enum\Method;
-use LaraJS\QueryParser\RequestParser\RequestParser;
+use LaraJS\Query\Enum\Method;
+use LaraJS\Query\RequestParser\RequestParser;
 
 class QueryParser implements QueryParserInterface
 {
@@ -18,8 +18,7 @@ class QueryParser implements QueryParserInterface
         private readonly FieldParser $fieldParser,
         private readonly SearchParser $searchParser,
         private readonly DateParser $dateParser,
-    ) {
-    }
+    ) {}
 
     /**
      * @param  Builder  $query

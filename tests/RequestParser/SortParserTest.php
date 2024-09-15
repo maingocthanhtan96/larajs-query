@@ -3,7 +3,7 @@
 namespace Tests\RequestParser;
 
 use Illuminate\Database\Eloquent\Builder;
-use LaraJS\QueryParser\RequestParser\SortParser;
+use LaraJS\Query\RequestParser\SortParser;
 use PHPUnit\Framework\TestCase;
 use Tests\ModelTest;
 
@@ -14,12 +14,12 @@ class SortParserTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->parser = new SortParser();
+        $this->parser = new SortParser;
     }
 
     public function testParser()
     {
-        $model = new ModelTest();
+        $model = new ModelTest;
         $query = \Mockery::mock(Builder::class);
         $query->shouldReceive('getModel')->andReturn($model);
         $queryString = '-updated_at,id,';
@@ -39,7 +39,7 @@ class SortParserTest extends TestCase
 
     public function testParserFilterable()
     {
-        $model = new ModelTest();
+        $model = new ModelTest;
         $query = \Mockery::mock(Builder::class);
         $query->shouldReceive('getModel')->andReturn($model);
         $queryString = 'id,-created_at,';

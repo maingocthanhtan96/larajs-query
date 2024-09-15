@@ -2,8 +2,8 @@
 
 namespace QueryParser;
 
-use LaraJS\QueryParser\Enum\Method;
-use LaraJS\QueryParser\QueryParser\SearchParser;
+use LaraJS\Query\Enum\Method;
+use LaraJS\Query\QueryParser\SearchParser;
 use PHPUnit\Framework\TestCase;
 
 class SearchParserTest extends TestCase
@@ -13,7 +13,7 @@ class SearchParserTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->parser = new SearchParser();
+        $this->parser = new SearchParser;
     }
 
     public function testParser()

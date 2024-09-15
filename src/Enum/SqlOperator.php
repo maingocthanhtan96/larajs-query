@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraJS\QueryParser\Enum;
+namespace LaraJS\Query\Enum;
 
 enum SqlOperator: string
 {

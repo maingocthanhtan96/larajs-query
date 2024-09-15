@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraJS\QueryParser\Providers;
+namespace LaraJS\Query\Providers;
 
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Contracts\Foundation\Application;
@@ -14,18 +14,18 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
-use LaraJS\QueryParser\QueryParser\DateParser;
-use LaraJS\QueryParser\QueryParser\FieldParser;
-use LaraJS\QueryParser\QueryParser\FilterParser;
-use LaraJS\QueryParser\QueryParser\IncludeParser;
-use LaraJS\QueryParser\QueryParser\QueryParser;
-use LaraJS\QueryParser\QueryParser\QueryParserInterface;
-use LaraJS\QueryParser\QueryParser\SearchParser;
-use LaraJS\QueryParser\QueryParser\SortParser;
-use LaraJS\QueryParser\RequestParser\RequestParser;
+use LaraJS\Query\QueryParser\DateParser;
+use LaraJS\Query\QueryParser\FieldParser;
+use LaraJS\Query\QueryParser\FilterParser;
+use LaraJS\Query\QueryParser\IncludeParser;
+use LaraJS\Query\QueryParser\QueryParser;
+use LaraJS\Query\QueryParser\QueryParserInterface;
+use LaraJS\Query\QueryParser\SearchParser;
+use LaraJS\Query\QueryParser\SortParser;
+use LaraJS\Query\RequestParser\RequestParser;
 use Znck\Eloquent\Relations\BelongsToThrough;
 
-class LaraJSQueryParserServiceProvider extends ServiceProvider
+class LaraJSQueryServiceProvider extends ServiceProvider
 {
     protected bool $defer = false;
 

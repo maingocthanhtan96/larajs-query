@@ -3,7 +3,7 @@
 namespace Tests\RequestParser;
 
 use Illuminate\Database\Eloquent\Builder;
-use LaraJS\QueryParser\RequestParser\FieldParser;
+use LaraJS\Query\RequestParser\FieldParser;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Tests\ModelTest;
@@ -17,8 +17,8 @@ class FieldParserTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->parser = new FieldParser();
-        $model = new ModelTest();
+        $this->parser = new FieldParser;
+        $model = new ModelTest;
         $this->query = Mockery::mock(Builder::class);
         $this->query->shouldReceive('getModel')->andReturn($model);
     }

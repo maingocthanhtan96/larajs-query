@@ -3,7 +3,7 @@
 namespace RequestParser;
 
 use Illuminate\Database\Eloquent\Builder;
-use LaraJS\QueryParser\RequestParser\IncludeParser;
+use LaraJS\Query\RequestParser\IncludeParser;
 use PHPUnit\Framework\TestCase;
 use Tests\ModelTest;
 
@@ -16,15 +16,15 @@ class IncludeParserTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->parser = new IncludeParser();
-        $model = new ModelTest();
+        $this->parser = new IncludeParser;
+        $model = new ModelTest;
         $this->query = \Mockery::mock(Builder::class);
         $this->query->shouldReceive('getModel')->andReturn($model);
     }
 
     public function testParser()
     {
-        $model = new ModelTest();
+        $model = new ModelTest;
         $query = \Mockery::mock(Builder::class);
         $query->shouldReceive('getModel')->andReturn($model);
 

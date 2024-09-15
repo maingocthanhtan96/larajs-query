@@ -3,7 +3,7 @@
 namespace RequestParser;
 
 use Illuminate\Database\Eloquent\Builder;
-use LaraJS\QueryParser\RequestParser\DateParser;
+use LaraJS\Query\RequestParser\DateParser;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Tests\ModelTest;
@@ -17,8 +17,8 @@ class DateParserTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->parser = new DateParser();
-        $model = new ModelTest();
+        $this->parser = new DateParser;
+        $model = new ModelTest;
         $this->query = Mockery::mock(Builder::class);
         $this->query->shouldReceive('getModel')->andReturn($model);
     }

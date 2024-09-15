@@ -1,9 +1,9 @@
 {
-    "name": "larajs/query-parser",
+    "name": "larajs/query",
     "version": "1.0.0",
     "autoload": {
         "psr-4": {
-            "LaraJS\\QueryParser\\": "src/"
+            "LaraJS\\Query\\": "src/"
         },
         "files": [
             "src/Helpers/Helper.php"
@@ -39,7 +39,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "LaraJS\\QueryParser\\Providers\\LaraJSQueryParserServiceProvider"
+                "LaraJS\\Query\\Providers\\LaraJSQueryServiceProvider"
             ]
         }
     }

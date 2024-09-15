@@ -3,7 +3,7 @@
 namespace Tests\QueryParser;
 
 use Exception;
-use LaraJS\QueryParser\QueryParser\FilterParser;
+use LaraJS\Query\QueryParser\FilterParser;
 use PHPUnit\Framework\TestCase;
 
 class FilterParserTest extends TestCase
@@ -13,7 +13,7 @@ class FilterParserTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->parser = new FilterParser();
+        $this->parser = new FilterParser;
     }
 
     /**

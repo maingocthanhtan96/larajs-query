@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraJS\QueryParser\RequestParser;
+namespace LaraJS\Query\RequestParser;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -26,8 +26,7 @@ class RequestParser implements RequestParserInterface
         private readonly FieldParser $fieldParser,
         private readonly SearchParser $searchParser,
         private readonly DateParser $dateParser,
-    ) {
-    }
+    ) {}
 
     /**
      * @param  Builder  $query

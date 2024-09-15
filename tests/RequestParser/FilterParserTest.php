@@ -3,7 +3,7 @@
 namespace Tests\RequestParser;
 
 use Illuminate\Database\Eloquent\Builder;
-use LaraJS\QueryParser\RequestParser\FilterParser;
+use LaraJS\Query\RequestParser\FilterParser;
 use PHPUnit\Framework\TestCase;
 use Tests\ModelTest;
 
@@ -16,8 +16,8 @@ class FilterParserTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->parser = new FilterParser();
-        $model = new ModelTest();
+        $this->parser = new FilterParser;
+        $model = new ModelTest;
         $this->query = \Mockery::mock(Builder::class);
         $this->query->shouldReceive('getModel')->andReturn($model);
     }

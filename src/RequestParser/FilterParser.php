@@ -1,12 +1,12 @@
 <?php
 
-namespace LaraJS\QueryParser\RequestParser;
+namespace LaraJS\Query\RequestParser;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
-use LaraJS\QueryParser\Enum\IbmOperator;
-use LaraJS\QueryParser\Enum\IbmValueType;
-use LaraJS\QueryParser\Enum\SqlOperator;
+use LaraJS\Query\Enum\IbmOperator;
+use LaraJS\Query\Enum\IbmValueType;
+use LaraJS\Query\Enum\SqlOperator;
 
 class FilterParser implements FilterParserInterface
 {

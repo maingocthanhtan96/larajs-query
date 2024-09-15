@@ -1,10 +1,10 @@
 <?php
 
-namespace LaraJS\QueryParser\QueryParser;
+namespace LaraJS\Query\QueryParser;
 
 use Illuminate\Support\Arr;
-use LaraJS\QueryParser\Enum\Method;
-use LaraJS\QueryParser\Enum\Operator;
+use LaraJS\Query\Enum\Method;
+use LaraJS\Query\Enum\Operator;
 
 class FilterParser implements FilterParserInterface
 {

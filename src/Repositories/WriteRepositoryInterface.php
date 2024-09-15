@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraJS\QueryParser\Repositories;
+namespace LaraJS\Query\Repositories;
 
 /**
  * @template T

@@ -3,7 +3,7 @@
 namespace RequestParser;
 
 use Illuminate\Database\Eloquent\Builder;
-use LaraJS\QueryParser\RequestParser\SearchParser;
+use LaraJS\Query\RequestParser\SearchParser;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Tests\ModelTest;
@@ -17,8 +17,8 @@ class SearchParserTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->parser = new SearchParser();
-        $model = new ModelTest();
+        $this->parser = new SearchParser;
+        $model = new ModelTest;
         $this->query = Mockery::mock(Builder::class);
         $this->query->shouldReceive('getModel')->andReturn($model);
     }

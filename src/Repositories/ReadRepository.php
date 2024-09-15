@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraJS\QueryParser\Repositories;
+namespace LaraJS\Query\Repositories;
 
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use LaraJS\QueryParser\LaraJSQueryParser;
+use LaraJS\Query\LaraJSQuery;
 
 /**
  * @template T
@@ -19,16 +19,14 @@ use LaraJS\QueryParser\LaraJSQueryParser;
  */
 class ReadRepository implements ReadRepositoryInterface
 {
-    use LaraJSQueryParser;
+    use LaraJSQuery;
 
     /**
      * @param  Model  $model
      * @param  int  $limit
      * @param  int  $maxLimit
      */
-    public function __construct(protected readonly Model $model, protected readonly int $limit, protected readonly int $maxLimit)
-    {
-    }
+    public function __construct(protected readonly Model $model, protected readonly int $limit, protected readonly int $maxLimit) {}
 
     /**
      * @param  Request  $request

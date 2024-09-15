@@ -2,7 +2,7 @@
 
 namespace Tests\QueryParser;
 
-use LaraJS\QueryParser\QueryParser\FieldParser;
+use LaraJS\Query\QueryParser\FieldParser;
 use PHPUnit\Framework\TestCase;
 
 class FieldParserTest extends TestCase
@@ -12,7 +12,7 @@ class FieldParserTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->parser = new FieldParser();
+        $this->parser = new FieldParser;
     }
 
     public function testParser()
