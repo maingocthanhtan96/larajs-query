@@ -34,7 +34,7 @@ class ReadRepository implements ReadRepositoryInterface
      */
     public function findAll(Request $request): LengthAwarePaginator|CursorPaginator|Paginator|Collection
     {
-        $queryBuilder = $this->applyQueryBuilder($this->query(), $request);
+        $queryBuilder = $this->applyLaraJSQuery($this->query(), $request);
         if ($request->input('pagination.page') === '-1') {
             $limit = min($this->maxLimit, $request->input('pagination.limit'));
 
@@ -56,7 +56,7 @@ class ReadRepository implements ReadRepositoryInterface
      */
     public function find(int $id, ?Request $request = null)
     {
-        return $this->applyQueryBuilder($this->query(), $request)->find($id);
+        return $this->applyLaraJSQuery($this->query(), $request)->find($id);
     }
 
     /**
@@ -68,7 +68,7 @@ class ReadRepository implements ReadRepositoryInterface
      */
     public function findOrFail(int $id, ?Request $request = null)
     {
-        return $this->applyQueryBuilder($this->query(), $request)->findOrFail($id);
+        return $this->applyLaraJSQuery($this->query(), $request)->findOrFail($id);
     }
 
     /**

@@ -313,7 +313,7 @@ class FilterParserTest extends TestCase
 
     public function testConditionLogicalANDFilterable()
     {
-        $queryString = "and(has(orders,'1'),has(bills,'1'))";
+        $queryString = "and(has(orders,'1'),has(bills,'1'))"; // bills not in filter in model
         $expect = [
             'AND' => [
                 [

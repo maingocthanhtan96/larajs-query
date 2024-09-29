@@ -22,8 +22,8 @@ class IncludeParserTest extends TestCase
         $model = new ModelTest;
         $query = \Mockery::mock(Builder::class);
         $query->shouldReceive('getModel')->andReturn($model);
-
-        $queryString = ['roles', 'roles|count', 'roles|exists', 'roles.total|sum', 'roles.total|min', 'roles.total|max', 'roles.total|avg'];
+        // ['roles', 'roles|count', 'roles|exists', 'roles.total|sum', 'roles.total|min', 'roles.total|max', 'roles.total|avg', 'roles.permissions', 'roles.permissions|count']
+        $queryString = ['roles.permissions|count'];
         $expect = [
             [
                 'fx' => 'with',
@@ -59,6 +59,16 @@ class IncludeParserTest extends TestCase
                 'fx' => 'withAggregate',
                 'isNested' => false,
                 'parameters' => ['roles', 'total', 'avg'],
+            ],
+            [
+                'fx' => 'with',
+                'isNested' => false,
+                'parameters' => ['roles.permissions'],
+            ],
+            [
+                'fx' => 'with',
+                'isNested' => false,
+                'parameters' => ['roles.permissions', '*', 'count'],
             ],
         ];
 

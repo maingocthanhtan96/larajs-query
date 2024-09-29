@@ -98,7 +98,7 @@ class FilterParser implements FilterParserInterface
                     break;
 
                 case IbmOperator::EQUALS->value:
-                    if (isNullString($stack[count($stack) - 2])) {
+                    if ($this->isNullString($stack[count($stack) - 2])) {
                         $attributeRef = $this->coerceValue(array_pop($stack), $token);
                         array_pop($stack); // Null - not included in output
                         if ($this->checkAllowFilter($attributeRef, $filterable)) {
@@ -151,26 +151,28 @@ class FilterParser implements FilterParserInterface
 
     public function coerceValue($value, $parentOperator = null): bool|int|string|float|null
     {
-        if (isNullString($value)) {
+        if ($this->isNullString($value)) {
             return null;
-        } elseif (str_starts_with($value, "'") && str_ends_with($value, "'")) {
+        }
+
+        if (str_starts_with($value, "'") && str_ends_with($value, "'")) {
             // constant value
             $value = substr($value, 1, -1);
-            if (isBooleanString($value)) {
+            if ($this->isBooleanString($value)) {
                 return strtolower($value) === 'true';
             }
-            if (isNumberString($value)) {
+            if ($this->isNumberString($value)) {
                 return str_contains($value, '.') ? (float) $value : (int) $value;
             }
-            if (isDateString($value)) {
+            if ($this->isDateString($value)) {
                 return $value;
             }
 
-            return wildCardString($value, $parentOperator); // string
-        } else {
-            // attribute reference
-            return "#$value";
+            return $this->wildCardString($value, $parentOperator); // string
         }
+
+        // attribute reference
+        return "#$value";
     }
 
     public function tokenizeExpression(string $expression): array
@@ -241,11 +243,46 @@ class FilterParser implements FilterParserInterface
 
     private function checkAllowFilter($field, $filterable): bool
     {
-        $field = removeHashFromString($field);
+        $field = $this->removeHashFromString($field);
         if (!$filterable) {
             return true;
         }
 
         return in_array($field, $filterable, true);
+    }
+
+    private function wildCardString($value, $operator = null): string
+    {
+        return match ($operator) {
+            'contains', 'containsRelation' => '%' . $value . '%',
+            'startsWith', 'startsWithRelation' => $value . '%',
+            'endsWith', 'endsWithRelation' => '%' . $value,
+            default => $value,
+        };
+    }
+
+    private function isDateString($value): bool
+    {
+        return preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) === 1;
+    }
+
+    private function isNumberString($value): bool
+    {
+        return is_string($value) && trim($value) !== '' && is_numeric($value);
+    }
+
+    private function isBooleanString($value): bool
+    {
+        return in_array($value, ['true', 'false']);
+    }
+
+    private function isNullString($value): bool
+    {
+        return $value === 'null';
+    }
+
+    private function removeHashFromString($str): string
+    {
+        return str_replace('#', '', $str);
     }
 }

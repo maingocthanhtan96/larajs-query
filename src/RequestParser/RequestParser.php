@@ -38,7 +38,7 @@ class RequestParser implements RequestParserInterface
         $option = $this->parseOption($request);
         $this->setInclude($this->includeParser->parse($query, $option['include']))
             ->setFilter($this->filterParser->parse($query, $option['filter']))
-            ->setSort($this->sortParser->parse($query, $option['orderBy']))
+            ->setSort($this->sortParser->parse($query, $option['sort']))
             ->setSearch($this->searchParser->parse($query, $option['search']))
             ->setDate($this->dateParser->parse($query, $option['date']))
             ->setSelect($this->fieldParser->parse($query, $option['select']));
@@ -53,7 +53,7 @@ class RequestParser implements RequestParserInterface
         $parseOptions['date'] = $request->query('date', []);
         $parseOptions['filter'] = $request->query('filter', []);
         $parseOptions['select'] = $request->query('select', '');
-        $parseOptions['orderBy'] = $request->query('orderBy', '');
+        $parseOptions['sort'] = $request->query('sort', '');
 
         return $parseOptions;
     }

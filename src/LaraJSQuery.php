@@ -13,7 +13,7 @@ trait LaraJSQuery
      * @param  ?Request  $request
      * @return Builder
      */
-    public function applyQueryBuilder(Builder $queryBuilder, ?Request $request = null): Builder
+    public function applyLaraJSQuery(Builder $queryBuilder, ?Request $request = null): Builder
     {
         return app(QueryParserInterface::class)->parse($queryBuilder, $request ?? request());
     }

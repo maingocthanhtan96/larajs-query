@@ -123,7 +123,7 @@ class LaraJSQueryServiceProvider extends ServiceProvider
                         $relationModel = $relation->getModel();
                         $relationTable = $relationModel->getTable();
 
-                        return $this->select("$mainTable.*")
+                        return $this
                             ->leftJoin(
                                 $tableThrough,
                                 "$tableThrough.$relationForeignKey",
@@ -141,7 +141,6 @@ class LaraJSQueryServiceProvider extends ServiceProvider
                         $queryTable = $this->getModel()->getTable();
                         $joins = array_reverse($relation->getQuery()->getQuery()->joins);
                         $queryTableRelated = $relation->getRelated()->getTable();
-                        $query = $this->select("$queryTable.*");
                         foreach ($joins as $i => $join) {
                             $where = $join->wheres[0];
                             if ($i === 0) {
@@ -150,16 +149,16 @@ class LaraJSQueryServiceProvider extends ServiceProvider
                                     $relation->getThroughParents(),
                                     fn(Model $model) => $model->getTable() === $join->table,
                                 );
-                                $query->leftJoin(
+                                $this->leftJoin(
                                     $join->table,
                                     $modelParent->qualifyColumn($relation->getForeignKeyName($modelFirst)),
                                     $modelFirst->getQualifiedKeyName(),
                                 );
                             }
-                            $query->leftJoin(explode('.', $where['second'])[0], $where['first'], '=', $where['second']);
+                            $this->leftJoin(explode('.', $where['second'])[0], $where['first'], '=', $where['second']);
                         }
 
-                        return $query->orderBy("$queryTableRelated.$column", $direction);
+                        return $this->orderBy("$queryTableRelated.$column", $direction);
                     }
 
                     $mainTable = $this->getModel()->getTable();
@@ -167,7 +166,7 @@ class LaraJSQueryServiceProvider extends ServiceProvider
                     $relationModel = $relation->getModel();
                     $relationTable = $relationModel->getTable();
 
-                    return $this->select("$mainTable.*")
+                    return $this
                         ->leftJoin(
                             $relationTable,
                             "$mainTable.$relationForeignKey",

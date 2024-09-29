@@ -17,7 +17,7 @@ class FilterParser implements FilterParserInterface
                 ? $this->sortNestedFilters($filter, $operator === Operator::OR->value)
                 : $this->parseParametersForObjection($operator, $filter, $isOr);
             $parsedArray[] = [
-                'fx' => $isOr ? convertToOrFormat($this->getMethod($operator)) : $this->getMethod($operator),
+                'fx' => $isOr ? $this->convertToOrFormat($this->getMethod($operator)) : $this->getMethod($operator),
                 'isNested' => $isNested,
                 'parameters' => $parameters,
             ];
@@ -43,11 +43,11 @@ class FilterParser implements FilterParserInterface
         $isSpecialOperator = in_array(strtolower($operator), array_map('strtolower', $specialOperators), true);
         $operator = $operatorMap[$operator] ?? $operator;
         if (is_array($value)) {
-            $sequelizeKey = removeHashFromString($value[0]);
+            $sequelizeKey = $this->removeHashFromString($value[0]);
             if ($isSpecialOperator) {
                 // HANDLE IN AND NOT IN
                 if ($operator === Operator::RELATION->value) {
-                    $sequelizeKeyField = removeHashFromString($value[1]);
+                    $sequelizeKeyField = $this->removeHashFromString($value[1]);
                     $parameters = [$sequelizeKey, $sequelizeKeyField, ...array_slice($value, 2)];
                 } else {
                     $parameters = [$sequelizeKey, array_slice($value, 1)];
@@ -58,7 +58,7 @@ class FilterParser implements FilterParserInterface
             }
         } else {
             // HANDLE NULL AND NOT NULL
-            $sequelizeKey = removeHashFromString($value);
+            $sequelizeKey = $this->removeHashFromString($value);
             $parameters = [$sequelizeKey];
         }
 
@@ -94,5 +94,17 @@ class FilterParser implements FilterParserInterface
                 => Method::fromName($key)->value,
             default => Method::DEFAULT->value,
         };
+    }
+
+    private function convertToOrFormat($str): string
+    {
+        $capStr = ucfirst($str);
+
+        return "or$capStr";
+    }
+
+    private function removeHashFromString($str): string
+    {
+        return str_replace('#', '', $str);
     }
 }
