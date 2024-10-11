@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Builder;
 use LaraJS\Query\RequestParser\DateParser;
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use Tests\ModelTest;
 
 class DateParserTest extends TestCase
 {
@@ -18,9 +17,6 @@ class DateParserTest extends TestCase
     {
         parent::setUp();
         $this->parser = new DateParser;
-        $model = new ModelTest;
-        $this->query = Mockery::mock(Builder::class);
-        $this->query->shouldReceive('getModel')->andReturn($model);
     }
 
     public function testParser()
@@ -34,7 +30,7 @@ class DateParserTest extends TestCase
             'value' => ['2024-01-01', '2024-12-01'],
         ];
 
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, []));
     }
 
     public function testParserFilterable()
@@ -45,6 +41,6 @@ class DateParserTest extends TestCase
         ];
         $expect = [];
 
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, ['updated_at']));
     }
 }

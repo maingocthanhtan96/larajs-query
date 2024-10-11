@@ -4,7 +4,7 @@ namespace LaraJS\Query\QueryParser;
 
 use LaraJS\Query\Enum\Method;
 
-class SearchParser implements SearchParserInterface
+class SearchParser
 {
     public function parse(array $queryString): array
     {

@@ -2,7 +2,7 @@
 
 namespace LaraJS\Query\QueryParser;
 
-class FieldParser implements FieldParserInterface
+class FieldParser
 {
     public function parse(array $fields): array
     {

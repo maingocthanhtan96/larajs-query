@@ -5,7 +5,6 @@ namespace Tests\RequestParser;
 use Illuminate\Database\Eloquent\Builder;
 use LaraJS\Query\RequestParser\FilterParser;
 use PHPUnit\Framework\TestCase;
-use Tests\ModelTest;
 
 class FilterParserTest extends TestCase
 {
@@ -17,9 +16,6 @@ class FilterParserTest extends TestCase
     {
         parent::setUp();
         $this->parser = new FilterParser;
-        $model = new ModelTest;
-        $this->query = \Mockery::mock(Builder::class);
-        $this->query->shouldReceive('getModel')->andReturn($model);
     }
 
     public function testEqualsParser()
@@ -31,7 +27,7 @@ class FilterParserTest extends TestCase
                 'Smith',
             ],
         ];
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, []));
     }
 
     public function testEqualsRelationParser()
@@ -45,7 +41,7 @@ class FilterParserTest extends TestCase
                 'Smith',
             ],
         ];
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, []));
     }
 
     public function testLessThanParser()
@@ -57,7 +53,7 @@ class FilterParserTest extends TestCase
                 25,
             ],
         ];
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, []));
     }
 
     public function testLessThanRelationParser()
@@ -71,7 +67,7 @@ class FilterParserTest extends TestCase
                 25,
             ],
         ];
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, []));
     }
 
     public function testLessOrEqualParser()
@@ -83,7 +79,7 @@ class FilterParserTest extends TestCase
                 '2001-01-01',
             ],
         ];
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, []));
     }
 
     public function testLessOrEqualRelationParser()
@@ -97,7 +93,7 @@ class FilterParserTest extends TestCase
                 '2001-01-01',
             ],
         ];
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, []));
     }
 
     public function testGreaterThanParser()
@@ -109,7 +105,7 @@ class FilterParserTest extends TestCase
                 '6:12:14',
             ],
         ];
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, []));
     }
 
     public function testGreaterThanRelationRelationParser()
@@ -123,7 +119,7 @@ class FilterParserTest extends TestCase
                 '6:12:14',
             ],
         ];
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, []));
     }
 
     public function testGreaterOrEqualParser()
@@ -135,7 +131,7 @@ class FilterParserTest extends TestCase
                 33.33,
             ],
         ];
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, []));
     }
 
     public function testGreaterOrEqualRelationRelationParser()
@@ -149,7 +145,7 @@ class FilterParserTest extends TestCase
                 33.33,
             ],
         ];
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, []));
     }
 
     public function testContainsParser()
@@ -161,7 +157,7 @@ class FilterParserTest extends TestCase
                 '%cooking%',
             ],
         ];
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, []));
     }
 
     public function testContainsRelationParser()
@@ -175,7 +171,7 @@ class FilterParserTest extends TestCase
                 '%cooking%',
             ],
         ];
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, []));
     }
 
     public function testStartsWithParser()
@@ -187,7 +183,7 @@ class FilterParserTest extends TestCase
                 'The%',
             ],
         ];
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, []));
     }
 
     public function testStartsWithRelationParser()
@@ -201,7 +197,7 @@ class FilterParserTest extends TestCase
                 'The%',
             ],
         ];
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, []));
     }
 
     public function testEndsWithParser()
@@ -213,7 +209,7 @@ class FilterParserTest extends TestCase
                 '%End',
             ],
         ];
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, []));
     }
 
     public function testEndsWithRelationParser()
@@ -227,7 +223,7 @@ class FilterParserTest extends TestCase
                 '%End',
             ],
         ];
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, []));
     }
 
     public function testAnyParser()
@@ -241,7 +237,7 @@ class FilterParserTest extends TestCase
                 'Conclusion',
             ],
         ];
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, []));
     }
 
     public function testNotParser()
@@ -251,7 +247,7 @@ class FilterParserTest extends TestCase
         $expect = [
             'NOT' => ['IS_NULL' => '#lastName'],
         ];
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, []));
     }
 
     public function testHasParser()
@@ -264,7 +260,7 @@ class FilterParserTest extends TestCase
                 2,
             ],
         ];
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, []));
     }
 
     public function testConditionLogicalOR()
@@ -286,7 +282,7 @@ class FilterParserTest extends TestCase
                 ],
             ],
         ];
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, []));
     }
 
     public function testConditionLogicalAND()
@@ -308,7 +304,7 @@ class FilterParserTest extends TestCase
                 ],
             ],
         ];
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, []));
     }
 
     public function testConditionLogicalANDFilterable()
@@ -324,6 +320,77 @@ class FilterParserTest extends TestCase
                 ],
             ],
         ];
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, ['orders']));
+    }
+
+    public function testFieldsFilterable()
+    {
+        $queryString = "and(equals(name,'Smith'),greaterThan(age,'25'),lessOrEqual(lastModified,'2001-01-01'),contains(description,'cooking'),contains(content,'cooking'))";
+        $expect = [
+            'AND' => [
+                [
+                    'LIKE' => [
+                        '#description',
+                        '%cooking%',
+                    ],
+                ],
+                [
+                    '<=' => [
+                        '#lastModified',
+                        '2001-01-01',
+                    ],
+                ],
+                [
+                    '>' => [
+                        '#age',
+                        25,
+                    ],
+                ],
+                [
+                    '=' => [
+                        '#name',
+                        'Smith',
+                    ],
+                ],
+            ],
+        ];
+        $this->assertSame($expect, $this->parser->parse($queryString, ['name', 'age', 'lastModified', 'description']));
+    }
+
+    public function testFieldsWithRelationFilterable()
+    {
+        $queryString = "and(equals(name,'Smith'),greaterThan(age,'25'),lessOrEqual(lastModified,'2001-01-01'),containsRelation(articles,description,'cooking'))";
+        $expect = [
+            'AND' => [
+                [
+                    'RELATION' => [
+                        '#articles',
+                        '#description',
+                        'LIKE',
+                        '%cooking%',
+                    ],
+                ],
+                [
+                    '<=' => [
+                        '#lastModified',
+                        '2001-01-01',
+                    ],
+                ],
+                [
+                    '>' => [
+                        '#age',
+                        25,
+                    ],
+                ],
+
+                [
+                    '=' => [
+                        '#name',
+                        'Smith',
+                    ],
+                ],
+            ],
+        ];
+        $this->assertSame($expect, $this->parser->parse($queryString, ['name', 'age', 'lastModified', 'description', 'articles']));
     }
 }

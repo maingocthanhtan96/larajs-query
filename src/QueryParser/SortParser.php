@@ -2,7 +2,7 @@
 
 namespace LaraJS\Query\QueryParser;
 
-class SortParser implements SortParserInterface
+class SortParser
 {
     public function parse(array $sorts): array
     {

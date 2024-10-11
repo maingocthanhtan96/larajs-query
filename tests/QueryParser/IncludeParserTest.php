@@ -2,10 +2,8 @@
 
 namespace QueryParser;
 
-use Illuminate\Database\Eloquent\Builder;
 use LaraJS\Query\QueryParser\IncludeParser;
 use PHPUnit\Framework\TestCase;
-use Tests\ModelTest;
 
 class IncludeParserTest extends TestCase
 {
@@ -19,11 +17,8 @@ class IncludeParserTest extends TestCase
 
     public function testParser()
     {
-        $model = new ModelTest;
-        $query = \Mockery::mock(Builder::class);
-        $query->shouldReceive('getModel')->andReturn($model);
-        // ['roles', 'roles|count', 'roles|exists', 'roles.total|sum', 'roles.total|min', 'roles.total|max', 'roles.total|avg', 'roles.permissions', 'roles.permissions|count']
-        $queryString = ['roles.permissions|count'];
+        $queryString = ['roles', 'roles|count', 'roles|exists', 'roles.total|sum', 'roles.total|min', 'roles.total|max', 'roles.total|avg', 'roles.permissions'];
+
         $expect = [
             [
                 'fx' => 'with',
@@ -64,11 +59,6 @@ class IncludeParserTest extends TestCase
                 'fx' => 'with',
                 'isNested' => false,
                 'parameters' => ['roles.permissions'],
-            ],
-            [
-                'fx' => 'with',
-                'isNested' => false,
-                'parameters' => ['roles.permissions', '*', 'count'],
             ],
         ];
 

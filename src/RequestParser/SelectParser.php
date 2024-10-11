@@ -2,24 +2,22 @@
 
 namespace LaraJS\Query\RequestParser;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 
-class FieldParser implements FieldParserInterface
+class SelectParser
 {
     /**
-     * @param  Builder  $query
+     * Field parser
+     *
      * @param  string  $queryString
+     * @param  array<string>  $filterable
      * @return array
      */
-    public function parse(Builder $query, string $queryString): array
+    public function parse(string $queryString, array $filterable): array
     {
         if (!$queryString) {
             return [];
         }
-        $filterable = method_exists($query->getModel(), 'allowQueryParsers')
-            ? $query->getModel()->allowQueryParsers()['field']
-            : [];
 
         return Str::of($queryString)
             ->trim(',')

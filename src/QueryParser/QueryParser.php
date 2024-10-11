@@ -3,7 +3,6 @@
 namespace LaraJS\Query\QueryParser;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use LaraJS\Query\Enum\Method;
 use LaraJS\Query\RequestParser\RequestParser;
@@ -22,52 +21,54 @@ class QueryParser implements QueryParserInterface
 
     /**
      * @param  Builder  $query
-     * @param  Request  $request
+     * @param  array{select:  array<string>, include: array<string>, sort: array<string>, filter: array<string>, search: array<string>, date: array<string>}  $options
+     * @param  array{select:  array<string>, include: array<string>, sort: array<string>, filter: array<string>, search: array<string>, date: array<string>}  $allows
      * @return Builder
      */
-    public function parse(Builder $query, Request $request): Builder
+    public function parse(Builder $query, array $options, array $allows): Builder
     {
-        $requestParser = $this->requestParser->parse($query, $request);
-        $field = $this->fieldParser->parse($requestParser->getSelect());
-        $search = $this->searchParser->parse($requestParser->getSearch());
-        $date = $this->dateParser->parse($requestParser->getDate());
-        $include = $this->aggregateParser->parse($requestParser->getInclude());
-        $filter = $this->filterParser->parse($requestParser->getFilter());
-        $sort = $this->sortParser->parse($requestParser->getSort());
-        $data = [...$field, ...$include, ...$filter, ...$search, ...$date, ...$sort];
+        $requestParser = $this->requestParser->parse($options, $allows);
 
-        return $this->handleQuery($query, $data);
+        $queries = array_merge(
+            $this->fieldParser->parse($requestParser->getSelect()),
+            $this->aggregateParser->parse($requestParser->getInclude()),
+            $this->filterParser->parse($requestParser->getFilter()),
+            $this->searchParser->parse($requestParser->getSearch()),
+            $this->dateParser->parse($requestParser->getDate()),
+            $this->sortParser->parse($requestParser->getSort())
+        );
+
+        return $this->handleQuery($query, $queries);
     }
 
-    private function handleQuery(Builder $query, array $data): Builder
+    private function handleQuery(Builder $builder, array $queries): Builder
     {
-        foreach ($data as $d) {
-            $fx = $d['fx'];
-            $parameters = $d['parameters'];
+        foreach ($queries as $query) {
+            $fx = $query['fx'];
+            $parameters = $query['parameters'];
 
-            if ($d['isNested']) {
-                $parameters = Arr::isAssoc($parameters[1]) ? [$parameters[1]] : $parameters[1];
-                $query->{$fx}(
-                    $parameters[0],
-                    fn(Builder $q) => $this->handleQuery($q, $parameters)
-                );
+            if ($query['isNested']) {
+                $parameters = $this->getNestedParameters($parameters);
+                $builder->{$fx}($parameters[0], fn(Builder $q) => $this->handleQuery($q, $parameters));
             } else {
-                $query->when($parameters, fn(Builder $q) => $this->applyFunction($q, $fx, $parameters));
+                $builder->when($parameters, fn(Builder $q) => $this->applyFunction($q, $fx, $parameters));
             }
         }
 
-        return $query;
+        return $builder;
     }
 
     private function applyFunction(Builder $query, string $fx, array $parameters): void
     {
-        if ($fx === Method::SPECIAL_LIKE->value) {
-            $query->when(
-                $parameters[0] && $parameters[1],
-                fn(Builder $q) => $q->{$fx}(...$parameters)
-            );
-        } else {
-            $query->{$fx}(...$parameters);
-        }
+        $query->when(
+            $fx === Method::SPECIAL_LIKE->value && $parameters[0] && $parameters[1],
+            fn(Builder $q) => $q->{$fx}(...$parameters),
+            fn(Builder $q) => $q->{$fx}(...$parameters)
+        );
+    }
+
+    private function getNestedParameters(array $parameters): array
+    {
+        return Arr::isAssoc($parameters[1]) ? [$parameters[1]] : $parameters[1];
     }
 }

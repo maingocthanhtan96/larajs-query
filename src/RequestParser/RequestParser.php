@@ -2,10 +2,7 @@
 
 namespace LaraJS\Query\RequestParser;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
-
-class RequestParser implements RequestParserInterface
+class RequestParser
 {
     protected string|array $filter;
 
@@ -23,39 +20,26 @@ class RequestParser implements RequestParserInterface
         private readonly FilterParser $filterParser,
         private readonly SortParser $sortParser,
         private readonly IncludeParser $includeParser,
-        private readonly FieldParser $fieldParser,
+        private readonly SelectParser $fieldParser,
         private readonly SearchParser $searchParser,
         private readonly DateParser $dateParser,
     ) {}
 
     /**
-     * @param  Builder  $query
-     * @param  Request  $request
+     * @param  array{select:  array<string>, include: array<string>, sort: array<string>, filter: array<string>, search: array<string>, date: array<string>}  $options
+     * @param  array{select:  array<string>, include: array<string>, sort: array<string>, filter: array<string>, search: array<string>, date: array<string>}  $allows
      * @return $this
      */
-    public function parse(Builder $query, Request $request): RequestParser
+    public function parse(array $options, array $allows): RequestParser
     {
-        $option = $this->parseOption($request);
-        $this->setInclude($this->includeParser->parse($query, $option['include']))
-            ->setFilter($this->filterParser->parse($query, $option['filter']))
-            ->setSort($this->sortParser->parse($query, $option['sort']))
-            ->setSearch($this->searchParser->parse($query, $option['search']))
-            ->setDate($this->dateParser->parse($query, $option['date']))
-            ->setSelect($this->fieldParser->parse($query, $option['select']));
+        $this->setInclude($this->includeParser->parse($options['include'] ?? [], $allows['include'] ?? []))
+            ->setFilter($this->filterParser->parse($options['filter'] ?? [], $allows['filter'] ?? []))
+            ->setSearch($this->searchParser->parse($options['search'] ?? [], $allows['search'] ?? []))
+            ->setDate($this->dateParser->parse($options['date'] ?? [], $allows['date'] ?? []))
+            ->setSort($this->sortParser->parse($options['sort'] ?? '', $allows['sort'] ?? []))
+            ->setSelect($this->fieldParser->parse($options['select'] ?? '', $allows['select'] ?? []));
 
         return $this;
-    }
-
-    public function parseOption(Request $request): array
-    {
-        $parseOptions['include'] = $request->query('include', []);
-        $parseOptions['search'] = $request->query('search', []);
-        $parseOptions['date'] = $request->query('date', []);
-        $parseOptions['filter'] = $request->query('filter', []);
-        $parseOptions['select'] = $request->query('select', '');
-        $parseOptions['sort'] = $request->query('sort', '');
-
-        return $parseOptions;
     }
 
     /**
