@@ -5,7 +5,6 @@ namespace RequestParser;
 use Illuminate\Database\Eloquent\Builder;
 use LaraJS\Query\RequestParser\IncludeParser;
 use PHPUnit\Framework\TestCase;
-use Tests\ModelTest;
 
 class IncludeParserTest extends TestCase
 {
@@ -17,21 +16,14 @@ class IncludeParserTest extends TestCase
     {
         parent::setUp();
         $this->parser = new IncludeParser;
-        $model = new ModelTest;
-        $this->query = \Mockery::mock(Builder::class);
-        $this->query->shouldReceive('getModel')->andReturn($model);
     }
 
     public function testParser()
     {
-        $model = new ModelTest;
-        $query = \Mockery::mock(Builder::class);
-        $query->shouldReceive('getModel')->andReturn($model);
-
         $queryString = ['roles', 'roles|count', 'roles|exists', 'roles.total|sum', 'roles.total|min', 'roles.total|max', 'roles.total|avg'];
         $expect = ['roles', 'roles|count', 'roles|exists', 'roles.total|sum', 'roles.total|min', 'roles.total|max', 'roles.total|avg'];
 
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, []));
     }
 
     public function testParserFilterable()
@@ -39,6 +31,6 @@ class IncludeParserTest extends TestCase
         $queryString = ['permissions|count', 'roles', 'roles|count', 'roles.permissions|count'];
         $expect = ['roles', 'roles|count', 'roles.permissions|count'];
 
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, ['roles']));
     }
 }

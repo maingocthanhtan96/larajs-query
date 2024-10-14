@@ -2,19 +2,21 @@
 
 namespace LaraJS\Query\RequestParser;
 
-use Illuminate\Database\Eloquent\Builder;
-
-class IncludeParser implements IncludeParserInterface
+class IncludeParser
 {
-    public function parse(Builder $query, array $queryString): array
+    /**
+     * Summary of parse
+     *
+     * @param  array  $queryString
+     * @param  array<string>  $filterable
+     * @return array
+     */
+    public function parse(array $queryString, array $filterable): array
     {
         $parsedArray = [];
         if (!$queryString) {
             return $parsedArray;
         }
-        $filterable = method_exists($query->getModel(), 'allowQueryParsers')
-            ? $query->getModel()->allowQueryParsers()['include']
-            : [];
 
         foreach ($queryString as $aggregate) {
             $field = explode('.', explode('|', $aggregate)[0])[0];

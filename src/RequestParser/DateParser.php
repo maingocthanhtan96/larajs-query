@@ -2,16 +2,16 @@
 
 namespace LaraJS\Query\RequestParser;
 
-use Illuminate\Database\Eloquent\Builder;
-
-class DateParser implements SearchParserInterface
+class DateParser
 {
     /**
-     * @param  Builder  $query
+     * Date parser
+     *
      * @param  array  $queryString
+     * @param  array<string>  $filterable
      * @return array
      */
-    public function parse(Builder $query, array $queryString): array
+    public function parse(array $queryString, array $filterable): array
     {
         if (!$queryString) {
             return [
@@ -19,10 +19,8 @@ class DateParser implements SearchParserInterface
                 'value' => [],
             ];
         }
-        $filterable = method_exists($query->getModel(), 'allowQueryParsers')
-            ? $query->getModel()->allowQueryParsers()['date']
-            : [];
         $column = $queryString['column'] ?? '';
+
         if ($filterable && !in_array($column, $filterable, true)) {
             return [];
         }

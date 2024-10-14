@@ -4,7 +4,7 @@ namespace LaraJS\Query\QueryParser;
 
 use Illuminate\Support\Str;
 
-class IncludeParser implements IncludeParserInterface
+class IncludeParser
 {
     public function parse(array $aggregates): array
     {

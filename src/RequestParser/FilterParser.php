@@ -2,29 +2,31 @@
 
 namespace LaraJS\Query\RequestParser;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use LaraJS\Query\Enum\IbmOperator;
 use LaraJS\Query\Enum\IbmValueType;
 use LaraJS\Query\Enum\SqlOperator;
 
-class FilterParser implements FilterParserInterface
+class FilterParser
 {
-    public function parse(Builder $query, string|array $queryString): array
+    /**
+     * Filter parser
+     *
+     * @param  string|array  $queryString
+     * @param  array<string>  $filterable
+     * @return array
+     */
+    public function parse(string|array $queryString, array $filterable): array
     {
         if (!$queryString) {
             return [];
         }
 
-        return $this->parseFilter($query, Arr::wrap($queryString));
+        return $this->parseFilter(Arr::wrap($queryString), $filterable);
     }
 
-    public function parseFilter(Builder $query, array $qsFilter): array
+    public function parseFilter(array $qsFilter, array $filterable): array
     {
-        $filterable = method_exists($query->getModel(), 'allowQueryParsers')
-            ? $query->getModel()->allowQueryParsers()['filter']
-            : [];
-
         $subResults = [];
         foreach ($qsFilter as $expression) {
             $subResults[] = $this->parseExpression($expression, $filterable);
@@ -38,7 +40,7 @@ class FilterParser implements FilterParserInterface
         return $subResults ?? [];
     }
 
-    public function parseExpression(string $expression, ?array $filterable)
+    public function parseExpression(string $expression, array $filterable)
     {
         $tokens = $this->tokenizeExpression($expression);
         $stack = [];

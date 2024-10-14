@@ -4,9 +4,7 @@ namespace RequestParser;
 
 use Illuminate\Database\Eloquent\Builder;
 use LaraJS\Query\RequestParser\SearchParser;
-use Mockery;
 use PHPUnit\Framework\TestCase;
-use Tests\ModelTest;
 
 class SearchParserTest extends TestCase
 {
@@ -18,9 +16,6 @@ class SearchParserTest extends TestCase
     {
         parent::setUp();
         $this->parser = new SearchParser;
-        $model = new ModelTest;
-        $this->query = Mockery::mock(Builder::class);
-        $this->query->shouldReceive('getModel')->andReturn($model);
     }
 
     public function testParser()
@@ -34,7 +29,7 @@ class SearchParserTest extends TestCase
             'value' => 'Lorem',
         ];
 
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, []));
     }
 
     public function testParserFilterable()
@@ -48,6 +43,6 @@ class SearchParserTest extends TestCase
             'value' => 'Lorem',
         ];
 
-        $this->assertSame($expect, $this->parser->parse($this->query, $queryString));
+        $this->assertSame($expect, $this->parser->parse($queryString, ['id', 'name', 'roles']));
     }
 }

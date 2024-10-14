@@ -6,7 +6,7 @@ use Illuminate\Support\Arr;
 use LaraJS\Query\Enum\Method;
 use LaraJS\Query\Enum\Operator;
 
-class FilterParser implements FilterParserInterface
+class FilterParser
 {
     public function parse(array $filters, bool $isOr = false): array
     {

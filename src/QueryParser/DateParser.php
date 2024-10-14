@@ -4,7 +4,7 @@ namespace LaraJS\Query\QueryParser;
 
 use Carbon\Carbon;
 
-class DateParser implements DateParserInterface
+class DateParser
 {
     public function parse(array $queryString): array
     {

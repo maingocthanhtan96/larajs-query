@@ -8,7 +8,6 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 /**
@@ -92,33 +91,34 @@ abstract class BaseLaraJSRepository implements ReadRepositoryInterface, WriteRep
 
     /**
      * @param  Request  $request
+     * @param  array{select?:  array<string>, include?: array<string>, sort?: array<string>, filter?: array<string>, search?: array<string>, date?: array<string>}  $allows
      * @return LengthAwarePaginator|CursorPaginator|Paginator|Collection<int, T>
      */
-    public function findAll(Request $request): LengthAwarePaginator|CursorPaginator|Paginator|Collection
+    public function findAll(Request $request, array $allows = []): LengthAwarePaginator|CursorPaginator|Paginator|Collection
     {
-        return $this->readRepository->findAll($request);
+        return $this->readRepository->findAll($request, $allows);
     }
 
     /**
      * @param  int  $id
-     * @param  ?Request  $request
+     * @param  Request  $request
+     * @param  array{select?:  array<string>, include?: array<string>, sort?: array<string>, filter?: array<string>, search?: array<string>, date?: array<string>}  $allows
      * @return T
      */
-    public function find(int $id, ?Request $request = null)
+    public function find(int $id, Request $request, array $allows = [])
     {
-        return $this->readRepository->find($id, $request);
+        return $this->readRepository->find($id, $request, $allows);
     }
 
     /**
      * @param  int  $id
-     * @param  ?Request  $request
+     * @param  Request  $request
+     * @param  array{select?:  array<string>, include?: array<string>, sort?: array<string>, filter?: array<string>, search?: array<string>, date?: array<string>}  $allows
      * @return T
-     *
-     * @throws ModelNotFoundException<T>
      */
-    public function findOrFail(int $id, ?Request $request = null)
+    public function findOrFail(int $id, Request $request, array $allows = [])
     {
-        return $this->readRepository->findOrFail($id, $request);
+        return $this->readRepository->findOrFail($id, $request, $allows);
     }
 
     /**

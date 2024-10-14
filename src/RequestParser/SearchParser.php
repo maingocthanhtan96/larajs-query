@@ -2,17 +2,18 @@
 
 namespace LaraJS\Query\RequestParser;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 
-class SearchParser implements SearchParserInterface
+class SearchParser
 {
     /**
-     * @param  Builder  $query
+     * Search parser
+     *
      * @param  array  $queryString
+     * @param  array<string>  $filterable
      * @return array
      */
-    public function parse(Builder $query, array $queryString): array
+    public function parse(array $queryString, array $filterable): array
     {
         if (!$queryString) {
             return [
@@ -20,9 +21,6 @@ class SearchParser implements SearchParserInterface
                 'value' => '',
             ];
         }
-        $filterable = method_exists($query->getModel(), 'allowQueryParsers')
-            ? $query->getModel()->allowQueryParsers()['search']
-            : [];
 
         $column = Str::of($queryString['column'] ?? '')
             ->trim(',')

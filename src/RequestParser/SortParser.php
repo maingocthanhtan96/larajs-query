@@ -2,20 +2,22 @@
 
 namespace LaraJS\Query\RequestParser;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 
-class SortParser implements SortParserInterface
+class SortParser
 {
-    public function parse(Builder $query, string $queryString): array
+    /**
+     * Sort parser
+     *
+     * @param  string  $queryString
+     * @param  array<string>  $filterable
+     * @return array
+     */
+    public function parse(string $queryString, array $filterable): array
     {
         if (!$queryString) {
             return [];
         }
-
-        $filterable = method_exists($query->getModel(), 'allowQueryParsers')
-            ? $query->getModel()->allowQueryParsers()['sort']
-            : [];
 
         return Str::of($queryString)->trim(',')
             ->explode(',')
