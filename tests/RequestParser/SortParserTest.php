@@ -29,7 +29,7 @@ class SortParserTest extends TestCase
             ],
         ];
 
-        $this->assertSame($expect, $this->parser->parse($queryString, []));
+        $this->assertSame($expect, $this->parser->parse($queryString, null));
     }
 
     public function testParserFilterable()

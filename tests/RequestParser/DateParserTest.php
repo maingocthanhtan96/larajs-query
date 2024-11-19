@@ -29,7 +29,7 @@ class DateParserTest extends TestCase
             'value' => ['2024-01-01', '2024-12-01'],
         ];
 
-        $this->assertSame($expect, $this->parser->parse($queryString, []));
+        $this->assertSame($expect, $this->parser->parse($queryString, null));
     }
 
     public function testParserFilterable()

@@ -15,12 +15,12 @@ use Illuminate\Support\Facades\Request;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use LaraJS\Query\QueryParser\DateParser;
-use LaraJS\Query\QueryParser\FieldParser;
 use LaraJS\Query\QueryParser\FilterParser;
 use LaraJS\Query\QueryParser\IncludeParser;
 use LaraJS\Query\QueryParser\QueryParser;
 use LaraJS\Query\QueryParser\QueryParserInterface;
 use LaraJS\Query\QueryParser\SearchParser;
+use LaraJS\Query\QueryParser\SelectParser;
 use LaraJS\Query\QueryParser\SortParser;
 use LaraJS\Query\RequestParser\RequestParser;
 use Znck\Eloquent\Relations\BelongsToThrough;
@@ -37,7 +37,7 @@ class LaraJSQueryServiceProvider extends ServiceProvider
                 $app->make(FilterParser::class),
                 $app->make(SortParser::class),
                 $app->make(IncludeParser::class),
-                $app->make(FieldParser::class),
+                $app->make(SelectParser::class),
                 $app->make(SearchParser::class),
                 $app->make(DateParser::class),
             );

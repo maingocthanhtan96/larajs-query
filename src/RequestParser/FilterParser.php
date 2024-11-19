@@ -13,16 +13,16 @@ class FilterParser
      * Filter parser
      *
      * @param  string|array  $queryString
-     * @param  array<string>  $filterable
+     * @param  ?array<string>  $filterable
      * @return array
      */
-    public function parse(string|array $queryString, array $filterable): array
+    public function parse(string|array $queryString, ?array $filterable): array
     {
-        if (!$queryString) {
+        if (!$queryString || (is_array($filterable) && empty($filterable))) {
             return [];
         }
 
-        return $this->parseFilter(Arr::wrap($queryString), $filterable);
+        return $this->parseFilter(Arr::wrap($queryString), $filterable ?? []);
     }
 
     public function parseFilter(array $qsFilter, array $filterable): array

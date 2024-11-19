@@ -23,7 +23,7 @@ class SelectParserTest extends TestCase
         $queryString = 'id,name,email,';
         $expect = ['id', 'name', 'email'];
 
-        $this->assertSame($expect, $this->parser->parse($queryString, []));
+        $this->assertSame($expect, $this->parser->parse($queryString, null));
     }
 
     public function testParserFilterable()

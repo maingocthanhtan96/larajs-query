@@ -20,7 +20,7 @@ class RequestParser
         private readonly FilterParser $filterParser,
         private readonly SortParser $sortParser,
         private readonly IncludeParser $includeParser,
-        private readonly SelectParser $fieldParser,
+        private readonly SelectParser $selectParser,
         private readonly SearchParser $searchParser,
         private readonly DateParser $dateParser,
     ) {}
@@ -32,12 +32,12 @@ class RequestParser
      */
     public function parse(array $options, array $allows): RequestParser
     {
-        $this->setInclude($this->includeParser->parse($options['include'] ?? [], $allows['include'] ?? []))
-            ->setFilter($this->filterParser->parse($options['filter'] ?? [], $allows['filter'] ?? []))
-            ->setSearch($this->searchParser->parse($options['search'] ?? [], $allows['search'] ?? []))
-            ->setDate($this->dateParser->parse($options['date'] ?? [], $allows['date'] ?? []))
-            ->setSort($this->sortParser->parse($options['sort'] ?? '', $allows['sort'] ?? []))
-            ->setSelect($this->fieldParser->parse($options['select'] ?? '', $allows['select'] ?? []));
+        $this->setInclude($this->includeParser->parse($options['include'] ?? [], $allows['include'] ?? null))
+            ->setFilter($this->filterParser->parse($options['filter'] ?? [], $allows['filter'] ?? null))
+            ->setSearch($this->searchParser->parse($options['search'] ?? [], $allows['search'] ?? null))
+            ->setDate($this->dateParser->parse($options['date'] ?? [], $allows['date'] ?? null))
+            ->setSort($this->sortParser->parse($options['sort'] ?? '', $allows['sort'] ?? null))
+            ->setSelect($this->selectParser->parse($options['select'] ?? '', $allows['select'] ?? null));
 
         return $this;
     }

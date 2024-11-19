@@ -23,7 +23,7 @@ class IncludeParserTest extends TestCase
         $queryString = ['roles', 'roles|count', 'roles|exists', 'roles.total|sum', 'roles.total|min', 'roles.total|max', 'roles.total|avg'];
         $expect = ['roles', 'roles|count', 'roles|exists', 'roles.total|sum', 'roles.total|min', 'roles.total|max', 'roles.total|avg'];
 
-        $this->assertSame($expect, $this->parser->parse($queryString, []));
+        $this->assertSame($expect, $this->parser->parse($queryString, null));
     }
 
     public function testParserFilterable()

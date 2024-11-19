@@ -29,7 +29,7 @@ class SearchParserTest extends TestCase
             'value' => 'Lorem',
         ];
 
-        $this->assertSame($expect, $this->parser->parse($queryString, []));
+        $this->assertSame($expect, $this->parser->parse($queryString, null));
     }
 
     public function testParserFilterable()

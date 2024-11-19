@@ -14,7 +14,7 @@ class QueryParser implements QueryParserInterface
         private readonly FilterParser $filterParser,
         private readonly SortParser $sortParser,
         private readonly IncludeParser $aggregateParser,
-        private readonly FieldParser $fieldParser,
+        private readonly SelectParser $selectParser,
         private readonly SearchParser $searchParser,
         private readonly DateParser $dateParser,
     ) {}
@@ -30,7 +30,7 @@ class QueryParser implements QueryParserInterface
         $requestParser = $this->requestParser->parse($options, $allows);
 
         $queries = array_merge(
-            $this->fieldParser->parse($requestParser->getSelect()),
+            $this->selectParser->parse($requestParser->getSelect()),
             $this->aggregateParser->parse($requestParser->getInclude()),
             $this->filterParser->parse($requestParser->getFilter()),
             $this->searchParser->parse($requestParser->getSearch()),

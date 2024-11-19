@@ -2,7 +2,7 @@
 
 namespace LaraJS\Query\QueryParser;
 
-class FieldParser
+class SelectParser
 {
     public function parse(array $fields): array
     {
