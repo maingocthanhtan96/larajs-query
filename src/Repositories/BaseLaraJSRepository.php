@@ -8,7 +8,7 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
+use LaraJS\Query\DTO\QueryParserAllowDTO;
 
 /**
  * @template T
@@ -90,35 +90,32 @@ abstract class BaseLaraJSRepository implements ReadRepositoryInterface, WriteRep
     }
 
     /**
-     * @param  Request  $request
-     * @param  array{select?:  array<string>, include?: array<string>, sort?: array<string>, filter?: array<string>, search?: array<string>, date?: array<string>}  $allows
+     * @param  QueryParserAllowDTO  $allow
      * @return LengthAwarePaginator|CursorPaginator|Paginator|Collection<int, T>
      */
-    public function findAll(Request $request, array $allows = []): LengthAwarePaginator|CursorPaginator|Paginator|Collection
+    public function findAll(QueryParserAllowDTO $allow): LengthAwarePaginator|CursorPaginator|Paginator|Collection
     {
-        return $this->readRepository->findAll($request, $allows);
+        return $this->readRepository->findAll($allow);
     }
 
     /**
      * @param  int  $id
-     * @param  Request  $request
-     * @param  array{select?:  array<string>, include?: array<string>, sort?: array<string>, filter?: array<string>, search?: array<string>, date?: array<string>}  $allows
+     * @param  QueryParserAllowDTO  $allow
      * @return T
      */
-    public function find(int $id, Request $request, array $allows = [])
+    public function find(int $id, QueryParserAllowDTO $allow)
     {
-        return $this->readRepository->find($id, $request, $allows);
+        return $this->readRepository->find($id, $allow);
     }
 
     /**
      * @param  int  $id
-     * @param  Request  $request
-     * @param  array{select?:  array<string>, include?: array<string>, sort?: array<string>, filter?: array<string>, search?: array<string>, date?: array<string>}  $allows
+     * @param  QueryParserAllowDTO  $allow
      * @return T
      */
-    public function findOrFail(int $id, Request $request, array $allows = [])
+    public function findOrFail(int $id, QueryParserAllowDTO $allow)
     {
-        return $this->readRepository->findOrFail($id, $request, $allows);
+        return $this->readRepository->findOrFail($id, $allow);
     }
 
     /**

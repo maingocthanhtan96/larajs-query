@@ -23,7 +23,7 @@ class IncludeParserTest extends TestCase
             [
                 'fx' => 'with',
                 'isNested' => false,
-                'parameters' => ['roles'],
+                'parameters' => ['roles', 'roles.permissions'],
             ],
             [
                 'fx' => 'withAggregate',
@@ -54,11 +54,6 @@ class IncludeParserTest extends TestCase
                 'fx' => 'withAggregate',
                 'isNested' => false,
                 'parameters' => ['roles', 'total', 'avg'],
-            ],
-            [
-                'fx' => 'with',
-                'isNested' => false,
-                'parameters' => ['roles.permissions'],
             ],
         ];
 

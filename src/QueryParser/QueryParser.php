@@ -4,6 +4,8 @@ namespace LaraJS\Query\QueryParser;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
+use LaraJS\Query\DTO\QueryParserAllowDTO;
+use LaraJS\Query\DTO\QueryParserRequestDTO;
 use LaraJS\Query\Enum\Method;
 use LaraJS\Query\RequestParser\RequestParser;
 
@@ -21,13 +23,13 @@ class QueryParser implements QueryParserInterface
 
     /**
      * @param  Builder  $query
-     * @param  array{select:  array<string>, include: array<string>, sort: array<string>, filter: array<string>, search: array<string>, date: array<string>}  $options
-     * @param  array{select:  array<string>, include: array<string>, sort: array<string>, filter: array<string>, search: array<string>, date: array<string>}  $allows
+     * @param  QueryParserRequestDTO  $options
+     * @param  QueryParserAllowDTO  $allow
      * @return Builder
      */
-    public function parse(Builder $query, array $options, array $allows): Builder
+    public function parse(Builder $query, QueryParserRequestDTO $options, QueryParserAllowDTO $allow): Builder
     {
-        $requestParser = $this->requestParser->parse($options, $allows);
+        $requestParser = $this->requestParser->parse($options, $allow);
 
         $queries = array_merge(
             $this->selectParser->parse($requestParser->getSelect()),

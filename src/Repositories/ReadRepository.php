@@ -8,7 +8,8 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
+use LaraJS\Query\DTO\QueryParserAllowDTO;
+use LaraJS\Query\DTO\QueryParserRequestDTO;
 use LaraJS\Query\LaraJSQuery;
 
 /**
@@ -28,18 +29,20 @@ class ReadRepository implements ReadRepositoryInterface
     public function __construct(protected readonly Model $model, protected readonly int $limit, protected readonly int $maxLimit) {}
 
     /**
-     * @param  Request  $request
-     * @param  array{select?:  array<string>, include?: array<string>, sort?: array<string>, filter?: array<string>, search?: array<string>, date?: array<string>}  $allows
+     * @param  QueryParserAllowDTO  $allow
      * @return LengthAwarePaginator|CursorPaginator|Paginator|Collection<int, T>
      */
-    public function findAll(Request $request, array $allows = []): LengthAwarePaginator|CursorPaginator|Paginator|Collection
+    public function findAll(QueryParserAllowDTO $allow): LengthAwarePaginator|CursorPaginator|Paginator|Collection
     {
-        $queryBuilder = $this->applyLaraJSQuery($this->query(), $request->query(), $allows);
+        $request = request();
+        $queryBuilder = $this->applyLaraJSQuery($this->query(), QueryParserRequestDTO::fromArray($request->query()), $allow);
+
         if ($request->input('pagination.page') === '-1') {
             $limit = min($this->maxLimit, $request->input('pagination.limit'));
 
             return $queryBuilder->take($limit)->get();
         }
+
         $limit = min($request->input('pagination.limit', $this->limit), $this->maxLimit);
 
         return match ($request->input('pagination.type')) {
@@ -51,24 +54,22 @@ class ReadRepository implements ReadRepositoryInterface
 
     /**
      * @param  int  $id
-     * @param  Request  $request
-     * @param  array{select?:  array<string>, include?: array<string>, sort?: array<string>, filter?: array<string>, search?: array<string>, date?: array<string>}  $allows
+     * @param  QueryParserAllowDTO  $allow
      * @return T
      */
-    public function find(int $id, Request $request, array $allows = [])
+    public function find(int $id, QueryParserAllowDTO $allow)
     {
-        return $this->applyLaraJSQuery($this->query(), $request->query(), $allows)->find($id);
+        return $this->applyLaraJSQuery($this->query(), QueryParserRequestDTO::fromArray([...request()->query(), 'filter' => []]), $allow)->find($id);
     }
 
     /**
      * @param  int  $id
-     * @param  Request  $request
-     * @param  array{select?:  array<string>, include?: array<string>, sort?: array<string>, filter?: array<string>, search?: array<string>, date?: array<string>}  $allows
+     * @param  QueryParserAllowDTO  $allow
      * @return T
      */
-    public function findOrFail(int $id, Request $request, array $allows = []): Model
+    public function findOrFail(int $id, QueryParserAllowDTO $allow): Model
     {
-        return $this->applyLaraJSQuery($this->query(), $request->query(), $allows)->findOrFail($id);
+        return $this->applyLaraJSQuery($this->query(), QueryParserRequestDTO::fromArray([...request()->query(), 'filter' => []]), $allow)->findOrFail($id);
     }
 
     /**

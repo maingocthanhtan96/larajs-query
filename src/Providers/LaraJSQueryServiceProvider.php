@@ -116,7 +116,6 @@ class LaraJSQueryServiceProvider extends ServiceProvider
                     $relation = $this->getRelation($relation);
                     if ($relation instanceof BelongsToMany) {
                         $mainModel = $this->getModel();
-                        $mainTable = $mainModel->getTable();
                         $tableThrough = $relation->getTable();
                         $relationForeignKey = $relation->getForeignPivotKeyName();
                         $relationRelatedKey = $relation->getRelatedPivotKeyName();
@@ -138,7 +137,6 @@ class LaraJSQueryServiceProvider extends ServiceProvider
                     }
 
                     if ($relation instanceof BelongsToThrough) {
-                        $queryTable = $this->getModel()->getTable();
                         $joins = array_reverse($relation->getQuery()->getQuery()->joins);
                         $queryTableRelated = $relation->getRelated()->getTable();
                         foreach ($joins as $i => $join) {

@@ -2,6 +2,9 @@
 
 namespace LaraJS\Query\RequestParser;
 
+use LaraJS\Query\DTO\QueryParserAllowDTO;
+use LaraJS\Query\DTO\QueryParserRequestDTO;
+
 class RequestParser
 {
     protected string|array $filter;
@@ -26,18 +29,18 @@ class RequestParser
     ) {}
 
     /**
-     * @param  array{select:  array<string>, include: array<string>, sort: array<string>, filter: array<string>, search: array<string>, date: array<string>}  $options
-     * @param  array{select:  array<string>, include: array<string>, sort: array<string>, filter: array<string>, search: array<string>, date: array<string>}  $allows
+     * @param  QueryParserRequestDTO  $options
+     * @param  QueryParserAllowDTO  $allow
      * @return $this
      */
-    public function parse(array $options, array $allows): RequestParser
+    public function parse(QueryParserRequestDTO $options, QueryParserAllowDTO $allow): RequestParser
     {
-        $this->setInclude($this->includeParser->parse($options['include'] ?? [], $allows['include'] ?? null))
-            ->setFilter($this->filterParser->parse($options['filter'] ?? [], $allows['filter'] ?? null))
-            ->setSearch($this->searchParser->parse($options['search'] ?? [], $allows['search'] ?? null))
-            ->setDate($this->dateParser->parse($options['date'] ?? [], $allows['date'] ?? null))
-            ->setSort($this->sortParser->parse($options['sort'] ?? '', $allows['sort'] ?? null))
-            ->setSelect($this->selectParser->parse($options['select'] ?? '', $allows['select'] ?? null));
+        $this->setInclude($this->includeParser->parse($options->include ?? [], $allow->include))
+            ->setFilter($this->filterParser->parse($options->filter ?? [], $allow->filter))
+            ->setSearch($this->searchParser->parse($options->search ?? [], $allow->search))
+            ->setDate($this->dateParser->parse($options->date ?? [], $allow->date))
+            ->setSort($this->sortParser->parse($options->sort ?? '', $allow->sort))
+            ->setSelect($this->selectParser->parse($options->select ?? '', $allow->select));
 
         return $this;
     }

@@ -3,14 +3,16 @@
 namespace LaraJS\Query\QueryParser;
 
 use Illuminate\Database\Eloquent\Builder;
+use LaraJS\Query\DTO\QueryParserAllowDTO;
+use LaraJS\Query\DTO\QueryParserRequestDTO;
 
 interface QueryParserInterface
 {
     /**
      * @param  Builder  $query
-     * @param  array{select:  array<string>, include: array<string>, sort: array<string>, filter: array<string>, search: array<string>, date: array<string>}  $options
-     * @param  array{select:  array<string>, include: array<string>, sort: array<string>, filter: array<string>, search: array<string>, date: array<string>}  $allows
+     * @param  QueryParserRequestDTO  $options
+     * @param  QueryParserAllowDTO  $allow
      * @return Builder
      */
-    public function parse(Builder $query, array $options, array $allows): Builder;
+    public function parse(Builder $query, QueryParserRequestDTO $options, QueryParserAllowDTO $allow): Builder;
 }

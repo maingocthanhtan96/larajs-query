@@ -19,7 +19,7 @@ class IncludeParser
         }
 
         foreach ($queryString as $aggregate) {
-            $field = explode('.', explode('|', $aggregate)[0])[0];
+            $field = explode(':', $aggregate)[0];
             if (!$filterable || in_array($field, $filterable, true)) {
                 $parsedArray[] = $aggregate;
             }
