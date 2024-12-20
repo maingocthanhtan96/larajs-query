@@ -29,6 +29,17 @@ class LaraJSQueryServiceProvider extends ServiceProvider
 {
     protected bool $defer = false;
 
+    public function boot(): void
+    {
+        $this->publishes(
+            [
+                __DIR__ . '/../../config/generator.php' => config_path('larajs-query.php'),
+            ],
+            'larajs-query',
+        );
+        $this->mergeConfigFrom(__DIR__ . '/../../config/larajs-query.php', 'larajs-query');
+    }
+
     public function register(): void
     {
         $this->app->singleton(QueryParserInterface::class, function (Application $app) {

@@ -18,9 +18,10 @@ interface ReadRepositoryInterface
      * Find all
      *
      * @param  QueryParserAllowDTO  $allow
+     * @param  array{limit: array{default: int, max: int}}  $options
      * @return LengthAwarePaginator|CursorPaginator|Paginator|Collection<int, T>
      */
-    public function findAll(QueryParserAllowDTO $allow): LengthAwarePaginator|CursorPaginator|Paginator|Collection;
+    public function findAll(QueryParserAllowDTO $allow, array $options = []): LengthAwarePaginator|CursorPaginator|Paginator|Collection;
 
     /**
      * Find one

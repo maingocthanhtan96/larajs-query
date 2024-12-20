@@ -23,27 +23,29 @@ class ReadRepository implements ReadRepositoryInterface
 
     /**
      * @param  Model  $model
-     * @param  int  $limit
-     * @param  int  $maxLimit
      */
-    public function __construct(protected readonly Model $model, protected readonly int $limit, protected readonly int $maxLimit) {}
+    public function __construct(protected readonly Model $model) {}
 
     /**
      * @param  QueryParserAllowDTO  $allow
+     * @param  array{limit: array{default: int, max: int}}  $options
      * @return LengthAwarePaginator|CursorPaginator|Paginator|Collection<int, T>
      */
-    public function findAll(QueryParserAllowDTO $allow): LengthAwarePaginator|CursorPaginator|Paginator|Collection
+    public function findAll(QueryParserAllowDTO $allow, array $options = []): LengthAwarePaginator|CursorPaginator|Paginator|Collection
     {
         $request = request();
+        $limit = $options['limit']['default'] ?? config('larajs-query.limit.default', 25);
+        $maxLimit = $options['limit']['max'] ?? config('larajs-query.limit.max', 100);
+
         $queryBuilder = $this->applyLaraJSQuery($this->query(), QueryParserRequestDTO::fromArray($request->query()), $allow);
 
         if ($request->input('pagination.page') === '-1') {
-            $limit = min($this->maxLimit, $request->input('pagination.limit'));
+            $limit = min($maxLimit, $request->input('pagination.limit'));
 
             return $queryBuilder->take($limit)->get();
         }
 
-        $limit = min($request->input('pagination.limit', $this->limit), $this->maxLimit);
+        $limit = min($request->input('pagination.limit', $limit), $maxLimit);
 
         return match ($request->input('pagination.type')) {
             'simple' => $queryBuilder->simplePaginate($limit, pageName: 'pagination[page]'),

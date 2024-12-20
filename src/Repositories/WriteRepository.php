@@ -17,36 +17,45 @@ class WriteRepository implements WriteRepositoryInterface
     public function __construct(protected readonly Model $model) {}
 
     /**
-     * @param  array  $data
+     * @param  array  $attributes
      * @return T
      */
-    public function create(array $data)
+    public function create(array $attributes)
     {
-        $model = new $this->model;
-        $model->fill($data)->save();
+        return $this->model->create($attributes);
+    }
+
+    /**
+     * @param  int|Model  $idOrModel
+     * @param  array  $attributes
+     * @param  array  $options
+     * @return T
+     */
+    public function update(int|Model $idOrModel, array $attributes, array $options = [])
+    {
+        if (is_int($idOrModel)) {
+            $model = $this->model->findOrFail($idOrModel);
+        } else {
+            $model = $idOrModel;
+        }
+
+        $model->update($attributes, $options);
 
         return $model;
     }
 
     /**
-     * @param  int  $id
-     * @param  array  $data
-     * @return T
-     */
-    public function update(int $id, array $data)
-    {
-        $model = $this->model->findOrFail($id);
-        $model->fill($data)->save();
-
-        return $model;
-    }
-
-    /**
-     * @param  int  $id
+     * @param  int|Model  $idOrModel
      * @return bool
      */
-    public function delete(int $id): bool
+    public function delete(int|Model $idOrModel): bool
     {
-        return $this->model->findOrFail($id)->delete();
+        if (is_int($idOrModel)) {
+            $model = $this->model->findOrFail($idOrModel);
+        } else {
+            $model = $idOrModel;
+        }
+
+        return $model->delete();
     }
 }

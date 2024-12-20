@@ -2,27 +2,30 @@
 
 namespace LaraJS\Query\Repositories;
 
+use Illuminate\Database\Eloquent\Model;
+
 /**
  * @template T
  */
 interface WriteRepositoryInterface
 {
     /**
-     * @param  array  $data
+     * @param  array  $attributes
      * @return T
      */
-    public function create(array $data);
+    public function create(array $attributes);
 
     /**
-     * @param  int  $id
-     * @param  array  $data
+     * @param  int|Model  $idOrModel
+     * @param  array  $attributes
+     * @param  array  $options
      * @return T
      */
-    public function update(int $id, array $data);
+    public function update(int|Model $idOrModel, array $attributes, array $options = []);
 
     /**
-     * @param  int  $id
+     * @param  int|Model  $idOrModel
      * @return bool
      */
-    public function delete(int $id): bool;
+    public function delete(int|Model $idOrModel): bool;
 }
