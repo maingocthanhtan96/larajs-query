@@ -10,8 +10,8 @@ class SearchParser
      * Parse the search query.
      *
      * @param  array  $queryString
-     * @param  ?array<{column: array<string>, value: string}> $filterable
-     * @return array<{column: array<string>, value: string}>
+     * @param  ?array{column: array<string>, value: string}  $filterable
+     * @return array{column: array<string>, value: string}
      */
     public function parse(array $queryString, ?array $filterable): array
     {

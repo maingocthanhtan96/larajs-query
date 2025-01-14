@@ -2,8 +2,6 @@
 
 namespace LaraJS\Query\RequestParser;
 
-use Illuminate\Support\Str;
-
 class SelectParser
 {
     /**
@@ -15,21 +13,28 @@ class SelectParser
      */
     public function parse(string $queryString, ?array $filterable): array
     {
-        if (!$queryString || (is_array($filterable) && empty($filterable))) {
+        if (!$queryString) {
+            return $filterable ?? [];
+        }
+
+        if (is_array($filterable) && empty($filterable)) {
             return [];
         }
 
-        return Str::of($queryString)
-            ->trim(',')
-            ->explode(',')
+        return collect(explode(',', trim($queryString, ',')))
+            ->map(fn($value) => trim($value))
             ->filter(function ($value) use ($filterable) {
-                if ($filterable) {
-                    return in_array($value, $filterable, true);
+                if (!$value) {
+                    return false;
+                }
+
+                if ($filterable && !in_array($value, $filterable, true)) {
+                    throw new \InvalidArgumentException("Field '{$value}' is not filterable.");
                 }
 
                 return true;
             })
-            ->map(fn ($value) => trim($value))
-            ->all();
+            ->values()
+            ->toArray();
     }
 }
