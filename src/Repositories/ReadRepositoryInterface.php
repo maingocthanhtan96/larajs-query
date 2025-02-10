@@ -26,20 +26,20 @@ interface ReadRepositoryInterface
     /**
      * Find one
      *
-     * @param  int  $id
+     * @param  string  $id
      * @param  QueryParserAllowDTO  $allow
      * @return T
      */
-    public function find(int $id, QueryParserAllowDTO $allow);
+    public function find(string $id, QueryParserAllowDTO $allow);
 
     /**
      * Find one or fail
      *
-     * @param  int  $id
+     * @param  string  $id
      * @param  QueryParserAllowDTO  $allow
      * @return T
      */
-    public function findOrFail(int $id, QueryParserAllowDTO $allow);
+    public function findOrFail(string $id, QueryParserAllowDTO $allow);
 
     /**
      * Query

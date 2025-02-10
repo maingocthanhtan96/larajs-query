@@ -42,21 +42,21 @@ class BaseRepository implements ReadRepositoryInterface, WriteRepositoryInterfac
     }
 
     /**
-     * @param  int  $id
+     * @param  string  $id
      * @param  QueryParserAllowDTO  $allow
      * @return T
      */
-    public function find(int $id, QueryParserAllowDTO $allow)
+    public function find(string $id, QueryParserAllowDTO $allow)
     {
         return $this->readRepository->find($id, $allow);
     }
 
     /**
-     * @param  int  $id
+     * @param  string  $id
      * @param  QueryParserAllowDTO  $allow
      * @return T
      */
-    public function findOrFail(int $id, QueryParserAllowDTO $allow)
+    public function findOrFail(string $id, QueryParserAllowDTO $allow)
     {
         return $this->readRepository->findOrFail($id, $allow);
     }
@@ -79,21 +79,21 @@ class BaseRepository implements ReadRepositoryInterface, WriteRepositoryInterfac
     }
 
     /**
-     * @param  int|Model  $idOrModel
+     * @param  string|Model  $idOrModel
      * @param  array  $attributes
      * @param  array  $options
      * @return T
      */
-    public function update(Model|int $idOrModel, array $attributes, array $options = [])
+    public function update(string|Model $idOrModel, array $attributes, array $options = [])
     {
         return $this->writeRepository->update($idOrModel, $attributes, $options);
     }
 
     /**
-     * @param  int|Model  $idOrModel
+     * @param  string|Model  $idOrModel
      * @return bool
      */
-    public function delete(Model|int $idOrModel): bool
+    public function delete(string|Model $idOrModel): bool
     {
         return $this->writeRepository->delete($idOrModel);
     }

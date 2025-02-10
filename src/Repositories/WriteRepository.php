@@ -26,36 +26,36 @@ class WriteRepository implements WriteRepositoryInterface
     }
 
     /**
-     * @param  int|Model  $idOrModel
+     * @param  string|Model  $idOrModel
      * @param  array  $attributes
      * @param  array  $options
      * @return T
      */
-    public function update(int|Model $idOrModel, array $attributes, array $options = [])
+    public function update(string|Model $idOrModel, array $attributes, array $options = [])
     {
-        if (is_int($idOrModel)) {
-            $model = $this->model->findOrFail($idOrModel);
-        } else {
-            $model = $idOrModel;
-        }
-
+        $model = $this->resolveModel($idOrModel);
         $model->update($attributes, $options);
 
         return $model;
     }
 
     /**
-     * @param  int|Model  $idOrModel
+     * @param  string|Model  $idOrModel
      * @return bool
      */
-    public function delete(int|Model $idOrModel): bool
+    public function delete(string|Model $idOrModel): bool
     {
-        if (is_int($idOrModel)) {
-            $model = $this->model->findOrFail($idOrModel);
-        } else {
-            $model = $idOrModel;
-        }
+        return $this->resolveModel($idOrModel)->delete();
+    }
 
-        return $model->delete();
+    /**
+     * @param  string|Model  $idOrModel
+     * @return Model
+     */
+    private function resolveModel(string|Model $idOrModel): Model
+    {
+        return $idOrModel instanceof Model
+            ? $idOrModel
+            : $this->model->findOrFail($idOrModel);
     }
 }
