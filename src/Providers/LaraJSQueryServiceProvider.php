@@ -33,7 +33,7 @@ class LaraJSQueryServiceProvider extends ServiceProvider
     {
         $this->publishes(
             [
-                __DIR__ . '/../../config/generator.php' => config_path('larajs-query.php'),
+                __DIR__ . '/../../config/larajs-query.php' => config_path('larajs-query.php'),
             ],
             'larajs-query',
         );

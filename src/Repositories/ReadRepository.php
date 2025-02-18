@@ -23,7 +23,7 @@ class ReadRepository implements ReadRepositoryInterface
 
     private const DEFAULT_LIMIT = 25;
 
-    private const MAX_LIMIT = 100;
+    private const MAX_LIMIT = 500;
 
     /**
      * @param  Model  $model

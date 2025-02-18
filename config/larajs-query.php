@@ -3,6 +3,6 @@
 return [
     'limit' => [
         'default' => 25,
-        'max' => 100,
+        'max' => 500,
     ],
 ];
