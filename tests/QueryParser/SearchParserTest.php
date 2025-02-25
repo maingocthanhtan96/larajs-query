@@ -16,7 +16,7 @@ class SearchParserTest extends TestCase
         $this->parser = new SearchParser;
     }
 
-    public function testParser()
+    public function test_parser()
     {
         $queryString = [
             'column' => ['name', 'roles.name'],

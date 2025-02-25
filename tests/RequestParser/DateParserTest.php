@@ -18,7 +18,7 @@ class DateParserTest extends TestCase
         $this->parser = new DateParser;
     }
 
-    public function testParser()
+    public function test_parser()
     {
         $queryString = [
             'column' => 'updated_at',
@@ -32,7 +32,7 @@ class DateParserTest extends TestCase
         $this->assertSame($expect, $this->parser->parse($queryString, null));
     }
 
-    public function testParserFilterable()
+    public function test_parser_filterable()
     {
         $queryString = [
             'column' => 'created_at',

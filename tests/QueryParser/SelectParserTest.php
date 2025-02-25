@@ -15,7 +15,7 @@ class SelectParserTest extends TestCase
         $this->parser = new SelectParser;
     }
 
-    public function testParser()
+    public function test_parser()
     {
         $queryString = ['id', 'name', 'email'];
         $expect = [

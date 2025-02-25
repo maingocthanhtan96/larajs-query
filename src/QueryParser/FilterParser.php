@@ -26,7 +26,7 @@ class FilterParser
         return $parsedArray;
     }
 
-    //To reconstruct the parameters to objections format
+    // To reconstruct the parameters to objections format
     public function parseParametersForObjection($operator, $value, $isOr): array
     {
         $specialOperators = [
@@ -65,7 +65,7 @@ class FilterParser
         return $parameters;
     }
 
-    //To handle "OR" AND "AND" recursively
+    // To handle "OR" AND "AND" recursively
     public function sortNestedFilters($filters, $isOr = false): array
     {
         $parsedArray = [];

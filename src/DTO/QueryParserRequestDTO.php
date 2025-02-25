@@ -16,7 +16,7 @@ class QueryParserRequestDTO
         public string $select,
         public array $include,
         public string $sort,
-        public array $filter,
+        public string|array $filter,
         public array $search,
         public array $date
     ) {}

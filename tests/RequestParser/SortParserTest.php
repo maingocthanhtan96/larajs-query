@@ -15,7 +15,7 @@ class SortParserTest extends TestCase
         $this->parser = new SortParser;
     }
 
-    public function testParser()
+    public function test_parser()
     {
         $queryString = '-updated_at,id,';
         $expect = [
@@ -32,7 +32,7 @@ class SortParserTest extends TestCase
         $this->assertSame($expect, $this->parser->parse($queryString, null));
     }
 
-    public function testParserFilterable()
+    public function test_parser_filterable()
     {
         $queryString = 'id,-created_at,';
         $expect = [

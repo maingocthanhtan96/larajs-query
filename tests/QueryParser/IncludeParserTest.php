@@ -15,7 +15,7 @@ class IncludeParserTest extends TestCase
         $this->parser = new IncludeParser;
     }
 
-    public function testParser()
+    public function test_parser()
     {
         $queryString = ['roles', 'roles|count', 'roles|exists', 'roles.total|sum', 'roles.total|min', 'roles.total|max', 'roles.total|avg', 'roles.permissions'];
 

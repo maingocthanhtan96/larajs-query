@@ -19,7 +19,7 @@ class FilterParserTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testEqualsParser()
+    public function test_equals_parser()
     {
         $queryString = [
             '=' => [
@@ -44,7 +44,7 @@ class FilterParserTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testEqualsRelationParser()
+    public function test_equals_relation_parser()
     {
         $queryString = [
             'RELATION' => [
@@ -72,7 +72,7 @@ class FilterParserTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testLessThanParser()
+    public function test_less_than_parser()
     {
         $queryString = [
             '<' => [
@@ -97,7 +97,7 @@ class FilterParserTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testLessThanRelationParser()
+    public function test_less_than_relation_parser()
     {
         $queryString = [
             'RELATION' => [
@@ -125,7 +125,7 @@ class FilterParserTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testLessOrEqualParser()
+    public function test_less_or_equal_parser()
     {
         $queryString = [
             '<=' => [
@@ -150,7 +150,7 @@ class FilterParserTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testLessOrEqualRelationParser()
+    public function test_less_or_equal_relation_parser()
     {
         $queryString = [
             'RELATION' => [
@@ -178,7 +178,7 @@ class FilterParserTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testGreaterThanParser()
+    public function test_greater_than_parser()
     {
         $queryString = [
             '>' => [
@@ -203,7 +203,7 @@ class FilterParserTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testGreaterThanRelationRelationParser()
+    public function test_greater_than_relation_relation_parser()
     {
         $queryString = [
             'RELATION' => [
@@ -231,7 +231,7 @@ class FilterParserTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testGreaterOrEqualParser()
+    public function test_greater_or_equal_parser()
     {
         $queryString = [
             '>=' => [
@@ -256,7 +256,7 @@ class FilterParserTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testGreaterOrEqualRelationRelationParser()
+    public function test_greater_or_equal_relation_relation_parser()
     {
         $queryString = [
             'RELATION' => [
@@ -284,7 +284,7 @@ class FilterParserTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testContainsParser()
+    public function test_contains_parser()
     {
         $queryString = [
             'LIKE' => [
@@ -309,7 +309,7 @@ class FilterParserTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testContainsRelationParser()
+    public function test_contains_relation_parser()
     {
         $queryString = [
             'RELATION' => [
@@ -337,7 +337,7 @@ class FilterParserTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testStartsWithParser()
+    public function test_starts_with_parser()
     {
         $queryString = [
             'LIKE' => [
@@ -362,7 +362,7 @@ class FilterParserTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testStartsWithRelationParser()
+    public function test_starts_with_relation_parser()
     {
         $queryString = [
             'RELATION' => [
@@ -390,7 +390,7 @@ class FilterParserTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testEndsWithParser()
+    public function test_ends_with_parser()
     {
         $queryString = [
             'LIKE' => [
@@ -415,7 +415,7 @@ class FilterParserTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testEndsWithRelationParser()
+    public function test_ends_with_relation_parser()
     {
         $queryString = [
             'RELATION' => [
@@ -443,7 +443,7 @@ class FilterParserTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testAnyParser()
+    public function test_any_parser()
     {
         $queryString = [
             'IN' => [
@@ -473,7 +473,7 @@ class FilterParserTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testNotParser()
+    public function test_not_parser()
     {
         $queryString = [
             'NOT' => ['IS_NULL' => '#lastName'],
@@ -497,7 +497,7 @@ class FilterParserTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testHasParser()
+    public function test_has_parser()
     {
         $queryString = [
             'HAS' => [
@@ -522,7 +522,7 @@ class FilterParserTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testConditionLogicalOR()
+    public function test_condition_logical_or()
     {
         $queryString = [
             'OR' => [
@@ -572,7 +572,7 @@ class FilterParserTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testConditionLogicalAND()
+    public function test_condition_logical_and()
     {
         $queryString = [
             'AND' => [

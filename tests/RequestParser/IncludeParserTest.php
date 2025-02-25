@@ -18,7 +18,7 @@ class IncludeParserTest extends TestCase
         $this->parser = new IncludeParser;
     }
 
-    public function testParser()
+    public function test_parser()
     {
         $queryString = ['roles', 'roles|count', 'roles|exists', 'roles.total|sum', 'roles.total|min', 'roles.total|max', 'roles.total|avg'];
         $expect = ['roles', 'roles|count', 'roles|exists', 'roles.total|sum', 'roles.total|min', 'roles.total|max', 'roles.total|avg'];
@@ -26,7 +26,7 @@ class IncludeParserTest extends TestCase
         $this->assertSame($expect, $this->parser->parse($queryString, null));
     }
 
-    public function testParserFilterable()
+    public function test_parser_filterable()
     {
         $queryString = ['roles', 'roles|count', 'roles.permissions|count'];
         $expect = ['roles', 'roles|count', 'roles.permissions|count'];
@@ -34,7 +34,7 @@ class IncludeParserTest extends TestCase
         $this->assertSame($expect, $this->parser->parse($queryString, ['roles', 'roles|count', 'roles.permissions|count']));
     }
 
-    public function testParserExceptPermissionCountInvalidFilterable()
+    public function test_parser_except_permission_count_invalid_filterable()
     {
         $this->expectException(\InvalidArgumentException::class);
 
@@ -43,7 +43,7 @@ class IncludeParserTest extends TestCase
         $this->parser->parse($queryString, ['roles', 'roles|count', 'roles.permissions|count']);
     }
 
-    public function testParserOneFilterable()
+    public function test_parser_one_filterable()
     {
         $queryString = ['roles', 'roles|count', 'roles.permissions|count'];
         $expect = ['roles', 'roles|count', 'roles.permissions|count'];
@@ -51,7 +51,7 @@ class IncludeParserTest extends TestCase
         $this->assertSame($expect, $this->parser->parse($queryString, ['roles', 'roles|count', 'roles.permissions|count']));
     }
 
-    public function testParserInvalidFilterable()
+    public function test_parser_invalid_filterable()
     {
         $this->expectException(\InvalidArgumentException::class);
 
@@ -60,7 +60,7 @@ class IncludeParserTest extends TestCase
         $this->parser->parse($queryString, ['roles:id,name', 'permissions']);
     }
 
-    public function testParserWithNoColumnSpecified()
+    public function test_parser_with_no_column_specified()
     {
         $queryString = ['users', 'roles'];
         $filterable = ['users', 'roles'];
@@ -69,7 +69,7 @@ class IncludeParserTest extends TestCase
         $this->assertSame($expect, $this->parser->parse($queryString, $filterable));
     }
 
-    public function testParserWithInvalidRelation()
+    public function test_parser_with_invalid_relation()
     {
         $this->expectException(\InvalidArgumentException::class);
 
@@ -79,7 +79,7 @@ class IncludeParserTest extends TestCase
         $this->parser->parse($queryString, $filterable);
     }
 
-    public function testParserWithMixedRelations()
+    public function test_parser_with_mixed_relations()
     {
         $queryString = ['users:id,name', 'roles', 'permissions:id'];
         $filterable = ['users:id,name', 'roles', 'permissions:id'];
@@ -88,7 +88,7 @@ class IncludeParserTest extends TestCase
         $this->assertSame($expect, $this->parser->parse($queryString, $filterable));
     }
 
-    public function testParserWithAggregates()
+    public function test_parser_with_aggregates()
     {
         $queryString = ['users|count', 'roles|exists'];
         $filterable = ['users|count', 'roles|exists'];

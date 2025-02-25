@@ -18,7 +18,7 @@ class SearchParserTest extends TestCase
         $this->parser = new SearchParser;
     }
 
-    public function testParser()
+    public function test_parser()
     {
         $queryString = [
             'column' => 'id,name,roles.name,',
@@ -32,7 +32,7 @@ class SearchParserTest extends TestCase
         $this->assertSame($expect, $this->parser->parse($queryString, null));
     }
 
-    public function testParserFilterable()
+    public function test_parser_filterable()
     {
         $queryString = [
             'column' => 'id,name,roles.name,age,permissions.name',

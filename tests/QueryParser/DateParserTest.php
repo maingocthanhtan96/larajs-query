@@ -16,7 +16,7 @@ class DateParserTest extends TestCase
         $this->parser = new DateParser;
     }
 
-    public function testParser()
+    public function test_parser()
     {
         $queryString = [
             'column' => 'updated_at',
