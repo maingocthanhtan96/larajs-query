@@ -94,7 +94,7 @@ class ReadRepository implements ReadRepositoryInterface
         $query = request()->query();
 
         if ($clearFilter) {
-            $query['filter'] = [];
+            unset($query['filter']);
         }
 
         return $this->applyLaraJSQuery(

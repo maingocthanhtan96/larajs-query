@@ -8,7 +8,7 @@ class QueryParserRequestDTO
      * @param  string  $select
      * @param  array<string>  $include
      * @param  string  $sort
-     * @param  array<string>  $filter
+     * @param  string  $filter
      * @param  array<string>  $search
      * @param  array<string>  $date
      */
@@ -16,7 +16,7 @@ class QueryParserRequestDTO
         public string $select,
         public array $include,
         public string $sort,
-        public string|array $filter,
+        public string $filter,
         public array $search,
         public array $date
     ) {}
@@ -31,7 +31,7 @@ class QueryParserRequestDTO
             $data['select'] ?? '',
             $data['include'] ?? [],
             $data['sort'] ?? '',
-            $data['filter'] ?? [],
+            $data['filter'] ?? '',
             $data['search'] ?? [],
             $data['date'] ?? []
         );

@@ -12,11 +12,11 @@ class FilterParser
     /**
      * Filter parser
      *
-     * @param  string|array  $queryString
+     * @param  string  $queryString
      * @param  ?array<string>  $filterable
      * @return array
      */
-    public function parse(string|array $queryString, ?array $filterable): array
+    public function parse(string $queryString, ?array $filterable): array
     {
         if (!$queryString || (is_array($filterable) && empty($filterable))) {
             return [];
