@@ -14,6 +14,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use LaraJS\Query\Enum\LimitOption;
 use LaraJS\Query\QueryParser\DateParser;
 use LaraJS\Query\QueryParser\FilterParser;
 use LaraJS\Query\QueryParser\IncludeParser;
@@ -54,8 +55,9 @@ class LaraJSQueryServiceProvider extends ServiceProvider
             );
         });
         $this->whereLikeRelationship();
-        $this->paginate();
+        $this->collectionPaginate();
         $this->orderByRelationship();
+        $this->dynamicPaginate();
     }
 
     private function whereLikeRelationship(): void
@@ -98,11 +100,11 @@ class LaraJSQueryServiceProvider extends ServiceProvider
         }
     }
 
-    private function paginate(): void
+    private function collectionPaginate(): void
     {
         // Enable pagination
-        if (!Collection::hasMacro('paginate')) {
-            Collection::macro('paginate', function ($perPage = 15, $page = null, $options = []) {
+        if (!Collection::hasMacro('collectionPaginate')) {
+            Collection::macro('collectionPaginate', function ($perPage = 15, $page = null, $options = []) {
                 $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
 
                 return (new LengthAwarePaginator(
@@ -185,6 +187,24 @@ class LaraJSQueryServiceProvider extends ServiceProvider
                 }
 
                 return $this->orderBy($searchColumn, $direction);
+            });
+        }
+    }
+
+    private function dynamicPaginate(): void
+    {
+        if (!Builder::hasGlobalMacro('dynamicPaginate')) {
+            Builder::macro('dynamicPaginate', function (array $options = []) {
+                $request = request();
+                $defaultLimit = $options['limit']['default'] ?? config('larajs-query.limit.default', LimitOption::DEFAULT_LIMIT);
+                $maxLimit = $options['limit']['max'] ?? config('larajs-query.limit.max', LimitOption::MAX_LIMIT);
+                $limit = min($request->input('pagination.limit', $defaultLimit), $maxLimit);
+
+                return match ($request->input('pagination.type')) {
+                    'simple' => $this->simplePaginate($limit, pageName: 'pagination[page]'),
+                    'cursor' => $this->cursorPaginate($limit, cursorName: 'pagination[cursor]'),
+                    default => $this->paginate($limit, pageName: 'pagination[page]'),
+                };
             });
         }
     }

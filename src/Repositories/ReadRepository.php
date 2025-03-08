@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use LaraJS\Query\DTO\QueryParserAllowDTO;
 use LaraJS\Query\DTO\QueryParserRequestDTO;
+use LaraJS\Query\Enum\LimitOption;
 use LaraJS\Query\LaraJSQuery;
 
 /**
@@ -20,10 +21,6 @@ use LaraJS\Query\LaraJSQuery;
 class ReadRepository implements ReadRepositoryInterface
 {
     use LaraJSQuery;
-
-    private const DEFAULT_LIMIT = 25;
-
-    private const MAX_LIMIT = 500;
 
     /**
      * @param  Model  $model
@@ -38,22 +35,15 @@ class ReadRepository implements ReadRepositoryInterface
     public function findAll(QueryParserAllowDTO $allow, array $options = []): LengthAwarePaginator|CursorPaginator|Paginator|Collection
     {
         $request = request();
-        $defaultLimit = $options['limit']['default'] ?? config('larajs-query.limit.default', self::DEFAULT_LIMIT);
-        $maxLimit = $options['limit']['max'] ?? config('larajs-query.limit.max', self::MAX_LIMIT);
-
         $queryBuilder = $this->getQueryWithLaraJS($allow);
 
         if ($request->input('pagination.page') === '-1') {
+            $maxLimit = $options['limit']['max'] ?? config('larajs-query.limit.max', LimitOption::MAX_LIMIT);
+
             return $queryBuilder->take(min($maxLimit, $request->input('pagination.limit')))->get();
         }
 
-        $limit = min($request->input('pagination.limit', $defaultLimit), $maxLimit);
-
-        return match ($request->input('pagination.type')) {
-            'simple' => $queryBuilder->simplePaginate($limit, pageName: 'pagination[page]'),
-            'cursor' => $queryBuilder->cursorPaginate($limit, cursorName: 'pagination[cursor]'),
-            default => $queryBuilder->paginate($limit, pageName: 'pagination[page]'),
-        };
+        return $queryBuilder->dynamicPaginate($options);
     }
 
     /**
