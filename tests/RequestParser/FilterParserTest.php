@@ -160,15 +160,27 @@ class FilterParserTest extends TestCase
         $this->assertSame($expect, $this->parser->parse($queryString, null));
     }
 
-    public function test_contains_relation_parser()
+    public function test_contains_number_parser()
     {
-        $queryString = "containsRelation(articles,description,'cooking')";
+        $queryString = "contains(card,'1234567890')";
+        $expect = [
+            'LIKE' => [
+                '#card',
+                '%1234567890%',
+            ],
+        ];
+        $this->assertSame($expect, $this->parser->parse($queryString, null));
+    }
+
+    public function test_contains_relation_number_parser()
+    {
+        $queryString = "containsRelation(articles,card,'1234567890')";
         $expect = [
             'RELATION' => [
                 '#articles',
-                '#description',
+                '#card',
                 'LIKE',
-                '%cooking%',
+                '%1234567890%',
             ],
         ];
         $this->assertSame($expect, $this->parser->parse($queryString, null));
@@ -181,6 +193,18 @@ class FilterParserTest extends TestCase
             'LIKE' => [
                 '#description',
                 'The%',
+            ],
+        ];
+        $this->assertSame($expect, $this->parser->parse($queryString, null));
+    }
+
+    public function test_starts_with_number_parser()
+    {
+        $queryString = "startsWith(card,'1234567890')";
+        $expect = [
+            'LIKE' => [
+                '#card',
+                '1234567890%',
             ],
         ];
         $this->assertSame($expect, $this->parser->parse($queryString, null));
@@ -200,6 +224,20 @@ class FilterParserTest extends TestCase
         $this->assertSame($expect, $this->parser->parse($queryString, null));
     }
 
+    public function test_starts_with_relation_number_parser()
+    {
+        $queryString = "startsWithRelation(articles,card,'1234567890')";
+        $expect = [
+            'RELATION' => [
+                '#articles',
+                '#card',
+                'LIKE',
+                '1234567890%',
+            ],
+        ];
+        $this->assertSame($expect, $this->parser->parse($queryString, null));
+    }
+
     public function test_ends_with_parser()
     {
         $queryString = "endsWith(description,'End')";
@@ -207,6 +245,18 @@ class FilterParserTest extends TestCase
             'LIKE' => [
                 '#description',
                 '%End',
+            ],
+        ];
+        $this->assertSame($expect, $this->parser->parse($queryString, null));
+    }
+
+    public function test_ends_with_number_parser()
+    {
+        $queryString = "endsWith(card,'1234567890')";
+        $expect = [
+            'LIKE' => [
+                '#card',
+                '%1234567890',
             ],
         ];
         $this->assertSame($expect, $this->parser->parse($queryString, null));
@@ -221,6 +271,20 @@ class FilterParserTest extends TestCase
                 '#description',
                 'LIKE',
                 '%End',
+            ],
+        ];
+        $this->assertSame($expect, $this->parser->parse($queryString, null));
+    }
+
+    public function test_ends_with_relation_number_parser()
+    {
+        $queryString = "endsWithRelation(articles,card,'1234567890')";
+        $expect = [
+            'RELATION' => [
+                '#articles',
+                '#card',
+                'LIKE',
+                '%1234567890',
             ],
         ];
         $this->assertSame($expect, $this->parser->parse($queryString, null));

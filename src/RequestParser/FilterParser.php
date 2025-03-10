@@ -163,7 +163,16 @@ class FilterParser
             if ($this->isBooleanString($value)) {
                 return strtolower($value) === 'true';
             }
-            if ($this->isNumberString($value)) {
+            if (
+                $this->isNumberString($value) &&
+                !in_array($parentOperator, [
+                    IbmOperator::CONTAINS->value,
+                    IbmOperator::CONTAINS_RELATION->value,
+                    IbmOperator::STARTS_WITH->value,
+                    IbmOperator::STARTS_WITH_RELATION->value,
+                    IbmOperator::ENDS_WITH->value,
+                    IbmOperator::ENDS_WITH_RELATION->value,
+                ])) {
                 return str_contains($value, '.') ? (float) $value : (int) $value;
             }
             if ($this->isDateString($value)) {
@@ -256,9 +265,9 @@ class FilterParser
     private function wildCardString($value, $operator = null): string
     {
         return match ($operator) {
-            'contains', 'containsRelation' => '%' . $value . '%',
-            'startsWith', 'startsWithRelation' => $value . '%',
-            'endsWith', 'endsWithRelation' => '%' . $value,
+            IbmOperator::CONTAINS->value, IbmOperator::CONTAINS_RELATION->value => '%' . $value . '%',
+            IbmOperator::STARTS_WITH->value, IbmOperator::STARTS_WITH_RELATION->value => $value . '%',
+            IbmOperator::ENDS_WITH->value, IbmOperator::ENDS_WITH_RELATION->value => '%' . $value,
             default => $value,
         };
     }
