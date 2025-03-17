@@ -201,9 +201,9 @@ class LaraJSQueryServiceProvider extends ServiceProvider
                 $limit = min($request->input('pagination.limit', $defaultLimit), $maxLimit);
 
                 return match ($request->input('pagination.type')) {
-                    'cursor' => $this->cursorPaginate(perPage: $limit, cursorName: 'pagination[cursor]'),
-                    'simple' => $this->simpleFastPaginate(perPage: $limit, pageName: 'pagination[page]'),
-                    default => $this->fastPaginate(perPage: $limit, pageName: 'pagination[page]'),
+                    'cursor' => $this->cursorPaginate(perPage: $limit, cursorName: 'pagination.cursor'),
+                    'simple' => $this->simpleFastPaginate(perPage: $limit, pageName: 'pagination.page'),
+                    default => $this->fastPaginate(perPage: $limit, pageName: 'pagination.page'),
                 };
             });
         }
