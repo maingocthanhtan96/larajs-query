@@ -15,7 +15,7 @@ class FilterParser
             $isNested = in_array($operator, [Operator::AND->value, Operator::OR->value, Operator::NOT->value], false);
             $parameters = $isNested
                 ? $this->sortNestedFilters($filter, $operator === Operator::OR->value)
-                : $this->parseParametersForObjection($operator, $filter, $isOr);
+                : $this->parseParametersForObjection($operator, $filter);
             $parsedArray[] = [
                 'fx' => $isOr ? $this->convertToOrFormat($this->getMethod($operator)) : $this->getMethod($operator),
                 'isNested' => $isNested,
@@ -27,7 +27,7 @@ class FilterParser
     }
 
     // To reconstruct the parameters to objections format
-    public function parseParametersForObjection($operator, $value, $isOr): array
+    public function parseParametersForObjection($operator, $value): array
     {
         $specialOperators = [
             Operator::IN->value,
@@ -36,6 +36,7 @@ class FilterParser
             Operator::IS_NULL->value,
             Operator::IS_NOT_NULL->value,
             Operator::RELATION->value,
+            Operator::ANY_RELATION->value,
         ];
         $operatorMap = [
             Operator::HAS->value => Operator::GREATER_OR_EQUAL->value,
@@ -46,9 +47,10 @@ class FilterParser
             $sequelizeKey = $this->removeHashFromString($value[0]);
             if ($isSpecialOperator) {
                 // HANDLE IN AND NOT IN
-                if ($operator === Operator::RELATION->value) {
-                    $sequelizeKeyField = $this->removeHashFromString($value[1]);
-                    $parameters = [$sequelizeKey, $sequelizeKeyField, ...array_slice($value, 2)];
+                $sequelizeKeyField = $this->removeHashFromString($value[1]);
+                if (in_array($operator, [Operator::RELATION->value, Operator::ANY_RELATION->value], true)) {
+                    $sliceIndex = $operator === Operator::RELATION->value ? 2 : 3;
+                    $parameters = [$sequelizeKey, $sequelizeKeyField, ...array_slice($value, $sliceIndex)];
                 } else {
                     $parameters = [$sequelizeKey, array_slice($value, 1)];
                 }
@@ -90,8 +92,8 @@ class FilterParser
             Operator::IN->value,
             Operator::IS_NULL->value,
             Operator::IS_NOT_NULL->value,
-            Operator::RELATION->value
-                => Method::fromName($key)->value,
+            Operator::RELATION->value,
+            Operator::ANY_RELATION->value => Method::fromName($key)->value,
             default => Method::DEFAULT->value,
         };
     }

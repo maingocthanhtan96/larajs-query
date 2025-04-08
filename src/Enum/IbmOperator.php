@@ -13,6 +13,7 @@ enum IbmOperator: string
     case STARTS_WITH = 'startsWith';
     case ENDS_WITH = 'endsWith';
     case ANY = 'any';
+    case ANY_RELATION = 'anyRelation';
     case EQUALS_RELATION = 'equalsRelation';
     case GREATER_THAN_RELATION = 'greaterThanRelation';
     case GREATER_OR_EQUAL_RELATION = 'greaterOrEqualRelation';

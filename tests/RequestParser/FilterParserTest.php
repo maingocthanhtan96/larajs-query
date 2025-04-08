@@ -304,6 +304,24 @@ class FilterParserTest extends TestCase
         $this->assertSame($expect, $this->parser->parse($queryString, null));
     }
 
+    public function test_any_relation_parser()
+    {
+        $queryString = "anyRelation(chapter,name,'Intro','Summary','Conclusion')";
+        $expect = [
+            'ANY_RELATION' => [
+                '#chapter',
+                '#name',
+                'IN',
+                [
+                    'Intro',
+                    'Summary',
+                    'Conclusion',
+                ],
+            ],
+        ];
+        $this->assertSame($expect, $this->parser->parse($queryString, null));
+    }
+
     public function test_not_parser()
     {
 

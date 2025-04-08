@@ -21,4 +21,5 @@ enum SqlOperator: string
     case IS_NOT_NULL = 'IS_NOT_NULL';
     case HAS = 'HAS';
     case RELATION = 'RELATION';
+    case ANY_RELATION = 'ANY_RELATION';
 }

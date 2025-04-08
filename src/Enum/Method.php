@@ -13,6 +13,7 @@ enum Method: string
     case HAS = 'has';
     case SPECIAL_LIKE = 'whereLikeRelationship';
     case RELATION = 'whereRelation';
+    case ANY_RELATION = 'whereRelationIn';
 
     public static function fromName(string $name): Method
     {

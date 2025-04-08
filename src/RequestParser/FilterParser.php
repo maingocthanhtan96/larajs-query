@@ -56,14 +56,12 @@ class FilterParser
             // Token is an operator
             switch ($token) {
                 case IbmOperator::ANY->value:
-                    $anyOperands = [];
-                    while (is_string(end($stack))) {
-                        $anyOperands[] = $this->coerceValue(array_pop($stack));
-                    }
+                    $anyOperands = array_map(fn($v) => $this->coerceValue($v), array_reverse(array_splice($stack, -count($stack), count($stack), [])));
                     if ($this->checkAllowFilter($anyOperands[0], $filterable)) {
                         $stack[] = [$this->mapOperator($token) => $anyOperands];
                     }
                     break;
+                case IbmOperator::ANY_RELATION->value:
                 case IbmOperator::EQUALS_RELATION->value:
                 case IbmOperator::GREATER_OR_EQUAL_RELATION->value:
                 case IbmOperator::GREATER_THAN_RELATION->value:
@@ -75,20 +73,20 @@ class FilterParser
                     $attributeRefRelation = $this->coerceValue(array_pop($stack), $token);
                     $attributeRefField = $this->coerceValue(array_pop($stack), $token);
                     $operator = match ($token) {
+                        IbmOperator::ANY_RELATION->value => SqlOperator::IN->value,
                         IbmOperator::EQUALS_RELATION->value => SqlOperator::EQUALS->value,
                         IbmOperator::GREATER_OR_EQUAL_RELATION->value => SqlOperator::GREATER_OR_EQUAL->value,
                         IbmOperator::GREATER_THAN_RELATION->value => SqlOperator::GREATER_THAN->value,
                         IbmOperator::LESS_OR_EQUAL_RELATION->value => SqlOperator::LESS_OR_EQUAL->value,
                         IbmOperator::LESS_THAN_RELATION->value => SqlOperator::LESS_THAN->value,
-                        IbmOperator::CONTAINS_RELATION->value,
-                        IbmOperator::ENDS_WITH_RELATION->value,
-                        IbmOperator::STARTS_WITH_RELATION->value => SqlOperator::LIKE->value,
-                        default => str_replace('_RELATION', '', $token)
+                        default => SqlOperator::LIKE->value,
                     };
-                    $value = $this->coerceValue(array_pop($stack), $token);
+                    $value = $token === IbmOperator::ANY_RELATION->value
+                        ? array_map(fn($v) => $this->coerceValue($v), array_reverse(array_splice($stack, -count($stack), count($stack), [])))
+                        : $this->coerceValue(array_pop($stack), $token);
                     if ($this->checkAllowFilter($attributeRefRelation, $filterable)) {
                         $stack[] = [
-                            $this->mapOperator($token, $value === null) => [
+                            $this->mapOperator($token, !is_array($value) && $value === null) => [
                                 $attributeRefRelation,
                                 $attributeRefField,
                                 $operator,
@@ -205,6 +203,7 @@ class FilterParser
     public function mapOperator($operator, $valueIsNull = false): string
     {
         return match ($operator) {
+            IbmOperator::ANY_RELATION->value => SqlOperator::ANY_RELATION->value,
             IbmOperator::EQUALS->value => $valueIsNull ? SqlOperator::IS_NULL->value : SqlOperator::EQUALS->value,
             IbmOperator::EQUALS_RELATION->value,
             IbmOperator::GREATER_OR_EQUAL_RELATION->value,

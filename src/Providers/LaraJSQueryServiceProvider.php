@@ -54,10 +54,22 @@ class LaraJSQueryServiceProvider extends ServiceProvider
                 $app->make(DateParser::class),
             );
         });
+        $this->whereRelationIn();
         $this->whereLikeRelationship();
         $this->collectionPaginate();
         $this->orderByRelationship();
         $this->dynamicPaginate();
+    }
+
+    private function whereRelationIn(): void
+    {
+        if (!Builder::hasGlobalMacro('whereRelationIn')) {
+            Builder::macro('whereRelationIn', function ($relation, $column, $values) {
+                return $this->whereHas($relation, function ($query) use ($column, $values) {
+                    $query->whereIn($column, $values);
+                });
+            });
+        }
     }
 
     private function whereLikeRelationship(): void
