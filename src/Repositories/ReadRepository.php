@@ -34,16 +34,7 @@ class ReadRepository implements ReadRepositoryInterface
      */
     public function findAll(QueryParserAllowDTO $allow, array $options = []): LengthAwarePaginator|CursorPaginator|Paginator|Collection
     {
-        $request = request();
-        $queryBuilder = $this->getQueryWithLaraJS($allow);
-
-        if ($request->input('pagination.page') === '-1') {
-            $maxLimit = $options['limit']['max'] ?? config('larajs-query.limit.max', LimitOption::MAX_LIMIT);
-
-            return $queryBuilder->take(min($maxLimit, $request->input('pagination.limit')))->get();
-        }
-
-        return $queryBuilder->dynamicPaginate($options);
+        return $this->getQueryWithLaraJS($allow)->dynamicPaginate($options);
     }
 
     /**

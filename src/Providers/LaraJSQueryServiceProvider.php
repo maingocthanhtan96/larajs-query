@@ -212,6 +212,12 @@ class LaraJSQueryServiceProvider extends ServiceProvider
                 $maxLimit = $options['limit']['max'] ?? config('larajs-query.limit.max', LimitOption::MAX_LIMIT);
                 $limit = min($request->input('pagination.limit', $defaultLimit), $maxLimit);
 
+                if ($request->input('pagination.page') === '-1') {
+                    $maxLimit = $options['limit']['max'] ?? config('larajs-query.limit.max', LimitOption::MAX_LIMIT);
+
+                    return $this->take(min($maxLimit, $request->input('pagination.limit')))->get();
+                }
+
                 return match ($request->input('pagination.type')) {
                     'cursor' => $this->cursorPaginate(perPage: $limit, cursorName: 'pagination.cursor'),
                     'simple' => $this->simpleFastPaginate(perPage: $limit, pageName: 'pagination.page'),
