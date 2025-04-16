@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use LaraJS\Query\DTO\QueryParserAllowDTO;
 use LaraJS\Query\DTO\QueryParserRequestDTO;
-use LaraJS\Query\Enum\LimitOption;
 use LaraJS\Query\LaraJSQuery;
 
 /**
