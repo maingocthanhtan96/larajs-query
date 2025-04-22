@@ -10,16 +10,12 @@ class SearchParser
      * Parse the search query.
      *
      * @param  array  $queryString
+     * @param  array  $defaultData
      * @param  ?array{column: array<string>, value: string}  $filterable
      * @return array{column: array<string>, value: string}
      */
-    public function parse(array $queryString, ?array $filterable): array
+    public function parse(array $queryString, array $defaultData, ?array $filterable): array
     {
-        $defaultData = [
-            'column' => '',
-            'value' => '',
-        ];
-
         if (is_array($filterable) && empty($filterable)) {
             return $defaultData;
         }
@@ -36,7 +32,7 @@ class SearchParser
             ->values()
             ->all();
 
-        // Return empty column and value if no valid columns are found
+        // Return an empty column and value if no valid columns are found
         if (!$columns) {
             return $defaultData;
         }
@@ -44,7 +40,7 @@ class SearchParser
         // Return the parsed column and value
         return [
             'column' => $columns,
-            'value' => $queryString['value'] ?? '',
+            'value' => $queryString['value'] ?? $defaultData['value'],
         ];
     }
 }

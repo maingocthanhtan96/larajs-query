@@ -10,6 +10,11 @@ class SearchParserTest extends TestCase
 {
     private SearchParser $parser;
 
+    private array $defaultData = [
+        'column' => '',
+        'value' => '',
+    ];
+
     private Builder $query;
 
     protected function setUp(): void
@@ -29,7 +34,7 @@ class SearchParserTest extends TestCase
             'value' => 'Lorem',
         ];
 
-        $this->assertSame($expect, $this->parser->parse($queryString, null));
+        $this->assertSame($expect, $this->parser->parse($queryString, $this->defaultData, null));
     }
 
     public function test_parser_filterable()
@@ -43,6 +48,6 @@ class SearchParserTest extends TestCase
             'value' => 'Lorem',
         ];
 
-        $this->assertSame($expect, $this->parser->parse($queryString, ['id', 'name', 'roles']));
+        $this->assertSame($expect, $this->parser->parse($queryString, $this->defaultData, ['id', 'name', 'roles']));
     }
 }

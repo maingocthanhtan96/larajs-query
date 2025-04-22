@@ -15,6 +15,8 @@ enum Method: string
     case RELATION = 'whereRelation';
     case ANY_RELATION = 'whereRelationIn';
 
+    case DATE_BETWEEN = 'whereDateBetween';
+
     public static function fromName(string $name): Method
     {
         return constant("self::$name");

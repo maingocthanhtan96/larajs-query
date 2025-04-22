@@ -25,7 +25,7 @@ class RequestParser
         private readonly IncludeParser $includeParser,
         private readonly SelectParser $selectParser,
         private readonly SearchParser $searchParser,
-        private readonly DateParser $dateParser,
+        private readonly SearchParser $dateParser,
     ) {}
 
     /**
@@ -37,8 +37,26 @@ class RequestParser
     {
         $this->setInclude($this->includeParser->parse($options->include ?? [], $allow->include))
             ->setFilter($this->filterParser->parse($options->filter ?? [], $allow->filter))
-            ->setSearch($this->searchParser->parse($options->search ?? [], $allow->search))
-            ->setDate($this->dateParser->parse($options->date ?? [], $allow->date))
+            ->setSearch(
+                $this->searchParser->parse(
+                    $options->search ?? [],
+                    [
+                        'column' => '',
+                        'value' => '',
+                    ],
+                    $allow->search
+                )
+            )
+            ->setDate(
+                $this->dateParser->parse(
+                    $options->date ?? [],
+                    [
+                        'column' => '',
+                        'value' => [],
+                    ],
+                    $allow->date
+                )
+            )
             ->setSort($this->sortParser->parse($options->sort ?? '', $allow->sort))
             ->setSelect($this->selectParser->parse($options->select ?? '', $allow->select));
 

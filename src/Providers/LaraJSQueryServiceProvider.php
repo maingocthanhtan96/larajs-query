@@ -56,6 +56,7 @@ class LaraJSQueryServiceProvider extends ServiceProvider
         });
         $this->whereRelationIn();
         $this->whereLikeRelationship();
+        $this->whereDateBetween();
         $this->collectionPaginate();
         $this->orderByRelationship();
         $this->dynamicPaginate();
@@ -104,6 +105,21 @@ class LaraJSQueryServiceProvider extends ServiceProvider
                                 $query->orWhere("$table.$attribute", 'LIKE', "%{$searchTerm}%");
                             },
                         );
+                    }
+                });
+
+                return $this;
+            });
+        }
+    }
+
+    private function whereDateBetween(): void
+    {
+        if (!Builder::hasGlobalMacro('whereDateBetween')) {
+            Builder::macro('whereDateBetween', function ($attributes, $dates) {
+                $this->whereNested(function ($query) use ($attributes, $dates) {
+                    foreach ($attributes as $column) {
+                        $query->whereBetween($column, $dates, 'or');
                     }
                 });
 

@@ -3,12 +3,13 @@
 namespace LaraJS\Query\QueryParser;
 
 use Carbon\Carbon;
+use LaraJS\Query\Enum\Method;
 
 class DateParser
 {
     public function parse(array $queryString): array
     {
-        $column = $queryString['column'] ?? '';
+        $column = $queryString['column'] ?? [];
         $value = $queryString['value'] ?? [];
         if (!$column || !$value) {
             return [];
@@ -16,7 +17,7 @@ class DateParser
 
         return [
             [
-                'fx' => 'whereBetween',
+                'fx' => Method::DATE_BETWEEN->value,
                 'isNested' => false,
                 'parameters' => [
                     $column,
