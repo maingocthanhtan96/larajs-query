@@ -39,6 +39,33 @@ class DateParserTest extends TestCase
         $this->assertEquals($expect, $this->parser->parse($queryString));
     }
 
+    public function test_value_start_end_parser()
+    {
+        $queryString = [
+            'column' => ['updated_at'],
+            'value' => [
+                'start' => '2024-01-01',
+                'end' => '2024-12-01',
+            ],
+        ];
+
+        $expect = [
+            [
+                'fx' => 'whereDateBetween',
+                'isNested' => false,
+                'parameters' => [
+                    ['updated_at'],
+                    [
+                        Carbon::createFromFormat('Y-m-d', $queryString['value']['start'])->startOfDay(),
+                        Carbon::createFromFormat('Y-m-d', $queryString['value']['end'])->endOfDay(),
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expect, $this->parser->parse($queryString));
+    }
+
     public function test_multiple_parser()
     {
         $queryString = [

@@ -22,8 +22,8 @@ class DateParser
                 'parameters' => [
                     $column,
                     [
-                        Carbon::createFromFormat('Y-m-d', $value[0])->startOfDay(),
-                        Carbon::createFromFormat('Y-m-d', $value[1])->endOfDay(),
+                        Carbon::createFromFormat('Y-m-d', $value['start'] ?? $value[0])->startOfDay(),
+                        Carbon::createFromFormat('Y-m-d', $value['end'] ?? $value[1])->endOfDay(),
                     ],
                 ],
             ],
