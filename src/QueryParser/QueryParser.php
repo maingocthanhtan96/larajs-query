@@ -15,7 +15,7 @@ class QueryParser implements QueryParserInterface
         private readonly RequestParser $requestParser,
         private readonly FilterParser $filterParser,
         private readonly SortParser $sortParser,
-        private readonly IncludeParser $aggregateParser,
+        private readonly IncludeParser $includeParser,
         private readonly SelectParser $selectParser,
         private readonly SearchParser $searchParser,
         private readonly DateParser $dateParser,
@@ -33,7 +33,7 @@ class QueryParser implements QueryParserInterface
 
         $queries = array_merge(
             $this->selectParser->parse($requestParser->getSelect()),
-            $this->aggregateParser->parse($requestParser->getInclude()),
+            $this->includeParser->parse($requestParser->getInclude()),
             $this->filterParser->parse($requestParser->getFilter()),
             $this->searchParser->parse($requestParser->getSearch()),
             $this->dateParser->parse($requestParser->getDate()),
@@ -50,9 +50,12 @@ class QueryParser implements QueryParserInterface
             $parameters = $query['parameters'];
 
             if ($query['isNested']) {
-                // NOTE: maybe apply for whereHas
                 // $builder->{$fx}($parameters[0], fn(Builder $query) => $this->handleQuery($query, $this->getNestedParameters($parameters)));
-                $builder->{$fx}(fn(Builder $q) => $this->handleQuery($q, $parameters));
+                if ($fx === Method::INCLUDE_RELATION_HAS->value) {
+                    $builder->{$fx}($parameters[0], fn(Builder $q) => $this->handleQuery($q, [$parameters[1]]));
+                } else {
+                    $builder->{$fx}(fn(Builder $q) => $this->handleQuery($q, $parameters));
+                }
             } else {
                 $builder->when($parameters, fn(Builder $q) => $this->applyFunction($q, $fx, $parameters));
             }

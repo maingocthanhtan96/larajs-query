@@ -6,11 +6,16 @@ use Illuminate\Support\Str;
 
 class IncludeParser
 {
+    /**
+     * @param  array{with: array, withWhereHas: array}  $aggregates
+     * @return array
+     */
     public function parse(array $aggregates): array
     {
-        $parsedArray = array_map(fn($aggregate) => $this->parseAggregate($aggregate), $aggregates);
+        $fxWith = array_map(fn($aggregate) => $this->parseAggregate($aggregate), $aggregates['with'] ?? []);
+        $fxWithWhereHas = (new FilterParser)->parse($aggregates['withWhereHas'] ?? []);
 
-        return $this->mergeWithFx($parsedArray);
+        return array_merge($this->mergeWithFx($fxWith), $fxWithWhereHas);
     }
 
     private function parseAggregate(string $aggregate): array

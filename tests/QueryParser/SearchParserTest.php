@@ -1,6 +1,6 @@
 <?php
 
-namespace QueryParser;
+namespace Tests\QueryParser;
 
 use LaraJS\Query\Enum\Method;
 use LaraJS\Query\QueryParser\SearchParser;

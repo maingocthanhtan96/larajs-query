@@ -14,7 +14,8 @@ enum Method: string
     case SPECIAL_LIKE = 'whereLikeRelationship';
     case RELATION = 'whereRelation';
     case ANY_RELATION = 'whereRelationIn';
-
+    case RELATION_HAS = 'whereHas';
+    case INCLUDE_RELATION_HAS = 'withWhereHas';
     case DATE_BETWEEN = 'whereDateBetween';
 
     public static function fromName(string $name): Method

@@ -11,16 +11,32 @@ class FilterParser
     public function parse(array $filters, bool $isOr = false): array
     {
         $parsedArray = [];
-        foreach ($filters as $operator => $filter) {
-            $isNested = in_array($operator, [Operator::AND->value, Operator::OR->value, Operator::NOT->value], false);
-            $parameters = $isNested
+        $isNested = static fn($op) => in_array($op, [
+            Operator::AND->value,
+            Operator::OR->value,
+            Operator::NOT->value,
+            Operator::RELATION_HAS->value,
+            Operator::INCLUDE_RELATION_HAS->value,
+        ], true);
+
+        $parseFilter = function ($operator, $filter) use ($isNested, $isOr) {
+            $nested = $isNested($operator);
+            $parameters = $nested
                 ? $this->sortNestedFilters($filter, $operator === Operator::OR->value)
                 : $this->parseParametersForObjection($operator, $filter);
-            $parsedArray[] = [
+
+            return [
                 'fx' => $isOr ? $this->convertToOrFormat($this->getMethod($operator)) : $this->getMethod($operator),
-                'isNested' => $isNested,
+                'isNested' => $nested,
                 'parameters' => $parameters,
             ];
+        };
+        $filters = Arr::isAssoc($filters) ? [$filters] : $filters;
+
+        foreach ($filters as $filterNotAssoc) {
+            foreach ($filterNotAssoc as $operator => $filter) {
+                $parsedArray[] = $parseFilter($operator, $filter);
+            }
         }
 
         return $parsedArray;
@@ -37,6 +53,8 @@ class FilterParser
             Operator::IS_NOT_NULL->value,
             Operator::RELATION->value,
             Operator::ANY_RELATION->value,
+            Operator::RELATION_HAS->value,
+            Operator::INCLUDE_RELATION_HAS->value,
         ];
         $operatorMap = [
             Operator::HAS->value => Operator::GREATER_OR_EQUAL->value,
@@ -93,7 +111,9 @@ class FilterParser
             Operator::IS_NULL->value,
             Operator::IS_NOT_NULL->value,
             Operator::RELATION->value,
-            Operator::ANY_RELATION->value => Method::fromName($key)->value,
+            Operator::ANY_RELATION->value,
+            Operator::RELATION_HAS->value,
+            Operator::INCLUDE_RELATION_HAS->value => Method::fromName($key)->value,
             default => Method::DEFAULT->value,
         };
     }

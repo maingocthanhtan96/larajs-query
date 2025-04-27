@@ -475,4 +475,186 @@ class FilterParserTest extends TestCase
         ];
         $this->assertSame($expect, $this->parser->parse($queryString, ['name', 'age', 'lastModified', 'description', 'articles']));
     }
+
+    public function test_where_has_parser()
+    {
+        $queryString = "relationHas(comments, contains(content,'cooking'))";
+        $expect = [
+            'RELATION_HAS' => [
+                'comments',
+                [
+                    'LIKE' => [
+                        '#content',
+                        '%cooking%',
+                    ],
+                ],
+            ],
+        ];
+        $this->assertSame($expect, $this->parser->parse($queryString, null));
+    }
+
+    public function test_where_has_nested_parser()
+    {
+        $queryString = "relationHas(comments, and(equals(name,'Smith'),greaterThan(age,'25'),lessOrEqual(lastModified,'2001-01-01'),containsRelation(articles,description,'cooking')))";
+        $expect = [
+            'RELATION_HAS' => [
+                'comments',
+                [
+                    'AND' => [
+                        [
+                            'RELATION' => [
+                                '#articles',
+                                '#description',
+                                'LIKE',
+                                '%cooking%',
+                            ],
+                        ],
+                        [
+                            '<=' => [
+                                '#lastModified',
+                                '2001-01-01',
+                            ],
+                        ],
+                        [
+                            '>' => [
+                                '#age',
+                                25,
+                            ],
+                        ],
+
+                        [
+                            '=' => [
+                                '#name',
+                                'Smith',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        $this->assertSame($expect, $this->parser->parse($queryString, null));
+    }
+
+    public function test_multiple_nested_where_has_parser()
+    {
+        $queryString = "relationHas(comments,relationHas(replies,equals(status,'approved')))";
+        $expect = [
+            'RELATION_HAS' => [
+                'comments',
+                [
+                    'RELATION_HAS' => [
+                        'replies',
+                        [
+                            '=' => [
+                                '#status',
+                                'approved',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        $this->assertSame($expect, $this->parser->parse($queryString, null));
+    }
+
+    public function test_complex_nested_where_has_parser()
+    {
+        $queryString = "relationHas(posts,and(equals(status,'published'),relationHas(comments,and(greaterThan(likes,'10'),equals(approved,'1')))))";
+        $expect = [
+            'RELATION_HAS' => [
+                'posts',
+                [
+                    'AND' => [
+                        [
+                            'RELATION_HAS' => [
+                                'comments',
+                                [
+                                    'AND' => [
+                                        [
+                                            '=' => [
+                                                '#approved',
+                                                1,
+                                            ],
+                                        ],
+                                        [
+                                            '>' => [
+                                                '#likes',
+                                                10,
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            '=' => [
+                                '#status',
+                                'published',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        $this->assertSame($expect, $this->parser->parse($queryString, null));
+    }
+
+    public function test_include_where_has_parser()
+    {
+        $queryString = "includeRelation(posts,and(equals(status,'published'),relationHas(comments,and(greaterThan(likes,'10'),equals(approved,'1')))))";
+        $expect = [
+            'INCLUDE_RELATION_HAS' => [
+                'posts',
+                [
+                    'AND' => [
+                        [
+                            'RELATION_HAS' => [
+                                'comments',
+                                [
+                                    'AND' => [
+                                        [
+                                            '=' => [
+                                                '#approved',
+                                                1,
+                                            ],
+                                        ],
+                                        [
+                                            '>' => [
+                                                '#likes',
+                                                10,
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            '=' => [
+                                '#status',
+                                'published',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        $this->assertSame($expect, $this->parser->parse($queryString, null));
+    }
+
+    public function test_include_relation_with_equals_parser()
+    {
+        $queryString = "includeRelation(comments,equals(status,'approved'))";
+        $expect = [
+            'INCLUDE_RELATION_HAS' => [
+                'comments',
+                [
+                    '=' => [
+                        '#status',
+                        'approved',
+                    ],
+                ],
+            ],
+        ];
+        $this->assertSame($expect, $this->parser->parse($queryString, null));
+    }
 }

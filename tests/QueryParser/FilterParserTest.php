@@ -792,4 +792,400 @@ class FilterParserTest extends TestCase
         ];
         $this->assertSame($expect, $this->parser->parse($queryString));
     }
+
+    public function test_where_has_parser()
+    {
+        $queryString = [
+            'RELATION_HAS' => [
+                'comments',
+                [
+                    'LIKE' => [
+                        '#content',
+                        '%cooking%',
+                    ],
+                ],
+            ],
+        ];
+        $expect = [
+            [
+                'fx' => 'whereHas',
+                'isNested' => true,
+                'parameters' => [
+                    'comments',
+                    [
+                        'fx' => 'where',
+                        'isNested' => false,
+                        'parameters' => [
+                            'content',
+                            'LIKE',
+                            '%cooking%',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        $this->assertSame($expect, $this->parser->parse($queryString));
+    }
+
+    public function test_where_has_nested_parser()
+    {
+        $queryString = [
+            'RELATION_HAS' => [
+                'comments',
+                [
+                    'AND' => [
+                        [
+                            'RELATION' => [
+                                '#articles',
+                                '#description',
+                                'LIKE',
+                                '%cooking%',
+                            ],
+                        ],
+                        [
+                            '<=' => [
+                                '#lastModified',
+                                '2001-01-01',
+                            ],
+                        ],
+                        [
+                            '>' => [
+                                '#age',
+                                25,
+                            ],
+                        ],
+
+                        [
+                            '=' => [
+                                '#name',
+                                'Smith',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        $expect = [
+            [
+                'fx' => 'whereHas',
+                'isNested' => true,
+                'parameters' => [
+                    'comments',
+                    [
+                        'fx' => 'where',
+                        'isNested' => true,
+                        'parameters' => [
+                            [
+                                'fx' => 'whereRelation',
+                                'isNested' => false,
+                                'parameters' => [
+                                    'articles',
+                                    'description',
+                                    'LIKE',
+                                    '%cooking%',
+                                ],
+                            ],
+                            [
+                                'fx' => 'where',
+                                'isNested' => false,
+                                'parameters' => [
+                                    'lastModified',
+                                    '<=',
+                                    '2001-01-01',
+                                ],
+                            ],
+                            [
+                                'fx' => 'where',
+                                'isNested' => false,
+                                'parameters' => [
+                                    'age',
+                                    '>',
+                                    25,
+                                ],
+                            ],
+                            [
+                                'fx' => 'where',
+                                'isNested' => false,
+                                'parameters' => [
+                                    'name',
+                                    '=',
+                                    'Smith',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        $this->assertSame($expect, $this->parser->parse($queryString));
+    }
+
+    public function test_complex_nested_relation()
+    {
+        $queryString = [
+            'RELATION_HAS' => [
+                'posts',
+                [
+                    'AND' => [
+                        [
+                            'RELATION_HAS' => [
+                                'comments',
+                                [
+                                    'IS_NULL' => '#deletedAt',
+                                ],
+                            ],
+                        ],
+                        [
+                            'NOT' => [
+                                'IS_NULL' => '#publishedAt',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $expect = [
+            [
+                'fx' => 'whereHas',
+                'isNested' => true,
+                'parameters' => [
+                    'posts',
+                    [
+                        'fx' => 'where',
+                        'isNested' => true,
+                        'parameters' => [
+                            [
+                                'fx' => 'whereHas',
+                                'isNested' => true,
+                                'parameters' => [
+                                    'comments',
+                                    [
+                                        'fx' => 'whereNull',
+                                        'isNested' => false,
+                                        'parameters' => ['deletedAt'],
+                                    ],
+                                ],
+                            ],
+                            [
+                                'fx' => 'whereNot',
+                                'isNested' => true,
+                                'parameters' => [
+                                    [
+                                        'fx' => 'whereNull',
+                                        'isNested' => false,
+                                        'parameters' => ['publishedAt'],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertSame($expect, $this->parser->parse($queryString));
+    }
+
+    public function test_relation_with_multiple_conditions()
+    {
+        $queryString = [
+            'RELATION_HAS' => [
+                'orders',
+                [
+                    'OR' => [
+                        [
+                            '>' => ['#total', 1000],
+                        ],
+                        [
+                            'IS_NULL' => '#canceledAt',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $expect = [
+            [
+                'fx' => 'whereHas',
+                'isNested' => true,
+                'parameters' => [
+                    'orders',
+                    [
+                        'fx' => 'where',
+                        'isNested' => true,
+                        'parameters' => [
+                            [
+                                'fx' => 'where',
+                                'isNested' => false,
+                                'parameters' => ['total', '>', 1000],
+                            ],
+                            [
+                                'fx' => 'orWhereNull',
+                                'isNested' => false,
+                                'parameters' => ['canceledAt'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertSame($expect, $this->parser->parse($queryString));
+    }
+
+    public function test_relation_with_null_check()
+    {
+        $queryString = [
+            'RELATION_HAS' => [
+                'user',
+                [
+                    'IS_NOT_NULL' => '#email',
+                ],
+            ],
+        ];
+
+        $expect = [
+            [
+                'fx' => 'whereHas',
+                'isNested' => true,
+                'parameters' => [
+                    'user',
+                    [
+                        'fx' => 'whereNotNull',
+                        'isNested' => false,
+                        'parameters' => ['email'],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertSame($expect, $this->parser->parse($queryString));
+    }
+
+    public function test_include_filter_relation_parser()
+    {
+        $queryString = [
+            'INCLUDE_RELATION_HAS' => [
+                'posts',
+                [
+                    'LIKE' => [
+                        '#title',
+                        '%test%',
+                    ],
+                ],
+            ],
+        ];
+
+        $expect = [
+            [
+                'fx' => 'withWhereHas',
+                'isNested' => true,
+                'parameters' => [
+                    'posts',
+                    [
+                        'fx' => 'where',
+                        'isNested' => false,
+                        'parameters' => [
+                            'title',
+                            'LIKE',
+                            '%test%',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertSame($expect, $this->parser->parse($queryString));
+    }
+
+    public function test_include_filter_relation_with_nested_conditions()
+    {
+        $queryString = [
+            'INCLUDE_RELATION_HAS' => [
+                'comments',
+                [
+                    'AND' => [
+                        [
+                            'IS_NOT_NULL' => '#publishedAt',
+                        ],
+                        [
+                            'LIKE' => [
+                                '#content',
+                                '%important%',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $expect = [
+            [
+                'fx' => 'withWhereHas',
+                'isNested' => true,
+                'parameters' => [
+                    'comments',
+                    [
+                        'fx' => 'where',
+                        'isNested' => true,
+                        'parameters' => [
+                            [
+                                'fx' => 'whereNotNull',
+                                'isNested' => false,
+                                'parameters' => ['publishedAt'],
+                            ],
+                            [
+                                'fx' => 'where',
+                                'isNested' => false,
+                                'parameters' => [
+                                    'content',
+                                    'LIKE',
+                                    '%important%',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertSame($expect, $this->parser->parse($queryString));
+    }
+
+    public function test_include_filter_relation_with_simple_condition()
+    {
+        $queryString = [
+            'INCLUDE_RELATION_HAS' => [
+                'comments',
+                [
+                    '=' => [
+                        '#status',
+                        'approved',
+                    ],
+                ],
+            ],
+        ];
+
+        $expect = [
+            [
+                'fx' => 'withWhereHas',
+                'isNested' => true,
+                'parameters' => [
+                    'comments',
+                    [
+                        'fx' => 'where',
+                        'isNested' => false,
+                        'parameters' => [
+                            'status',
+                            '=',
+                            'approved',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertSame($expect, $this->parser->parse($queryString));
+    }
 }
