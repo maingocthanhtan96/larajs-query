@@ -1079,7 +1079,7 @@ class FilterParserTest extends TestCase
 
         $expect = [
             [
-                'fx' => 'withWhereHas',
+                'fx' => 'with',
                 'isNested' => true,
                 'parameters' => [
                     'posts',
@@ -1122,7 +1122,7 @@ class FilterParserTest extends TestCase
 
         $expect = [
             [
-                'fx' => 'withWhereHas',
+                'fx' => 'with',
                 'isNested' => true,
                 'parameters' => [
                     'comments',
@@ -1169,7 +1169,7 @@ class FilterParserTest extends TestCase
 
         $expect = [
             [
-                'fx' => 'withWhereHas',
+                'fx' => 'with',
                 'isNested' => true,
                 'parameters' => [
                     'comments',

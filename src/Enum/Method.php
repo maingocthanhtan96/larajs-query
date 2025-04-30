@@ -15,8 +15,10 @@ enum Method: string
     case RELATION = 'whereRelation';
     case ANY_RELATION = 'whereRelationIn';
     case RELATION_HAS = 'whereHas';
-    case INCLUDE_RELATION_HAS = 'withWhereHas';
     case DATE_BETWEEN = 'whereDateBetween';
+
+    case WITH = 'with';
+    case WITH_AGGREGATE = 'withAggregate';
 
     public static function fromName(string $name): Method
     {

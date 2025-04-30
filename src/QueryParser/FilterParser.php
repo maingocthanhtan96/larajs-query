@@ -112,8 +112,8 @@ class FilterParser
             Operator::IS_NOT_NULL->value,
             Operator::RELATION->value,
             Operator::ANY_RELATION->value,
-            Operator::RELATION_HAS->value,
-            Operator::INCLUDE_RELATION_HAS->value => Method::fromName($key)->value,
+            Operator::RELATION_HAS->value => Method::fromName($key)->value,
+            Operator::INCLUDE_RELATION_HAS->value => Method::WITH->value,
             default => Method::DEFAULT->value,
         };
     }

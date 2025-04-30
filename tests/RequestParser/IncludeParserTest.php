@@ -150,7 +150,7 @@ class IncludeParserTest extends TestCase
     public function test_parser_filter_relation()
     {
         $queryString = ["users|and(equals(name,'Smith'),greaterThan(age,'25'))"];
-        $filterable = ['users'];
+        $filterable = ['users', 'roles'];
         $expect['with'] = [];
         $expect['withWhereHas'] = [
             [

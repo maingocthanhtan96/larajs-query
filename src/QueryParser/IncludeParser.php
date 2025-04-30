@@ -3,6 +3,7 @@
 namespace LaraJS\Query\QueryParser;
 
 use Illuminate\Support\Str;
+use LaraJS\Query\Enum\Method;
 
 class IncludeParser
 {
@@ -26,7 +27,7 @@ class IncludeParser
             $method = strtolower($method);
 
             return [
-                'fx' => 'withAggregate',
+                'fx' => Method::WITH_AGGREGATE->value,
                 'isNested' => false,
                 'parameters' => [
                     $relation,
@@ -37,7 +38,7 @@ class IncludeParser
         }
 
         return [
-            'fx' => 'with',
+            'fx' => Method::WITH->value,
             'isNested' => false,
             'parameters' => [$aggregate],
         ];

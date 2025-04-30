@@ -88,7 +88,7 @@ class IncludeParserTest extends TestCase
 
         $expect = [
             [
-                'fx' => 'withWhereHas',
+                'fx' => 'with',
                 'isNested' => true,
                 'parameters' => [
                     'users',
@@ -122,6 +122,7 @@ class IncludeParserTest extends TestCase
 
         $this->assertSame($expect, $this->parser->parse($queryString));
     }
+
 
     public function test_empty_input()
     {
@@ -174,7 +175,7 @@ class IncludeParserTest extends TestCase
                 'parameters' => ['roles', '*', 'count'],
             ],
             [
-                'fx' => 'withWhereHas',
+                'fx' => 'with',
                 'isNested' => true,
                 'parameters' => [
                     'users',
@@ -227,7 +228,7 @@ class IncludeParserTest extends TestCase
 
         $expect = [
             [
-                'fx' => 'withWhereHas',
+                'fx' => 'with',
                 'isNested' => true,
                 'parameters' => [
                     'categories',
@@ -287,7 +288,7 @@ class IncludeParserTest extends TestCase
 
         $expect = [
             [
-                'fx' => 'withWhereHas',
+                'fx' => 'with',
                 'isNested' => true,
                 'parameters' => [
                     'users',
@@ -318,7 +319,7 @@ class IncludeParserTest extends TestCase
                 ],
             ],
             [
-                'fx' => 'withWhereHas',
+                'fx' => 'with',
                 'isNested' => true,
                 'parameters' => [
                     'categories',

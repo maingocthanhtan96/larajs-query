@@ -3,7 +3,7 @@
 namespace LaraJS\Query\RequestParser;
 
 use InvalidArgumentException;
-use LaraJS\Query\Enum\IbmOperator;
+use LaraJS\Query\Enum\SqlOperator;
 
 class IncludeParser
 {
@@ -35,8 +35,14 @@ class IncludeParser
                 throw new InvalidArgumentException("Relations: '{$relation}'is not allowed");
             }
             if ($args && !in_array(strtolower($args), ['count', 'sum', 'avg', 'min', 'max', 'exists'], true)) {
-                $withWhereHas = (new FilterParser)->parse(IbmOperator::INCLUDE_RELATION->value . "($relation, $args)", null);
-                $includes['withWhereHas'][] = $withWhereHas;
+                $withWhereHas = (new FilterParser)->parse($args, null);
+
+                $includes['withWhereHas'][] = [
+                    SqlOperator::INCLUDE_RELATION_HAS->value => [
+                        $relation,
+                        $withWhereHas,
+                    ],
+                ];
             } else {
                 $includes['with'][] = $aggregate;
             }

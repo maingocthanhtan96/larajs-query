@@ -43,7 +43,7 @@ class QueryParser implements QueryParserInterface
         return $this->handleQuery($query, $queries);
     }
 
-    private function handleQuery(Builder $builder, array $queries): Builder
+    private function handleQuery($builder, array $queries)
     {
         foreach ($queries as $query) {
             $fx = $query['fx'];
@@ -51,8 +51,8 @@ class QueryParser implements QueryParserInterface
 
             if ($query['isNested']) {
                 // $builder->{$fx}($parameters[0], fn(Builder $query) => $this->handleQuery($query, $this->getNestedParameters($parameters)));
-                if ($fx === Method::INCLUDE_RELATION_HAS->value) {
-                    $builder->{$fx}($parameters[0], fn(Builder $q) => $this->handleQuery($q, [$parameters[1]]));
+                if ($fx === Method::WITH->value) {
+                    $builder->{$fx}([$parameters[0] => fn($q) => $this->handleQuery($q, [$parameters[1]])]);
                 } else {
                     $builder->{$fx}(fn(Builder $q) => $this->handleQuery($q, $parameters));
                 }
