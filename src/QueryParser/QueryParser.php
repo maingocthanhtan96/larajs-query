@@ -57,20 +57,11 @@ class QueryParser implements QueryParserInterface
                     $builder->{$fx}(fn(Builder $q) => $this->handleQuery($q, $parameters));
                 }
             } else {
-                $builder->when($parameters, fn(Builder $q) => $this->applyFunction($q, $fx, $parameters));
+                $builder->when($parameters, fn(Builder $q) => $q->{$fx}(...$parameters));
             }
         }
 
         return $builder;
-    }
-
-    private function applyFunction(Builder $query, string $fx, array $parameters): void
-    {
-        $query->when(
-            $fx === Method::SPECIAL_LIKE->value && $parameters[0] && $parameters[1],
-            fn(Builder $q) => $q->{$fx}(...$parameters),
-            fn(Builder $q) => $q->{$fx}(...$parameters)
-        );
     }
 
     //    private function getNestedParameters(array $parameters): array
