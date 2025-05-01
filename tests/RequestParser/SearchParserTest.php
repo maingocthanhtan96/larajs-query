@@ -1,6 +1,6 @@
 <?php
 
-namespace RequestParser;
+namespace Tests\RequestParser;
 
 use Illuminate\Database\Eloquent\Builder;
 use LaraJS\Query\RequestParser\SearchParser;

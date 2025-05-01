@@ -26,4 +26,6 @@ enum IbmOperator: string
     case AND = 'and';
     case OR = 'or';
     case HAS = 'has';
+    case RELATION = 'relation';
+    case INCLUDE_RELATION = 'includeRelation';
 }

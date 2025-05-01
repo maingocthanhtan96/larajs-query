@@ -20,6 +20,8 @@ enum SqlOperator: string
     case IS_NULL = 'IS_NULL';
     case IS_NOT_NULL = 'IS_NOT_NULL';
     case HAS = 'HAS';
+    case FILTER_RELATION_HAS = 'FILTER_RELATION_HAS';
+    case FILTER_RELATION = 'FILTER_RELATION';
     case RELATION = 'RELATION';
     case ANY_RELATION = 'ANY_RELATION';
 }

@@ -21,4 +21,6 @@ enum Operator: string
     case HAS = 'HAS';
     case RELATION = 'RELATION';
     case ANY_RELATION = 'ANY_RELATION';
+    case FILTER_RELATION_HAS = 'FILTER_RELATION_HAS';
+    case FILTER_RELATION = 'FILTER_RELATION';
 }

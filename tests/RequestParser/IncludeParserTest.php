@@ -1,6 +1,6 @@
 <?php
 
-namespace RequestParser;
+namespace Tests\RequestParser;
 
 use Illuminate\Database\Eloquent\Builder;
 use LaraJS\Query\RequestParser\IncludeParser;
@@ -21,17 +21,54 @@ class IncludeParserTest extends TestCase
     public function test_parser()
     {
         $queryString = ['roles', 'roles|count', 'roles|exists', 'roles.total|sum', 'roles.total|min', 'roles.total|max', 'roles.total|avg'];
-        $expect = ['roles', 'roles|count', 'roles|exists', 'roles.total|sum', 'roles.total|min', 'roles.total|max', 'roles.total|avg'];
+        $expect = [
+            'with' => ['roles', 'roles|count', 'roles|exists', 'roles.total|sum', 'roles.total|min', 'roles.total|max', 'roles.total|avg'],
+            'filterWith' => [],
+        ];
 
         $this->assertSame($expect, $this->parser->parse($queryString, null));
+    }
+
+    public function test_parser_empty_query_string()
+    {
+        $queryString = [];
+        $filterable = ['roles', 'users'];
+        $expect = [
+            'with' => [],
+            'filterWith' => [],
+        ];
+
+        $this->assertSame($expect, $this->parser->parse($queryString, $filterable));
+    }
+
+    public function test_parser_null_query_string_and_filterable()
+    {
+        $queryString = null;
+        $filterable = null;
+        $expect = [
+            'with' => [],
+            'filterWith' => [],
+        ];
+
+        $this->assertSame($expect, $this->parser->parse($queryString ?? [], $filterable));
+    }
+
+    public function test_parser_invalid_relation_throws_exception()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $queryString = ['invalid'];
+        $filterable = ['users', 'roles'];
+
+        $this->parser->parse($queryString, $filterable);
     }
 
     public function test_parser_filterable()
     {
         $queryString = ['roles', 'roles|count', 'roles.permissions|count'];
-        $expect = ['roles', 'roles|count', 'roles.permissions|count'];
+        $expect['with'] = ['roles', 'roles|count', 'roles.permissions|count'];
+        $expect['filterWith'] = [];
 
-        $this->assertSame($expect, $this->parser->parse($queryString, ['roles', 'roles|count', 'roles.permissions|count']));
+        $this->assertSame($expect, $this->parser->parse($queryString, ['roles', 'roles', 'roles.permissions']));
     }
 
     public function test_parser_except_permission_count_invalid_filterable()
@@ -40,31 +77,33 @@ class IncludeParserTest extends TestCase
 
         $queryString = ['permissions|count', 'roles', 'roles|count', 'roles.permissions|count'];
 
-        $this->parser->parse($queryString, ['roles', 'roles|count', 'roles.permissions|count']);
+        $this->parser->parse($queryString, ['roles', 'roles', 'roles.permissions']);
     }
 
     public function test_parser_one_filterable()
     {
-        $queryString = ['roles', 'roles|count', 'roles.permissions|count'];
-        $expect = ['roles', 'roles|count', 'roles.permissions|count'];
+        $queryString = ['roles:id,name|count', 'roles.permissions|count'];
+        $expect['with'] = ['roles:id,name|count', 'roles.permissions|count'];
+        $expect['filterWith'] = [];
 
-        $this->assertSame($expect, $this->parser->parse($queryString, ['roles', 'roles|count', 'roles.permissions|count']));
+        $this->assertSame($expect, $this->parser->parse($queryString, ['roles', 'roles.permissions']));
     }
 
     public function test_parser_invalid_filterable()
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $queryString = ['roles:id,name,created_at'];
+        $queryString = ['roles:id,name,created_at', 'users'];
 
-        $this->parser->parse($queryString, ['roles:id,name', 'permissions']);
+        $this->parser->parse($queryString, ['roles', 'permissions']);
     }
 
     public function test_parser_with_no_column_specified()
     {
         $queryString = ['users', 'roles'];
         $filterable = ['users', 'roles'];
-        $expect = ['users', 'roles'];
+        $expect['with'] = ['users', 'roles'];
+        $expect['filterWith'] = [];
 
         $this->assertSame($expect, $this->parser->parse($queryString, $filterable));
     }
@@ -83,7 +122,8 @@ class IncludeParserTest extends TestCase
     {
         $queryString = ['users:id,name', 'roles', 'permissions:id'];
         $filterable = ['users:id,name', 'roles', 'permissions:id'];
-        $expect = ['users:id,name', 'roles', 'permissions:id'];
+        $expect['with'] = ['users:id,name', 'roles', 'permissions:id'];
+        $expect['filterWith'] = [];
 
         $this->assertSame($expect, $this->parser->parse($queryString, $filterable));
     }
@@ -91,8 +131,93 @@ class IncludeParserTest extends TestCase
     public function test_parser_with_aggregates()
     {
         $queryString = ['users|count', 'roles|exists'];
-        $filterable = ['users|count', 'roles|exists'];
-        $expect = ['users|count', 'roles|exists'];
+        $filterable = ['users', 'roles'];
+        $expect['with'] = ['users|count', 'roles|exists'];
+        $expect['filterWith'] = [];
+
+        $this->assertSame($expect, $this->parser->parse($queryString, $filterable));
+    }
+
+    public function test_parser_with_aggregates_filterable()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $queryString = ['users|count', 'roles|exists'];
+        $filterable = ['users'];
+
+        $this->parser->parse($queryString, $filterable);
+    }
+
+    public function test_parser_filter_relation()
+    {
+        $queryString = ["users|and(equals(name,'Smith'),greaterThan(age,'25'))"];
+        $filterable = ['users', 'roles'];
+        $expect['with'] = [];
+        $expect['filterWith'] = [
+            [
+                'FILTER_RELATION' => [
+                    'users',
+                    [
+                        'AND' => [
+                            [
+                                '>' => [
+                                    '#age',
+                                    25,
+                                ],
+                            ],
+                            [
+                                '=' => [
+                                    '#name',
+                                    'Smith',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertSame($expect, $this->parser->parse($queryString, $filterable));
+    }
+
+    public function test_parser_multiple_filter_relations()
+    {
+        $queryString = ["users|and(equals(name,'Smith'),greaterThan(age,'25'))", "categories|equals(user_id,'1')"];
+        $filterable = ['users', 'categories'];
+        $expect['with'] = [];
+        $expect['filterWith'] = [
+            [
+                'FILTER_RELATION' => [
+                    'users',
+                    [
+                        'AND' => [
+                            [
+                                '>' => [
+                                    '#age',
+                                    25,
+                                ],
+                            ],
+                            [
+                                '=' => [
+                                    '#name',
+                                    'Smith',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'FILTER_RELATION' => [
+                    'categories',
+                    [
+                        '=' => [
+                            '#user_id',
+                            1,
+                        ],
+                    ],
+                ],
+            ],
+        ];
 
         $this->assertSame($expect, $this->parser->parse($queryString, $filterable));
     }

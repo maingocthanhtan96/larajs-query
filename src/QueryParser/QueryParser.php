@@ -15,7 +15,7 @@ class QueryParser implements QueryParserInterface
         private readonly RequestParser $requestParser,
         private readonly FilterParser $filterParser,
         private readonly SortParser $sortParser,
-        private readonly IncludeParser $aggregateParser,
+        private readonly IncludeParser $includeParser,
         private readonly SelectParser $selectParser,
         private readonly SearchParser $searchParser,
         private readonly DateParser $dateParser,
@@ -33,7 +33,7 @@ class QueryParser implements QueryParserInterface
 
         $queries = array_merge(
             $this->selectParser->parse($requestParser->getSelect()),
-            $this->aggregateParser->parse($requestParser->getInclude()),
+            $this->includeParser->parse($requestParser->getInclude()),
             $this->filterParser->parse($requestParser->getFilter()),
             $this->searchParser->parse($requestParser->getSearch()),
             $this->dateParser->parse($requestParser->getDate()),
@@ -43,16 +43,23 @@ class QueryParser implements QueryParserInterface
         return $this->handleQuery($query, $queries);
     }
 
-    private function handleQuery(Builder $builder, array $queries): Builder
+    private function handleQuery($builder, array $queries)
     {
         foreach ($queries as $query) {
             $fx = $query['fx'];
             $parameters = $query['parameters'];
 
             if ($query['isNested']) {
-                // NOTE: maybe apply for whereHas
-                // $builder->{$fx}($parameters[0], fn(Builder $query) => $this->handleQuery($query, $this->getNestedParameters($parameters)));
-                $builder->{$fx}(fn(Builder $q) => $this->handleQuery($q, $parameters));
+                switch ($fx) {
+                    case Method::WITH->value:
+                        $builder->{$fx}([$parameters[0] => fn($q) => $this->handleQuery($q, [$parameters[1]])]);
+                        break;
+                    case Method::FILTER_RELATION_HAS->value:
+                        $builder->{$fx}($parameters[0], fn($q) => $this->handleQuery($q, [$parameters[1]]));
+                        break;
+                    default:
+                        $builder->{$fx}(fn(Builder $q) => $this->handleQuery($q, $parameters));
+                }
             } else {
                 $builder->when($parameters, fn(Builder $q) => $q->{$fx}(...$parameters));
             }
@@ -60,9 +67,4 @@ class QueryParser implements QueryParserInterface
 
         return $builder;
     }
-
-    //    private function getNestedParameters(array $parameters): array
-    //    {
-    //        return Arr::isAssoc($parameters[1]) ? [$parameters[1]] : $parameters[1];
-    //    }
 }

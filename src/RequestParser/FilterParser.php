@@ -129,6 +129,12 @@ class FilterParser
                         $stack[] = [$this->mapOperator($token) => [$attributeRef, $value]];
                     }
                     break;
+
+                case IbmOperator::RELATION->value:
+                    [$value, $relation] = array_splice($stack, 0);
+                    $stack[] = [$this->mapOperator($token) => [$relation, $value]];
+                    break;
+
                 case IbmOperator::AND->value:
                 case IbmOperator::OR->value:
                     $stack[] = [$this->mapOperator($token) => array_splice($stack, 0)];
@@ -225,6 +231,7 @@ class FilterParser
             IbmOperator::AND->value => SqlOperator::AND->value,
             IbmOperator::OR->value => SqlOperator::OR->value,
             IbmOperator::HAS->value => SqlOperator::HAS->value,
+            IbmOperator::RELATION->value => SqlOperator::FILTER_RELATION_HAS->value,
         };
     }
 

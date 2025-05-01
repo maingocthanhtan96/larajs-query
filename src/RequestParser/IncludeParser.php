@@ -3,6 +3,7 @@
 namespace LaraJS\Query\RequestParser;
 
 use InvalidArgumentException;
+use LaraJS\Query\Enum\SqlOperator;
 
 class IncludeParser
 {
@@ -11,50 +12,43 @@ class IncludeParser
      *
      * @param  array  $queryString
      * @param  ?array<string>  $filterable
-     * @return array
+     * @return array{with: array, withWhereHas: array}
      */
     public function parse(array $queryString, ?array $filterable): array
     {
-        if (is_null($filterable)) {
-            return $queryString;
+        $includes = [
+            'with' => [],
+            'filterWith' => [],
+        ];
+
+        if (!$queryString) {
+            return $includes;
         }
 
-        if (!$queryString || !$filterable) {
-            return [];
-        }
-
-        $filterableMap = $this->buildFilterableMap($filterable);
-
-        $parsedArray = [];
+        $filterableMap = $this->buildFilterableMap($filterable ?? []);
 
         foreach ($queryString as $aggregate) {
-            [$relation, $fields] = explode(':', $aggregate, 2) + [null, null];
+            [$relation, $args] = explode('|', $aggregate, 2) + [null, null];
+            [$relationMap] = explode(':', $relation, 2) + [null, null];
 
-            if (str_contains($relation, '|')) {
-                if (!in_array($relation, $filterable, true)) {
-                    throw new InvalidArgumentException("Relations: '{$relation}' is not allowed");
-                }
-                $parsedArray[] = $aggregate;
-
-                continue;
-            }
-
-            if (!isset($filterableMap[$relation])) {
+            if (!isset($filterableMap[$relationMap]) && !is_null($filterable)) {
                 throw new InvalidArgumentException("Relations: '{$relation}'is not allowed");
             }
+            if ($args && !in_array(strtolower($args), ['count', 'sum', 'avg', 'min', 'max', 'exists'], true)) {
+                $withWhereHas = (new FilterParser)->parse($args, null);
 
-            [, $allowedFields] = explode(':', $filterableMap[$relation], 2) + [null, null];
-            $allowedFieldsArray = $allowedFields ? explode(',', $allowedFields) : [];
-
-            if ($fields) {
-                $this->validateFields($fields, $allowedFieldsArray, $relation);
-                $parsedArray[] = $aggregate;
+                $includes['filterWith'][] = [
+                    SqlOperator::FILTER_RELATION->value => [
+                        $relation,
+                        $withWhereHas,
+                    ],
+                ];
             } else {
-                $parsedArray[] = $filterableMap[$relation];
+                $includes['with'][] = $aggregate;
             }
         }
 
-        return $parsedArray;
+        return $includes;
     }
 
     /**
@@ -68,33 +62,12 @@ class IncludeParser
         $filterableMap = [];
         foreach ($filterable as $item) {
             [$relation] = explode(':', $item, 2);
+            [$relation] = explode('|', $relation, 2);
             if ($relation) {
                 $filterableMap[$relation] = $item;
             }
         }
 
         return $filterableMap;
-    }
-
-    /**
-     * Validate fields against allowed fields for a given relation.
-     *
-     * @param  string  $fields
-     * @param  array<string>  $allowedFields
-     * @param  string  $relation
-     * @return void
-     *
-     * @throws InvalidArgumentException
-     */
-    private function validateFields(string $fields, array $allowedFields, string $relation): void
-    {
-        $requestedFields = explode(',', $fields);
-        foreach ($requestedFields as $field) {
-            if (!in_array($field, $allowedFields, true)) {
-                throw new InvalidArgumentException(
-                    "Field '{$field}' is not allowed for relation '{$relation}'."
-                );
-            }
-        }
     }
 }
