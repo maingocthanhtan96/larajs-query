@@ -8,13 +8,13 @@ use LaraJS\Query\Enum\Method;
 class IncludeParser
 {
     /**
-     * @param  array{with: array, withWhereHas: array}  $aggregates
+     * @param  array{with: array, filterWith: array}  $aggregates
      * @return array
      */
     public function parse(array $aggregates): array
     {
         $fxWith = array_map(fn($aggregate) => $this->parseAggregate($aggregate), $aggregates['with'] ?? []);
-        $fxWithWhereHas = (new FilterParser)->parse($aggregates['withWhereHas'] ?? []);
+        $fxWithWhereHas = (new FilterParser)->parse($aggregates['filterWith'] ?? []);
 
         return array_merge($this->mergeWithFx($fxWith), $fxWithWhereHas);
     }

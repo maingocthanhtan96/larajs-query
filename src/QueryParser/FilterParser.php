@@ -15,8 +15,8 @@ class FilterParser
             Operator::AND->value,
             Operator::OR->value,
             Operator::NOT->value,
-            Operator::RELATION_HAS->value,
-            Operator::INCLUDE_RELATION_HAS->value,
+            Operator::FILTER_RELATION_HAS->value,
+            Operator::FILTER_RELATION->value,
         ], true);
 
         $parseFilter = function ($operator, $filter) use ($isNested, $isOr) {
@@ -53,8 +53,8 @@ class FilterParser
             Operator::IS_NOT_NULL->value,
             Operator::RELATION->value,
             Operator::ANY_RELATION->value,
-            Operator::RELATION_HAS->value,
-            Operator::INCLUDE_RELATION_HAS->value,
+            Operator::FILTER_RELATION_HAS->value,
+            Operator::FILTER_RELATION->value,
         ];
         $operatorMap = [
             Operator::HAS->value => Operator::GREATER_OR_EQUAL->value,
@@ -112,8 +112,8 @@ class FilterParser
             Operator::IS_NOT_NULL->value,
             Operator::RELATION->value,
             Operator::ANY_RELATION->value,
-            Operator::RELATION_HAS->value => Method::fromName($key)->value,
-            Operator::INCLUDE_RELATION_HAS->value => Method::WITH->value,
+            Operator::FILTER_RELATION_HAS->value => Method::fromName($key)->value,
+            Operator::FILTER_RELATION->value => Method::WITH->value,
             default => Method::DEFAULT->value,
         };
     }

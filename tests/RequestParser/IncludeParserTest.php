@@ -23,7 +23,7 @@ class IncludeParserTest extends TestCase
         $queryString = ['roles', 'roles|count', 'roles|exists', 'roles.total|sum', 'roles.total|min', 'roles.total|max', 'roles.total|avg'];
         $expect = [
             'with' => ['roles', 'roles|count', 'roles|exists', 'roles.total|sum', 'roles.total|min', 'roles.total|max', 'roles.total|avg'],
-            'withWhereHas' => [],
+            'filterWith' => [],
         ];
 
         $this->assertSame($expect, $this->parser->parse($queryString, null));
@@ -35,7 +35,7 @@ class IncludeParserTest extends TestCase
         $filterable = ['roles', 'users'];
         $expect = [
             'with' => [],
-            'withWhereHas' => [],
+            'filterWith' => [],
         ];
 
         $this->assertSame($expect, $this->parser->parse($queryString, $filterable));
@@ -47,7 +47,7 @@ class IncludeParserTest extends TestCase
         $filterable = null;
         $expect = [
             'with' => [],
-            'withWhereHas' => [],
+            'filterWith' => [],
         ];
 
         $this->assertSame($expect, $this->parser->parse($queryString ?? [], $filterable));
@@ -66,7 +66,7 @@ class IncludeParserTest extends TestCase
     {
         $queryString = ['roles', 'roles|count', 'roles.permissions|count'];
         $expect['with'] = ['roles', 'roles|count', 'roles.permissions|count'];
-        $expect['withWhereHas'] = [];
+        $expect['filterWith'] = [];
 
         $this->assertSame($expect, $this->parser->parse($queryString, ['roles', 'roles', 'roles.permissions']));
     }
@@ -84,7 +84,7 @@ class IncludeParserTest extends TestCase
     {
         $queryString = ['roles:id,name|count', 'roles.permissions|count'];
         $expect['with'] = ['roles:id,name|count', 'roles.permissions|count'];
-        $expect['withWhereHas'] = [];
+        $expect['filterWith'] = [];
 
         $this->assertSame($expect, $this->parser->parse($queryString, ['roles', 'roles.permissions']));
     }
@@ -103,7 +103,7 @@ class IncludeParserTest extends TestCase
         $queryString = ['users', 'roles'];
         $filterable = ['users', 'roles'];
         $expect['with'] = ['users', 'roles'];
-        $expect['withWhereHas'] = [];
+        $expect['filterWith'] = [];
 
         $this->assertSame($expect, $this->parser->parse($queryString, $filterable));
     }
@@ -123,7 +123,7 @@ class IncludeParserTest extends TestCase
         $queryString = ['users:id,name', 'roles', 'permissions:id'];
         $filterable = ['users:id,name', 'roles', 'permissions:id'];
         $expect['with'] = ['users:id,name', 'roles', 'permissions:id'];
-        $expect['withWhereHas'] = [];
+        $expect['filterWith'] = [];
 
         $this->assertSame($expect, $this->parser->parse($queryString, $filterable));
     }
@@ -133,7 +133,7 @@ class IncludeParserTest extends TestCase
         $queryString = ['users|count', 'roles|exists'];
         $filterable = ['users', 'roles'];
         $expect['with'] = ['users|count', 'roles|exists'];
-        $expect['withWhereHas'] = [];
+        $expect['filterWith'] = [];
 
         $this->assertSame($expect, $this->parser->parse($queryString, $filterable));
     }
@@ -152,9 +152,9 @@ class IncludeParserTest extends TestCase
         $queryString = ["users|and(equals(name,'Smith'),greaterThan(age,'25'))"];
         $filterable = ['users', 'roles'];
         $expect['with'] = [];
-        $expect['withWhereHas'] = [
+        $expect['filterWith'] = [
             [
-                'INCLUDE_RELATION_HAS' => [
+                'FILTER_RELATION' => [
                     'users',
                     [
                         'AND' => [
@@ -184,9 +184,9 @@ class IncludeParserTest extends TestCase
         $queryString = ["users|and(equals(name,'Smith'),greaterThan(age,'25'))", "categories|equals(user_id,'1')"];
         $filterable = ['users', 'categories'];
         $expect['with'] = [];
-        $expect['withWhereHas'] = [
+        $expect['filterWith'] = [
             [
-                'INCLUDE_RELATION_HAS' => [
+                'FILTER_RELATION' => [
                     'users',
                     [
                         'AND' => [
@@ -207,7 +207,7 @@ class IncludeParserTest extends TestCase
                 ],
             ],
             [
-                'INCLUDE_RELATION_HAS' => [
+                'FILTER_RELATION' => [
                     'categories',
                     [
                         '=' => [

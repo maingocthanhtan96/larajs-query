@@ -796,7 +796,7 @@ class FilterParserTest extends TestCase
     public function test_where_has_parser()
     {
         $queryString = [
-            'RELATION_HAS' => [
+            'FILTER_RELATION_HAS' => [
                 'comments',
                 [
                     'LIKE' => [
@@ -830,7 +830,7 @@ class FilterParserTest extends TestCase
     public function test_where_has_nested_parser()
     {
         $queryString = [
-            'RELATION_HAS' => [
+            'FILTER_RELATION_HAS' => [
                 'comments',
                 [
                     'AND' => [
@@ -923,12 +923,12 @@ class FilterParserTest extends TestCase
     public function test_complex_nested_relation()
     {
         $queryString = [
-            'RELATION_HAS' => [
+            'FILTER_RELATION_HAS' => [
                 'posts',
                 [
                     'AND' => [
                         [
-                            'RELATION_HAS' => [
+                            'FILTER_RELATION_HAS' => [
                                 'comments',
                                 [
                                     'IS_NULL' => '#deletedAt',
@@ -990,7 +990,7 @@ class FilterParserTest extends TestCase
     public function test_relation_with_multiple_conditions()
     {
         $queryString = [
-            'RELATION_HAS' => [
+            'FILTER_RELATION_HAS' => [
                 'orders',
                 [
                     'OR' => [
@@ -1037,7 +1037,7 @@ class FilterParserTest extends TestCase
     public function test_relation_with_null_check()
     {
         $queryString = [
-            'RELATION_HAS' => [
+            'FILTER_RELATION_HAS' => [
                 'user',
                 [
                     'IS_NOT_NULL' => '#email',
@@ -1066,7 +1066,7 @@ class FilterParserTest extends TestCase
     public function test_include_filter_relation_parser()
     {
         $queryString = [
-            'INCLUDE_RELATION_HAS' => [
+            'FILTER_RELATION' => [
                 'posts',
                 [
                     'LIKE' => [
@@ -1102,7 +1102,7 @@ class FilterParserTest extends TestCase
     public function test_include_filter_relation_with_nested_conditions()
     {
         $queryString = [
-            'INCLUDE_RELATION_HAS' => [
+            'FILTER_RELATION' => [
                 'comments',
                 [
                     'AND' => [
@@ -1156,7 +1156,7 @@ class FilterParserTest extends TestCase
     public function test_include_filter_relation_with_simple_condition()
     {
         $queryString = [
-            'INCLUDE_RELATION_HAS' => [
+            'FILTER_RELATION' => [
                 'comments',
                 [
                     '=' => [

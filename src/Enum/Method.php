@@ -14,11 +14,11 @@ enum Method: string
     case SPECIAL_LIKE = 'whereLikeRelationship';
     case RELATION = 'whereRelation';
     case ANY_RELATION = 'whereRelationIn';
-    case RELATION_HAS = 'whereHas';
+    case FILTER_RELATION_HAS = 'whereHas';
     case DATE_BETWEEN = 'whereDateBetween';
-
     case WITH = 'with';
     case WITH_AGGREGATE = 'withAggregate';
+    case SELECT = 'select';
 
     public static function fromName(string $name): Method
     {

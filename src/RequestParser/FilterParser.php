@@ -231,7 +231,7 @@ class FilterParser
             IbmOperator::AND->value => SqlOperator::AND->value,
             IbmOperator::OR->value => SqlOperator::OR->value,
             IbmOperator::HAS->value => SqlOperator::HAS->value,
-            IbmOperator::RELATION->value => SqlOperator::RELATION_HAS->value,
+            IbmOperator::RELATION->value => SqlOperator::FILTER_RELATION_HAS->value,
         };
     }
 

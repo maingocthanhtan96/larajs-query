@@ -18,7 +18,7 @@ class IncludeParser
     {
         $includes = [
             'with' => [],
-            'withWhereHas' => [],
+            'filterWith' => [],
         ];
 
         if (!$queryString) {
@@ -37,8 +37,8 @@ class IncludeParser
             if ($args && !in_array(strtolower($args), ['count', 'sum', 'avg', 'min', 'max', 'exists'], true)) {
                 $withWhereHas = (new FilterParser)->parse($args, null);
 
-                $includes['withWhereHas'][] = [
-                    SqlOperator::INCLUDE_RELATION_HAS->value => [
+                $includes['filterWith'][] = [
+                    SqlOperator::FILTER_RELATION->value => [
                         $relation,
                         $withWhereHas,
                     ],

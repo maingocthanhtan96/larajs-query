@@ -2,6 +2,8 @@
 
 namespace LaraJS\Query\QueryParser;
 
+use LaraJS\Query\Enum\Method;
+
 class SelectParser
 {
     public function parse(array $fields): array
@@ -12,7 +14,7 @@ class SelectParser
 
         return [
             [
-                'fx' => 'select',
+                'fx' => Method::SELECT->value,
                 'isNested' => false,
                 'parameters' => $fields,
             ],

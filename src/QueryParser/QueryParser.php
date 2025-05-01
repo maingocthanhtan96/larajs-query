@@ -50,11 +50,15 @@ class QueryParser implements QueryParserInterface
             $parameters = $query['parameters'];
 
             if ($query['isNested']) {
-                // $builder->{$fx}($parameters[0], fn(Builder $query) => $this->handleQuery($query, $this->getNestedParameters($parameters)));
-                if ($fx === Method::WITH->value) {
-                    $builder->{$fx}([$parameters[0] => fn($q) => $this->handleQuery($q, [$parameters[1]])]);
-                } else {
-                    $builder->{$fx}(fn(Builder $q) => $this->handleQuery($q, $parameters));
+                switch ($fx) {
+                    case Method::WITH->value:
+                        $builder->{$fx}([$parameters[0] => fn($q) => $this->handleQuery($q, [$parameters[1]])]);
+                        break;
+                    case Method::FILTER_RELATION_HAS->value:
+                        $builder->{$fx}($parameters[0], fn($q) => $this->handleQuery($q, [$parameters[1]]));
+                        break;
+                    default:
+                        $builder->{$fx}(fn(Builder $q) => $this->handleQuery($q, $parameters));
                 }
             } else {
                 $builder->when($parameters, fn(Builder $q) => $q->{$fx}(...$parameters));
@@ -63,9 +67,4 @@ class QueryParser implements QueryParserInterface
 
         return $builder;
     }
-
-    //    private function getNestedParameters(array $parameters): array
-    //    {
-    //        return Arr::isAssoc($parameters[1]) ? [$parameters[1]] : $parameters[1];
-    //    }
 }

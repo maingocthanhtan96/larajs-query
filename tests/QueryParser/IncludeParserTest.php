@@ -18,7 +18,7 @@ class IncludeParserTest extends TestCase
     public function test_parser()
     {
         $queryString['with'] = ['roles', 'roles|count', 'roles|exists', 'roles.total|sum', 'roles.total|min', 'roles.total|max', 'roles.total|avg', 'roles.permissions'];
-        $queryString['withWhereHas'] = [];
+        $queryString['filterWith'] = [];
 
         $expect = [
             [
@@ -64,8 +64,8 @@ class IncludeParserTest extends TestCase
     public function test_parser_with_where_has()
     {
         $queryString['with'] = [];
-        $queryString['withWhereHas'] = [
-            'INCLUDE_RELATION_HAS' => [
+        $queryString['filterWith'] = [
+            'FILTER_RELATION' => [
                 'users',
                 [
                     'AND' => [
@@ -127,7 +127,7 @@ class IncludeParserTest extends TestCase
     public function test_empty_input()
     {
         $queryString['with'] = [];
-        $queryString['withWhereHas'] = [];
+        $queryString['filterWith'] = [];
 
         $this->assertSame([], $this->parser->parse($queryString));
     }
@@ -135,7 +135,7 @@ class IncludeParserTest extends TestCase
     public function test_nested_relations_with_count()
     {
         $queryString['with'] = ['permissions|count', 'roles.users|count'];
-        $queryString['withWhereHas'] = [];
+        $queryString['filterWith'] = [];
 
         $expect = [
             [
@@ -156,8 +156,8 @@ class IncludeParserTest extends TestCase
     public function test_mixed_with_and_where_has()
     {
         $queryString['with'] = ['roles|count'];
-        $queryString['withWhereHas'] = [
-            'INCLUDE_RELATION_HAS' => [
+        $queryString['filterWith'] = [
+            'FILTER_RELATION' => [
                 'users',
                 [
                     '=' => [
@@ -198,7 +198,7 @@ class IncludeParserTest extends TestCase
     public function test_deep_nested_relations()
     {
         $queryString['with'] = ['company.departments.employees|count'];
-        $queryString['withWhereHas'] = [];
+        $queryString['filterWith'] = [];
 
         $expect = [
             [
@@ -214,8 +214,8 @@ class IncludeParserTest extends TestCase
     public function test_parser_assign_work_users()
     {
         $queryString['with'] = [];
-        $queryString['withWhereHas'] = [
-            'INCLUDE_RELATION_HAS' => [
+        $queryString['filterWith'] = [
+            'FILTER_RELATION' => [
                 'categories',
                 [
                     '=' => [
@@ -251,9 +251,9 @@ class IncludeParserTest extends TestCase
     public function test_parser_combined_where_has_conditions()
     {
         $queryString['with'] = [];
-        $queryString['withWhereHas'] = [
+        $queryString['filterWith'] = [
             [
-                'INCLUDE_RELATION_HAS' => [
+                'FILTER_RELATION' => [
                     'users',
                     [
                         'AND' => [
@@ -274,7 +274,7 @@ class IncludeParserTest extends TestCase
                 ],
             ],
             [
-                'INCLUDE_RELATION_HAS' => [
+                'FILTER_RELATION' => [
                     'categories',
                     [
                         '=' => [
