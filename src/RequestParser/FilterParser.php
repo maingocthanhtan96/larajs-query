@@ -124,7 +124,8 @@ class FilterParser
 
                 case IbmOperator::HAS->value:
                     $attributeRef = array_pop($stack);
-                    $value = $this->coerceValue(array_pop($stack));
+                    $value = array_pop($stack);
+                    $value = is_null($value) ? 1 : $this->coerceValue($value);
                     if ($this->checkAllowFilter($attributeRef, $filterable)) {
                         $stack[] = [$this->mapOperator($token) => [$attributeRef, $value]];
                     }

@@ -345,6 +345,19 @@ class FilterParserTest extends TestCase
         $this->assertSame($expect, $this->parser->parse($queryString, null));
     }
 
+    public function test_only_has_parser()
+    {
+        // count(articles) >= 1
+        $queryString = 'has(articles)';
+        $expect = [
+            'HAS' => [
+                'articles',
+                1,
+            ],
+        ];
+        $this->assertSame($expect, $this->parser->parse($queryString, null));
+    }
+
     public function test_condition_logical_or()
     {
         $queryString = "or(has(orders,'1'),has(invoices,'1'))";
