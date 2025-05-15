@@ -24,4 +24,6 @@ enum SqlOperator: string
     case FILTER_RELATION = 'FILTER_RELATION';
     case RELATION = 'RELATION';
     case ANY_RELATION = 'ANY_RELATION';
+    case BETWEEN = 'BETWEEN';
+    case BETWEEN_RELATION = 'BETWEEN_RELATION';
 }

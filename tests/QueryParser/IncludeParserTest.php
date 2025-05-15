@@ -123,7 +123,6 @@ class IncludeParserTest extends TestCase
         $this->assertSame($expect, $this->parser->parse($queryString));
     }
 
-
     public function test_empty_input()
     {
         $queryString['with'] = [];

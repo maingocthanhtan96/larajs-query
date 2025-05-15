@@ -311,7 +311,6 @@ class FilterParserTest extends TestCase
             'ANY_RELATION' => [
                 '#chapter',
                 '#name',
-                'IN',
                 [
                     'Intro',
                     'Summary',
@@ -607,6 +606,45 @@ class FilterParserTest extends TestCase
                         ],
                     ],
                 ],
+            ],
+        ];
+        $this->assertSame($expect, $this->parser->parse($queryString, null));
+    }
+
+    public function test_between_parser()
+    {
+        $queryString = "between(updated_at,'25','30')";
+        $expect = [
+            'BETWEEN' => [
+                '#updated_at',
+                25,
+                30,
+            ],
+        ];
+        $this->assertSame($expect, $this->parser->parse($queryString, null));
+    }
+
+    public function test_between_date_parser()
+    {
+        $queryString = "between(updated_at,'2025-01-01 00:00:00','2025-01-15 23:59:59')";
+        $expect = [
+            'BETWEEN' => [
+                '#updated_at',
+                '2025-01-01 00:00:00',
+                '2025-01-15 23:59:59',
+            ],
+        ];
+        $this->assertSame($expect, $this->parser->parse($queryString, null));
+    }
+
+    public function test_between_relation_parser()
+    {
+        $queryString = "betweenRelation(articles,price,'10','20')";
+        $expect = [
+            'BETWEEN_RELATION' => [
+                '#articles',
+                '#price',
+                [10, 20],
             ],
         ];
         $this->assertSame($expect, $this->parser->parse($queryString, null));

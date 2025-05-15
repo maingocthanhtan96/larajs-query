@@ -3,7 +3,6 @@
 namespace LaraJS\Query\QueryParser;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Arr;
 use LaraJS\Query\DTO\QueryParserAllowDTO;
 use LaraJS\Query\DTO\QueryParserRequestDTO;
 use LaraJS\Query\Enum\Method;
@@ -43,26 +42,19 @@ class QueryParser implements QueryParserInterface
         return $this->handleQuery($query, $queries);
     }
 
-    private function handleQuery($builder, array $queries)
+    private function handleQuery(Builder $builder, array $queries): Builder
     {
-        foreach ($queries as $query) {
-            $fx = $query['fx'];
-            $parameters = $query['parameters'];
-
-            if ($query['isNested']) {
-                switch ($fx) {
-                    case Method::WITH->value:
-                        $builder->{$fx}([$parameters[0] => fn($q) => $this->handleQuery($q, [$parameters[1]])]);
-                        break;
-                    case Method::FILTER_RELATION_HAS->value:
-                        $builder->{$fx}($parameters[0], fn($q) => $this->handleQuery($q, [$parameters[1]]));
-                        break;
-                    default:
-                        $builder->{$fx}(fn(Builder $q) => $this->handleQuery($q, $parameters));
-                }
-            } else {
-                $builder->when($parameters, fn(Builder $q) => $q->{$fx}(...$parameters));
+        foreach ($queries as ['fx' => $fx, 'parameters' => $parameters, 'isNested' => $isNested]) {
+            if ($isNested) {
+                match ($fx) {
+                    Method::WITH->value => $builder->{$fx}([$parameters[0] => fn($q) => $this->handleQuery($q, [$parameters[1]])]),
+                    Method::FILTER_RELATION_HAS->value => $builder->{$fx}($parameters[0], fn($q) => $this->handleQuery($q, [$parameters[1]])),
+                    default => $builder->{$fx}(fn(Builder $q) => $this->handleQuery($q, $parameters))
+                };
+                continue;
             }
+
+            $builder->when($parameters, fn(Builder $q) => $q->{$fx}(...$parameters));
         }
 
         return $builder;

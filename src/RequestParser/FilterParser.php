@@ -70,6 +70,7 @@ class FilterParser
                 case IbmOperator::CONTAINS_RELATION->value:
                 case IbmOperator::STARTS_WITH_RELATION->value:
                 case IbmOperator::ENDS_WITH_RELATION->value:
+                case IbmOperator::BETWEEN_RELATION->value:
                     $attributeRefRelation = $this->coerceValue(array_pop($stack), $token);
                     $attributeRefField = $this->coerceValue(array_pop($stack), $token);
                     $operator = match ($token) {
@@ -79,20 +80,31 @@ class FilterParser
                         IbmOperator::GREATER_THAN_RELATION->value => SqlOperator::GREATER_THAN->value,
                         IbmOperator::LESS_OR_EQUAL_RELATION->value => SqlOperator::LESS_OR_EQUAL->value,
                         IbmOperator::LESS_THAN_RELATION->value => SqlOperator::LESS_THAN->value,
+                        IbmOperator::BETWEEN_RELATION->value => SqlOperator::BETWEEN->value,
                         default => SqlOperator::LIKE->value,
                     };
-                    $value = $token === IbmOperator::ANY_RELATION->value
-                        ? array_map(fn($v) => $this->coerceValue($v), array_reverse(array_splice($stack, -count($stack), count($stack), [])))
-                        : $this->coerceValue(array_pop($stack), $token);
+                    $value = match ($token) {
+                        IbmOperator::ANY_RELATION->value => array_map(
+                            fn($v) => $this->coerceValue($v),
+                            array_reverse(array_splice($stack, -count($stack), count($stack), []))
+                        ),
+                        IbmOperator::BETWEEN_RELATION->value => [
+                            $this->coerceValue(array_pop($stack), $token),
+                            $this->coerceValue(array_pop($stack), $token),
+                        ],
+                        default => $this->coerceValue(array_pop($stack), $token)
+                    };
+
                     if ($this->checkAllowFilter($attributeRefRelation, $filterable)) {
-                        $stack[] = [
-                            $this->mapOperator($token, !is_array($value) && $value === null) => [
-                                $attributeRefRelation,
-                                $attributeRefField,
-                                $operator,
-                                $value,
-                            ],
-                        ];
+                        $mapOperator = $this->mapOperator($token, !is_array($value) && $value === null);
+                        $params = [$attributeRefRelation, $attributeRefField];
+
+                        if (!in_array($token, [IbmOperator::BETWEEN_RELATION->value, IbmOperator::ANY_RELATION->value])) {
+                            $params[] = $operator;
+                        }
+                        $params[] = $value;
+
+                        $stack[] = [$mapOperator => $params];
                     }
 
                     break;
@@ -114,6 +126,16 @@ class FilterParser
                         }
                     }
                     break;
+                case IbmOperator::BETWEEN->value:
+                    $attributeRef = $this->coerceValue(array_pop($stack), $token);
+                    $firstBound = $this->coerceValue(array_pop($stack), $token);
+                    $secondBound = $this->coerceValue(array_pop($stack), $token);
+                    if ($this->checkAllowFilter($attributeRef, $filterable)) {
+                        $stack[] = [
+                            $this->mapOperator($token) => [$attributeRef, $firstBound, $secondBound],
+                        ];
+                    }
+                    break;
 
                 case IbmOperator::NOT->value:
                     $attributeRef = array_pop($stack);
@@ -133,7 +155,9 @@ class FilterParser
 
                 case IbmOperator::RELATION->value:
                     [$value, $relation] = array_splice($stack, 0);
-                    $stack[] = [$this->mapOperator($token) => [$relation, $value]];
+                    if ($this->checkAllowFilter($relation, $filterable)) {
+                        $stack[] = [$this->mapOperator($token) => [$relation, $value]];
+                    }
                     break;
 
                 case IbmOperator::AND->value:
@@ -233,6 +257,8 @@ class FilterParser
             IbmOperator::OR->value => SqlOperator::OR->value,
             IbmOperator::HAS->value => SqlOperator::HAS->value,
             IbmOperator::RELATION->value => SqlOperator::FILTER_RELATION_HAS->value,
+            IbmOperator::BETWEEN->value => SqlOperator::BETWEEN->value,
+            IbmOperator::BETWEEN_RELATION->value => SqlOperator::BETWEEN_RELATION->value,
         };
     }
 

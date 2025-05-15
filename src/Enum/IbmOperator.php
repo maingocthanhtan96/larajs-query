@@ -28,4 +28,6 @@ enum IbmOperator: string
     case HAS = 'has';
     case RELATION = 'relation';
     case INCLUDE_RELATION = 'includeRelation';
+    case BETWEEN = 'between';
+    case BETWEEN_RELATION = 'betweenRelation';
 }

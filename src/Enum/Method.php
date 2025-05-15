@@ -16,6 +16,7 @@ enum Method: string
     case ANY_RELATION = 'whereRelationIn';
     case FILTER_RELATION_HAS = 'whereHas';
     case BETWEEN = 'whereBetween';
+    case BETWEEN_RELATION = 'whereRelationBetween';
     case WITH = 'with';
     case WITH_AGGREGATE = 'withAggregate';
     case SELECT = 'select';

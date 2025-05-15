@@ -55,6 +55,7 @@ class LaraJSQueryServiceProvider extends ServiceProvider
             );
         });
         $this->whereRelationIn();
+        $this->whereRelationBetween();
         $this->whereLikeRelationship();
         $this->collectionPaginate();
         $this->orderByRelationship();
@@ -67,6 +68,17 @@ class LaraJSQueryServiceProvider extends ServiceProvider
             Builder::macro('whereRelationIn', function ($relation, $column, $values) {
                 return $this->whereHas($relation, function ($query) use ($column, $values) {
                     $query->whereIn($column, $values);
+                });
+            });
+        }
+    }
+
+    private function whereRelationBetween(): void
+    {
+        if (!Builder::hasGlobalMacro('whereRelationBetween')) {
+            Builder::macro('whereRelationBetween', function ($relation, $column, $values) {
+                return $this->whereHas($relation, function ($query) use ($column, $values) {
+                    $query->whereBetween($column, $values);
                 });
             });
         }

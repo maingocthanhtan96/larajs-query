@@ -55,6 +55,8 @@ class FilterParser
             Operator::ANY_RELATION->value,
             Operator::FILTER_RELATION_HAS->value,
             Operator::FILTER_RELATION->value,
+            Operator::BETWEEN->value,
+            Operator::BETWEEN_RELATION->value,
         ];
         $operatorMap = [
             Operator::HAS->value => Operator::GREATER_OR_EQUAL->value,
@@ -66,9 +68,9 @@ class FilterParser
             if ($isSpecialOperator) {
                 // HANDLE IN AND NOT IN
                 $sequelizeKeyField = $this->removeHashFromString($value[1]);
-                if (in_array($operator, [Operator::RELATION->value, Operator::ANY_RELATION->value], true)) {
-                    $sliceIndex = $operator === Operator::RELATION->value ? 2 : 3;
-                    $parameters = [$sequelizeKey, $sequelizeKeyField, ...array_slice($value, $sliceIndex)];
+                if (in_array($operator, [Operator::RELATION->value, Operator::ANY_RELATION->value, Operator::BETWEEN_RELATION->value], true)) {
+                    $sequelizeKeyField = $this->removeHashFromString($value[1]);
+                    $parameters = [$sequelizeKey, $sequelizeKeyField, ...array_slice($value, 2)];
                 } else {
                     $parameters = [$sequelizeKey, array_slice($value, 1)];
                 }
@@ -112,7 +114,9 @@ class FilterParser
             Operator::IS_NOT_NULL->value,
             Operator::RELATION->value,
             Operator::ANY_RELATION->value,
-            Operator::FILTER_RELATION_HAS->value => Method::fromName($key)->value,
+            Operator::FILTER_RELATION_HAS->value,
+            Operator::BETWEEN->value,
+            Operator::BETWEEN_RELATION->value => Method::fromName($key)->value,
             Operator::FILTER_RELATION->value => Method::WITH->value,
             default => Method::DEFAULT->value,
         };
