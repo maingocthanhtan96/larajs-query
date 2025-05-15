@@ -9,7 +9,7 @@ class DateParser
 {
     public function parse(array $queryString): array
     {
-        $column = $queryString['column'] ?? [];
+        $column = $queryString['column'] ?? '';
         $value = $queryString['value'] ?? [];
         if (!$column || !$value) {
             return [];
@@ -17,7 +17,7 @@ class DateParser
 
         return [
             [
-                'fx' => Method::DATE_BETWEEN->value,
+                'fx' => Method::BETWEEN->value,
                 'isNested' => false,
                 'parameters' => [
                     $column,

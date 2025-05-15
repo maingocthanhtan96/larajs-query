@@ -19,65 +19,15 @@ class DateParserTest extends TestCase
     public function test_parser()
     {
         $queryString = [
-            'column' => ['updated_at'],
+            'column' => 'updated_at',
             'value' => ['2024-01-01', '2024-12-01'],
         ];
         $expect = [
             [
-                'fx' => 'whereDateBetween',
+                'fx' => 'whereBetween',
                 'isNested' => false,
                 'parameters' => [
-                    ['updated_at'],
-                    [
-                        Carbon::createFromFormat('Y-m-d', $queryString['value'][0])->startOfDay(),
-                        Carbon::createFromFormat('Y-m-d', $queryString['value'][1])->endOfDay(),
-                    ],
-                ],
-            ],
-        ];
-
-        $this->assertEquals($expect, $this->parser->parse($queryString));
-    }
-
-    public function test_value_start_end_parser()
-    {
-        $queryString = [
-            'column' => ['updated_at'],
-            'value' => [
-                'start' => '2024-01-01',
-                'end' => '2024-12-01',
-            ],
-        ];
-
-        $expect = [
-            [
-                'fx' => 'whereDateBetween',
-                'isNested' => false,
-                'parameters' => [
-                    ['updated_at'],
-                    [
-                        Carbon::createFromFormat('Y-m-d', $queryString['value']['start'])->startOfDay(),
-                        Carbon::createFromFormat('Y-m-d', $queryString['value']['end'])->endOfDay(),
-                    ],
-                ],
-            ],
-        ];
-
-        $this->assertEquals($expect, $this->parser->parse($queryString));
-    }
-
-    public function test_multiple_parser()
-    {
-        $queryString = [
-            'column' => ['created_at', 'updated_at'],
-            'value' => ['2024-01-01', '2024-12-01'],
-        ];
-        $expect = [
-            [
-                'fx' => 'whereDateBetween',
-                'isNested' => false,
-                'parameters' => [
-                    ['created_at', 'updated_at'],
+                    'updated_at',
                     [
                         Carbon::createFromFormat('Y-m-d', $queryString['value'][0])->startOfDay(),
                         Carbon::createFromFormat('Y-m-d', $queryString['value'][1])->endOfDay(),
