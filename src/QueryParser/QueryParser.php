@@ -51,6 +51,7 @@ class QueryParser implements QueryParserInterface
                     Method::FILTER_RELATION_HAS->value => $builder->{$fx}($parameters[0], fn($q) => $this->handleQuery($q, [$parameters[1]])),
                     default => $builder->{$fx}(fn(Builder $q) => $this->handleQuery($q, $parameters))
                 };
+
                 continue;
             }
 

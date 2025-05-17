@@ -2,8 +2,6 @@
 
 namespace LaraJS\Query\RequestParser;
 
-use Illuminate\Support\Str;
-
 class SortParser
 {
     /**
@@ -19,21 +17,31 @@ class SortParser
             return [];
         }
 
-        return Str::of($queryString)->trim(',')
-            ->explode(',')
-            ->filter(function ($value) use ($filterable) {
-                if ($filterable) {
-                    return in_array(ltrim($value, '-'), $filterable, true);
-                }
+        // Trim trailing commas and split by comma
+        $fields = explode(',', trim($queryString, ','));
+        $result = [];
 
-                return true;
-            })->map(function ($pair) {
-                if (str_starts_with($pair, '-')) {
-                    return [substr($pair, 1), 'desc'];
-                }
+        // Process each field
+        foreach ($fields as $field) {
+            // Skip empty fields
+            if (trim($field) === '') {
+                continue;
+            }
 
-                return [$pair, 'asc'];
-            })
-            ->all();
+            // Check if the field is allowed
+            $cleanField = ltrim($field, '-');
+            if ($filterable && !in_array($cleanField, $filterable, true)) {
+                continue;
+            }
+
+            // Determine sort direction
+            if (str_starts_with($field, '-')) {
+                $result[] = [$cleanField, 'desc'];
+            } else {
+                $result[] = [$field, 'asc'];
+            }
+        }
+
+        return $result;
     }
 }

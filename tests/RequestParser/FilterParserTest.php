@@ -649,4 +649,42 @@ class FilterParserTest extends TestCase
         ];
         $this->assertSame($expect, $this->parser->parse($queryString, null));
     }
+
+    public function test_equals_boolean_true_parser()
+    {
+        $queryString = "equals(active,'true')";
+        $expect = [
+            '=' => [
+                '#active',
+                true,
+            ],
+        ];
+        $this->assertSame($expect, $this->parser->parse($queryString, null));
+    }
+
+    public function test_equals_boolean_false_parser()
+    {
+        $queryString = "equals(active,'false')";
+        $expect = [
+            '=' => [
+                '#active',
+                false,
+            ],
+        ];
+        $this->assertSame($expect, $this->parser->parse($queryString, null));
+    }
+
+    public function test_equals_relation_boolean_parser()
+    {
+        $queryString = "equalsRelation(articles,active,'true')";
+        $expect = [
+            'RELATION' => [
+                '#articles',
+                '#active',
+                '=',
+                true,
+            ],
+        ];
+        $this->assertSame($expect, $this->parser->parse($queryString, null));
+    }
 }

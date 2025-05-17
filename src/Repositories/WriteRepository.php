@@ -31,7 +31,7 @@ class WriteRepository implements WriteRepositoryInterface
      * @param  array  $options
      * @return T
      */
-    public function update(string|Model $idOrModel, array $attributes, array $options = [])
+    public function update(string|Model $idOrModel, array $attributes, array $options = []): Model
     {
         $model = $this->resolveModel($idOrModel);
         $model->update($attributes, $options);
@@ -54,8 +54,6 @@ class WriteRepository implements WriteRepositoryInterface
      */
     private function resolveModel(string|Model $idOrModel): Model
     {
-        return $idOrModel instanceof Model
-            ? $idOrModel
-            : $this->model->findOrFail($idOrModel);
+        return $idOrModel instanceof Model ? $idOrModel : $this->model->findOrFail($idOrModel);
     }
 }

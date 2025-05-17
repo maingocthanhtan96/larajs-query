@@ -20,6 +20,7 @@ enum Method: string
     case WITH = 'with';
     case WITH_AGGREGATE = 'withAggregate';
     case SELECT = 'select';
+    case ORDER_RELATION = 'orderByRelationship';
 
     public static function fromName(string $name): Method
     {

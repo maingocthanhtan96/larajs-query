@@ -89,33 +89,36 @@ class LaraJSQueryServiceProvider extends ServiceProvider
         // whereLike
         if (!Builder::hasGlobalMacro('whereLikeRelationship')) {
             Builder::macro('whereLikeRelationship', function ($attributes, string $searchTerm) {
-                $this->where(function (Builder $query) use ($attributes, $searchTerm) {
-                    foreach (Arr::wrap($attributes) as $attribute) {
-                        $query->when(
-                            // Check if the attribute is not an expression and contains a dot (indicating a related model)
-                            !($attribute instanceof Expression) && str_contains((string) $attribute, '.'),
-                            function (Builder $query) use ($attribute, $searchTerm) {
-                                // Split the attribute into a relation and related attribute
-                                [$relation, $relatedAttribute] = explode('.', (string) $attribute);
+                // Pre-compute the search pattern at once
+                $searchPattern = "%{$searchTerm}%";
 
-                                // Perform a 'LIKE' search on the related model's attribute
-                                $relationModel = $this->getRelation($relation)->getModel();
-                                $relationTable = $relationModel->getTable();
-                                $query->orWhereHas($relation, function (Builder $query) use (
-                                    $relatedAttribute,
-                                    $searchTerm,
-                                    $relationTable,
-                                ) {
-                                    $query->where("$relationTable.$relatedAttribute", 'LIKE', "%{$searchTerm}%");
-                                });
-                            },
-                            function (Builder $query) use ($attribute, $searchTerm) {
-                                // Perform a 'LIKE' search on the current model's attribute
-                                // also attribute can be an expression
-                                $table = $this->getModel()->getTable();
-                                $query->orWhere("$table.$attribute", 'LIKE', "%{$searchTerm}%");
-                            },
-                        );
+                // Get the current model's table name at once
+                $currentTable = $this->getModel()->getTable();
+
+                $this->where(function (Builder $query) use ($attributes, $searchPattern, $currentTable) {
+                    foreach (Arr::wrap($attributes) as $attribute) {
+                        // Check if the attribute is a relation (contains a dot and is not an Expression)
+                        $isRelation = !($attribute instanceof Expression) && is_string($attribute) && str_contains($attribute, '.');
+
+                        if ($isRelation) {
+                            // Handle relation attribute
+                            [$relation, $relatedAttribute] = explode('.', $attribute, 2);
+
+                            // Get relation info once outside the closure
+                            $relationModel = $this->getRelation($relation)->getModel();
+                            $relationTable = $relationModel->getTable();
+
+                            $query->orWhereHas($relation, function (Builder $subQuery) use (
+                                $relatedAttribute,
+                                $searchPattern,
+                                $relationTable
+                            ) {
+                                $subQuery->where("$relationTable.$relatedAttribute", 'LIKE', $searchPattern);
+                            });
+                        } else {
+                            // Handle local attribute
+                            $query->orWhere("$currentTable.$attribute", 'LIKE', $searchPattern);
+                        }
                     }
                 });
 

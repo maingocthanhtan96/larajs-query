@@ -10,6 +10,7 @@ class SearchParser
     {
         $column = $queryString['column'];
         $value = $queryString['value'];
+
         if (!$column || !$value) {
             return [];
         }

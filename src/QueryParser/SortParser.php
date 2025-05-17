@@ -2,6 +2,8 @@
 
 namespace LaraJS\Query\QueryParser;
 
+use LaraJS\Query\Enum\Method;
+
 class SortParser
 {
     public function parse(array $sorts): array
@@ -9,7 +11,7 @@ class SortParser
         $parsedArray = [];
         foreach ($sorts as $sort) {
             $parsedArray[] = [
-                'fx' => 'orderByRelationship',
+                'fx' => Method::ORDER_RELATION->value,
                 'isNested' => false,
                 'parameters' => $sort,
             ];
