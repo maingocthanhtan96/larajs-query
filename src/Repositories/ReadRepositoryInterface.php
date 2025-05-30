@@ -24,15 +24,6 @@ interface ReadRepositoryInterface
     public function findAll(QueryParserAllowDTO $allow, array $options = []): LengthAwarePaginator|CursorPaginator|Paginator|Collection;
 
     /**
-     * Find one
-     *
-     * @param  string  $id
-     * @param  QueryParserAllowDTO  $allow
-     * @return T
-     */
-    public function find(string $id, QueryParserAllowDTO $allow);
-
-    /**
      * Find one or fail
      *
      * @param  string  $id
@@ -47,4 +38,13 @@ interface ReadRepositoryInterface
      * @return Builder<T>
      */
     public function query(): Builder;
+
+    /**
+     * Get the query with LaraJS
+     *
+     * @param  QueryParserAllowDTO  $allow
+     * @param  bool  $clearFilter
+     * @return Builder<T>
+     */
+    public function laraJSQuery(QueryParserAllowDTO $allow, bool $clearFilter = false): Builder;
 }

@@ -33,17 +33,7 @@ class ReadRepository implements ReadRepositoryInterface
      */
     public function findAll(QueryParserAllowDTO $allow, array $options = []): LengthAwarePaginator|CursorPaginator|Paginator|Collection
     {
-        return $this->getQueryWithLaraJS($allow)->dynamicPaginate($options);
-    }
-
-    /**
-     * @param  string  $id
-     * @param  QueryParserAllowDTO  $allow
-     * @return T
-     */
-    public function find(string $id, QueryParserAllowDTO $allow)
-    {
-        return $this->getQueryWithLaraJS($allow, true)->find($id);
+        return $this->laraJSQuery($allow)->dynamicPaginate($options);
     }
 
     /**
@@ -53,7 +43,7 @@ class ReadRepository implements ReadRepositoryInterface
      */
     public function findOrFail(string $id, QueryParserAllowDTO $allow): Model
     {
-        return $this->getQueryWithLaraJS($allow, true)->findOrFail($id);
+        return $this->laraJSQuery($allow, true)->findOrFail($id);
     }
 
     /**
@@ -69,7 +59,7 @@ class ReadRepository implements ReadRepositoryInterface
      * @param  bool  $clearFilter
      * @return Builder
      */
-    private function getQueryWithLaraJS(QueryParserAllowDTO $allow, bool $clearFilter = false): Builder
+    public function laraJSQuery(QueryParserAllowDTO $allow, bool $clearFilter = false): Builder
     {
         $query = request()->query();
 
