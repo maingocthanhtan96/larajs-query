@@ -8,19 +8,13 @@ class SearchParser
 {
     public function parse(array $queryString): array
     {
-        $column = $queryString['column'];
-        $value = $queryString['value'];
+        $column = $queryString['column'] ?? null;
+        $value = $queryString['value'] ?? null;
 
-        if (!$column || !$value) {
-            return [];
-        }
-
-        return [
-            [
-                'fx' => Method::SPECIAL_LIKE->value,
-                'isNested' => false,
-                'parameters' => [$column, $value],
-            ],
-        ];
+        return ($column && $value) ? [[
+            'fx' => Method::SPECIAL_LIKE->value,
+            'isNested' => false,
+            'parameters' => [$column, $value],
+        ]] : [];
     }
 }

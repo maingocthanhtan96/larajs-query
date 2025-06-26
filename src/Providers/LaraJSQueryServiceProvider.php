@@ -86,25 +86,17 @@ class LaraJSQueryServiceProvider extends ServiceProvider
 
     private function whereLikeRelationship(): void
     {
-        // whereLike
         if (!Builder::hasGlobalMacro('whereLikeRelationship')) {
             Builder::macro('whereLikeRelationship', function ($attributes, string $searchTerm) {
-                // Pre-compute the search pattern at once
                 $searchPattern = "%{$searchTerm}%";
-
-                // Get the current model's table name at once
                 $currentTable = $this->getModel()->getTable();
 
                 $this->where(function (Builder $query) use ($attributes, $searchPattern, $currentTable) {
                     foreach (Arr::wrap($attributes) as $attribute) {
-                        // Check if the attribute is a relation (contains a dot and is not an Expression)
                         $isRelation = !($attribute instanceof Expression) && is_string($attribute) && str_contains($attribute, '.');
 
                         if ($isRelation) {
-                            // Handle relation attribute
                             [$relation, $relatedAttribute] = explode('.', $attribute, 2);
-
-                            // Get relation info once outside the closure
                             $relationModel = $this->getRelation($relation)->getModel();
                             $relationTable = $relationModel->getTable();
 
@@ -116,7 +108,6 @@ class LaraJSQueryServiceProvider extends ServiceProvider
                                 $subQuery->where("$relationTable.$relatedAttribute", 'LIKE', $searchPattern);
                             });
                         } else {
-                            // Handle local attribute
                             $query->orWhere("$currentTable.$attribute", 'LIKE', $searchPattern);
                         }
                     }
@@ -129,15 +120,12 @@ class LaraJSQueryServiceProvider extends ServiceProvider
 
     private function collectionPaginate(): void
     {
-        // Enable pagination
         if (!Collection::hasMacro('collectionPaginate')) {
             Collection::macro('collectionPaginate', function ($perPage = 15, $page = null, $options = []) {
                 $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
 
                 return (new LengthAwarePaginator(
-                    $this->forPage($page, $perPage)
-                        ->values()
-                        ->all(),
+                    $this->forPage($page, $perPage)->values()->all(),
                     $this->count(),
                     $perPage,
                     $page,

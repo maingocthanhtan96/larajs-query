@@ -8,45 +8,19 @@ use LaraJS\Query\Enum\Operator;
 
 class FilterParser
 {
-    /**
-     * Cache for special operators in lowercase
-     *
-     * @var array<string>
-     */
     private array $specialOperatorsLower;
 
-    /**
-     * Cache for relation operators
-     *
-     * @var array<string, bool>
-     */
     private array $relationOperatorsMap;
 
-    /**
-     * Cache for operator mappings
-     *
-     * @var array<string, string>
-     */
     private array $operatorMap;
 
-    /**
-     * Cache for direct method mappings
-     *
-     * @var array<string, bool>
-     */
     private array $directMappingsMap;
 
-    /**
-     * Cache for nested operators
-     *
-     * @var array<string, bool>
-     */
     private array $nestedOperatorsMap;
 
     public function __construct()
     {
-        // Initialize special operators
-        $specialOperators = [
+        $this->specialOperatorsLower = array_map('strtolower', [
             Operator::IN->value,
             Operator::NOT_IN->value,
             Operator::NOT->value,
@@ -58,20 +32,17 @@ class FilterParser
             Operator::FILTER_RELATION->value,
             Operator::BETWEEN->value,
             Operator::BETWEEN_RELATION->value,
-        ];
-        $this->specialOperatorsLower = array_map('strtolower', $specialOperators);
+        ]);
 
-        // Initialize relation operators as a map for faster lookups
-        $relationOperators = [Operator::RELATION->value, Operator::ANY_RELATION->value, Operator::BETWEEN_RELATION->value];
-        $this->relationOperatorsMap = array_fill_keys($relationOperators, true);
+        $this->relationOperatorsMap = array_fill_keys([
+            Operator::RELATION->value,
+            Operator::ANY_RELATION->value,
+            Operator::BETWEEN_RELATION->value,
+        ], true);
 
-        // Initialize operator map
-        $this->operatorMap = [
-            Operator::HAS->value => Operator::GREATER_OR_EQUAL->value,
-        ];
+        $this->operatorMap = [Operator::HAS->value => Operator::GREATER_OR_EQUAL->value];
 
-        // Initialize direct mappings as a map for faster lookups
-        $directMappings = [
+        $this->directMappingsMap = array_fill_keys([
             Operator::HAS->value,
             Operator::NOT->value,
             Operator::NOT_IN->value,
@@ -83,18 +54,15 @@ class FilterParser
             Operator::FILTER_RELATION_HAS->value,
             Operator::BETWEEN->value,
             Operator::BETWEEN_RELATION->value,
-        ];
-        $this->directMappingsMap = array_fill_keys($directMappings, true);
+        ], true);
 
-        // Initialize nested operators as a map for faster lookups
-        $nestedOperators = [
+        $this->nestedOperatorsMap = array_fill_keys([
             Operator::AND->value,
             Operator::OR->value,
             Operator::NOT->value,
             Operator::FILTER_RELATION_HAS->value,
             Operator::FILTER_RELATION->value,
-        ];
-        $this->nestedOperatorsMap = array_fill_keys($nestedOperators, true);
+        ], true);
     }
 
     public function parse(array $filters, bool $isOr = false): array
@@ -152,32 +120,16 @@ class FilterParser
         return $parameters;
     }
 
-    /**
-     * Handle "OR" AND "AND" recursively
-     * Optimized to avoid unnecessary array operations
-     */
     public function sortNestedFilters($filters, $isOr = false): array
     {
-        // Ensure filters is an array of arrays
         $filters = Arr::isAssoc($filters) ? [$filters] : $filters;
-
-        // Pre-allocate array with approximate size to avoid resizing
         $parsedArray = [];
-        $count = count($filters);
 
-        for ($i = 0; $i < $count; $i++) {
-            // Use the "orWhere" only from the second iteration
+        foreach ($filters as $i => $filter) {
             $useOr = $isOr && $i > 0;
 
-            // Handle null filters
-            $filter = $filters[$i] ?? [];
-
-            // Parse the filter and add to results
             if (is_array($filter)) {
-                $parseFilterResponse = $this->parse($filter, $useOr);
-                foreach ($parseFilterResponse as $response) {
-                    $parsedArray[] = $response;
-                }
+                array_push($parsedArray, ...$this->parse($filter, $useOr));
             } else {
                 $parsedArray[] = $filter;
             }
@@ -199,39 +151,18 @@ class FilterParser
         return Method::DEFAULT->value;
     }
 
-    /**
-     * Convert a method name to its "or" format (e.g., "where" to "orWhere")
-     * Using a more direct approach for string concatenation
-     */
     private function convertToOrFormat($str): string
     {
         return 'or' . ucfirst($str);
     }
 
-    /**
-     * Remove hash character from string
-     * Using a more efficient approach for simple character removal
-     */
     private function removeHashFromString($str): string
     {
-        // For non-string values, just return as is
-        if (!is_string($str)) {
-            return $str;
-        }
-
-        // Check if the string contains a hash to avoid unnecessary replacement
-        return $str[0] === '#' ? substr($str, 1) : $str;
+        return is_string($str) && str_starts_with($str, '#') ? substr($str, 1) : $str;
     }
 
-    // Check if an operator is a nested operator
     private function isNested(string $op): bool
     {
-        return in_array($op, [
-            Operator::AND->value,
-            Operator::OR->value,
-            Operator::NOT->value,
-            Operator::FILTER_RELATION_HAS->value,
-            Operator::FILTER_RELATION->value,
-        ], true);
+        return isset($this->nestedOperatorsMap[$op]);
     }
 }

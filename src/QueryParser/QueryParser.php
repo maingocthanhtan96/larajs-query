@@ -20,24 +20,18 @@ class QueryParser implements QueryParserInterface
         private readonly DateParser $dateParser,
     ) {}
 
-    /**
-     * @param  Builder  $query
-     * @param  QueryParserRequestDTO  $options
-     * @param  QueryParserAllowDTO  $allow
-     * @return Builder
-     */
     public function parse(Builder $query, QueryParserRequestDTO $options, QueryParserAllowDTO $allow): Builder
     {
         $requestParser = $this->requestParser->parse($options, $allow);
 
-        $queries = array_merge(
-            $this->selectParser->parse($requestParser->getSelect()),
-            $this->includeParser->parse($requestParser->getInclude()),
-            $this->filterParser->parse($requestParser->getFilter()),
-            $this->searchParser->parse($requestParser->getSearch()),
-            $this->dateParser->parse($requestParser->getDate()),
-            $this->sortParser->parse($requestParser->getSort())
-        );
+        $queries = [
+            ...$this->selectParser->parse($requestParser->getSelect()),
+            ...$this->includeParser->parse($requestParser->getInclude()),
+            ...$this->filterParser->parse($requestParser->getFilter()),
+            ...$this->searchParser->parse($requestParser->getSearch()),
+            ...$this->dateParser->parse($requestParser->getDate()),
+            ...$this->sortParser->parse($requestParser->getSort()),
+        ];
 
         return $this->handleQuery($query, $queries);
     }

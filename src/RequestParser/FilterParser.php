@@ -8,27 +8,10 @@ use LaraJS\Query\Enum\SqlOperator;
 
 class FilterParser
 {
-    /**
-     * Cached array of IBM operator values
-     *
-     * @var array<string>|null
-     */
     private ?array $ibmOperatorValues = null;
 
-    /**
-     * Cached mapping of operators to SQL operators
-     *
-     * @var array<string, string>|null
-     */
     private ?array $operatorMappings = null;
 
-    /**
-     * Filter parser
-     *
-     * @param  string  $queryString
-     * @param  ?array<string>  $filterable
-     * @return array
-     */
     public function parse(string $queryString, ?array $filterable): array
     {
         if (!$queryString || (is_array($filterable) && empty($filterable))) {
@@ -58,10 +41,7 @@ class FilterParser
         $tokens = $this->tokenizeExpression($expression);
         $stack = [];
 
-        // Initialize the cached operator values if not already set
-        if ($this->ibmOperatorValues === null) {
-            $this->ibmOperatorValues = array_map(fn(IbmOperator $operator) => $operator->value, IbmOperator::cases());
-        }
+        $this->ibmOperatorValues ??= array_map(fn(IbmOperator $operator) => $operator->value, IbmOperator::cases());
 
         foreach (array_reverse($tokens) as $token) {
             $isOperator = in_array($token, $this->ibmOperatorValues, false);
@@ -244,35 +224,9 @@ class FilterParser
 
     public function tokenizeExpression(string $expression): array
     {
-        // Pre-allocate a result array for better memory efficiency
-        $result = [];
-        $currentTokens = [$expression];
-        $newTokens = [];
+        $tokens = preg_split('/[(),]/', $expression);
 
-        // Process each delimiter sequentially
-        foreach (['(', ')', ','] as $delimiter) {
-            $newTokens = [];
-
-            // Process each token
-            foreach ($currentTokens as $token) {
-                if (trim($token) === '') {
-                    continue;
-                }
-
-                // Split by delimiter and add to new tokens
-                $parts = explode($delimiter, $token);
-                foreach ($parts as $part) {
-                    $trimmed = trim($part);
-                    if ($trimmed !== '') {
-                        $newTokens[] = $trimmed;
-                    }
-                }
-            }
-
-            $currentTokens = $newTokens;
-        }
-
-        return $currentTokens;
+        return array_filter(array_map('trim', $tokens));
     }
 
     public function mapOperator($operator, $valueIsNull = false): string
@@ -282,36 +236,33 @@ class FilterParser
             return SqlOperator::IS_NULL->value;
         }
 
-        // Initialize the operator mappings cache if not already set
-        if ($this->operatorMappings === null) {
-            $this->operatorMappings = [
-                IbmOperator::ANY_RELATION->value => SqlOperator::ANY_RELATION->value,
-                IbmOperator::EQUALS->value => SqlOperator::EQUALS->value,
-                IbmOperator::EQUALS_RELATION->value => SqlOperator::RELATION->value,
-                IbmOperator::GREATER_OR_EQUAL_RELATION->value => SqlOperator::RELATION->value,
-                IbmOperator::GREATER_THAN_RELATION->value => SqlOperator::RELATION->value,
-                IbmOperator::LESS_OR_EQUAL_RELATION->value => SqlOperator::RELATION->value,
-                IbmOperator::LESS_THAN_RELATION->value => SqlOperator::RELATION->value,
-                IbmOperator::CONTAINS_RELATION->value => SqlOperator::RELATION->value,
-                IbmOperator::STARTS_WITH_RELATION->value => SqlOperator::RELATION->value,
-                IbmOperator::ENDS_WITH_RELATION->value => SqlOperator::RELATION->value,
-                IbmOperator::GREATER_THAN->value => SqlOperator::GREATER_THAN->value,
-                IbmOperator::GREATER_OR_EQUAL->value => SqlOperator::GREATER_OR_EQUAL->value,
-                IbmOperator::LESS_THAN->value => SqlOperator::LESS_THAN->value,
-                IbmOperator::LESS_OR_EQUAL->value => SqlOperator::LESS_OR_EQUAL->value,
-                IbmOperator::CONTAINS->value => SqlOperator::LIKE->value,
-                IbmOperator::STARTS_WITH->value => SqlOperator::LIKE->value,
-                IbmOperator::ENDS_WITH->value => SqlOperator::LIKE->value,
-                IbmOperator::ANY->value => SqlOperator::IN->value,
-                IbmOperator::NOT->value => SqlOperator::NOT->value,
-                IbmOperator::AND->value => SqlOperator::AND->value,
-                IbmOperator::OR->value => SqlOperator::OR->value,
-                IbmOperator::HAS->value => SqlOperator::HAS->value,
-                IbmOperator::RELATION->value => SqlOperator::FILTER_RELATION_HAS->value,
-                IbmOperator::BETWEEN->value => SqlOperator::BETWEEN->value,
-                IbmOperator::BETWEEN_RELATION->value => SqlOperator::BETWEEN_RELATION->value,
-            ];
-        }
+        $this->operatorMappings ??= [
+            IbmOperator::ANY_RELATION->value => SqlOperator::ANY_RELATION->value,
+            IbmOperator::EQUALS->value => SqlOperator::EQUALS->value,
+            IbmOperator::EQUALS_RELATION->value => SqlOperator::RELATION->value,
+            IbmOperator::GREATER_OR_EQUAL_RELATION->value => SqlOperator::RELATION->value,
+            IbmOperator::GREATER_THAN_RELATION->value => SqlOperator::RELATION->value,
+            IbmOperator::LESS_OR_EQUAL_RELATION->value => SqlOperator::RELATION->value,
+            IbmOperator::LESS_THAN_RELATION->value => SqlOperator::RELATION->value,
+            IbmOperator::CONTAINS_RELATION->value => SqlOperator::RELATION->value,
+            IbmOperator::STARTS_WITH_RELATION->value => SqlOperator::RELATION->value,
+            IbmOperator::ENDS_WITH_RELATION->value => SqlOperator::RELATION->value,
+            IbmOperator::GREATER_THAN->value => SqlOperator::GREATER_THAN->value,
+            IbmOperator::GREATER_OR_EQUAL->value => SqlOperator::GREATER_OR_EQUAL->value,
+            IbmOperator::LESS_THAN->value => SqlOperator::LESS_THAN->value,
+            IbmOperator::LESS_OR_EQUAL->value => SqlOperator::LESS_OR_EQUAL->value,
+            IbmOperator::CONTAINS->value => SqlOperator::LIKE->value,
+            IbmOperator::STARTS_WITH->value => SqlOperator::LIKE->value,
+            IbmOperator::ENDS_WITH->value => SqlOperator::LIKE->value,
+            IbmOperator::ANY->value => SqlOperator::IN->value,
+            IbmOperator::NOT->value => SqlOperator::NOT->value,
+            IbmOperator::AND->value => SqlOperator::AND->value,
+            IbmOperator::OR->value => SqlOperator::OR->value,
+            IbmOperator::HAS->value => SqlOperator::HAS->value,
+            IbmOperator::RELATION->value => SqlOperator::FILTER_RELATION_HAS->value,
+            IbmOperator::BETWEEN->value => SqlOperator::BETWEEN->value,
+            IbmOperator::BETWEEN_RELATION->value => SqlOperator::BETWEEN_RELATION->value,
+        ];
 
         return $this->operatorMappings[$operator] ?? SqlOperator::EQUALS->value;
     }
@@ -331,20 +282,11 @@ class FilterParser
 
     private function wildCardString($value, $operator = null): string
     {
-        // Fast path for default case
-        if ($operator === null) {
-            return $value;
-        }
-
-        // Use simple if-else for better performance than match in this case
-        if ($operator === IbmOperator::CONTAINS->value || $operator === IbmOperator::CONTAINS_RELATION->value) {
-            return '%' . $value . '%';
-        } elseif ($operator === IbmOperator::STARTS_WITH->value || $operator === IbmOperator::STARTS_WITH_RELATION->value) {
-            return $value . '%';
-        } elseif ($operator === IbmOperator::ENDS_WITH->value || $operator === IbmOperator::ENDS_WITH_RELATION->value) {
-            return '%' . $value;
-        }
-
-        return $value;
+        return match ($operator) {
+            IbmOperator::CONTAINS->value, IbmOperator::CONTAINS_RELATION->value => '%' . $value . '%',
+            IbmOperator::STARTS_WITH->value, IbmOperator::STARTS_WITH_RELATION->value => $value . '%',
+            IbmOperator::ENDS_WITH->value, IbmOperator::ENDS_WITH_RELATION->value => '%' . $value,
+            default => $value,
+        };
     }
 }

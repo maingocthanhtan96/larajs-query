@@ -8,16 +8,10 @@ class SelectParser
 {
     public function parse(array $fields): array
     {
-        if (!$fields) {
-            return [];
-        }
-
-        return [
-            [
-                'fx' => Method::SELECT->value,
-                'isNested' => false,
-                'parameters' => $fields,
-            ],
-        ];
+        return $fields ? [[
+            'fx' => Method::SELECT->value,
+            'isNested' => false,
+            'parameters' => $fields,
+        ]] : [];
     }
 }

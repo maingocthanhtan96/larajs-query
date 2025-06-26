@@ -38,7 +38,7 @@ class BaseRepository implements ReadRepositoryInterface, WriteRepositoryInterfac
      */
     public function findAll(QueryParserAllowDTO $allow, array $options = []): LengthAwarePaginator|CursorPaginator|Paginator|Collection
     {
-        return $this->readRepository->findAll($allow, $options);
+    return $this->readRepository->findAll($allow, $options);
     }
 
     /**

@@ -4,21 +4,12 @@ namespace LaraJS\Query\RequestParser;
 
 class DateParser
 {
-    /**
-     * Date parser
-     *
-     * @param  array  $queryString
-     * @param  ?array<string>  $filterable
-     * @return array
-     */
     public function parse(array $queryString, ?array $filterable): array
     {
         if (!$queryString || (is_array($filterable) && empty($filterable))) {
-            return [
-                'column' => '',
-                'value' => [],
-            ];
+            return ['column' => '', 'value' => []];
         }
+
         $column = $queryString['column'] ?? '';
 
         if ($filterable && !in_array($column, $filterable, true)) {

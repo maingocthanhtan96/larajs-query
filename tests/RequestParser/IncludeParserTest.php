@@ -98,6 +98,16 @@ class IncludeParserTest extends TestCase
         $this->parser->parse($queryString, ['roles', 'permissions']);
     }
 
+    public function test_parser_with_column_specified_filterable()
+    {
+        $queryString = ['users:id,name', 'roles'];
+        $filterable = ['users', 'roles'];
+        $expect['with'] = ['users:id,name', 'roles'];
+        $expect['filterWith'] = [];
+
+        $this->assertSame($expect, $this->parser->parse($queryString, $filterable));
+    }
+
     public function test_parser_with_no_column_specified()
     {
         $queryString = ['users', 'roles'];
