@@ -14,7 +14,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
-use LaraJS\Query\Enum\LimitOption;
 use LaraJS\Query\QueryParser\DateParser;
 use LaraJS\Query\QueryParser\FilterParser;
 use LaraJS\Query\QueryParser\IncludeParser;
@@ -211,14 +210,12 @@ class LaraJSQueryServiceProvider extends ServiceProvider
         if (!Builder::hasGlobalMacro('dynamicPaginate')) {
             Builder::macro('dynamicPaginate', function (array $options = []) {
                 $request = request();
-                $defaultLimit = $options['limit']['default'] ?? config('larajs-query.limit.default', LimitOption::DEFAULT_LIMIT);
-                $maxLimit = $options['limit']['max'] ?? config('larajs-query.limit.max', LimitOption::MAX_LIMIT);
+                $defaultLimit = $options['limit']['default'] ?? config('larajs-query.limit.default', 25);
+                $maxLimit = $options['limit']['max'] ?? config('larajs-query.limit.max', 500);
                 $limit = min($request->input('pagination.limit', $defaultLimit), $maxLimit);
 
                 if ($request->input('pagination.page') === '-1') {
-                    $maxLimit = $options['limit']['max'] ?? config('larajs-query.limit.max', LimitOption::MAX_LIMIT);
-
-                    return $this->take(min($maxLimit, $request->input('pagination.limit')))->get();
+                    return $this->take($limit)->get();
                 }
 
                 return match ($request->input('pagination.type')) {
