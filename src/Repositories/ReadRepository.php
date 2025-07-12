@@ -57,7 +57,7 @@ class ReadRepository implements ReadRepositoryInterface
     /**
      * @param  QueryParserAllowDTO  $allow
      * @param  bool  $clearFilter
-     * @return Builder
+     * @return Builder<T>
      */
     public function laraJSQuery(QueryParserAllowDTO $allow, bool $clearFilter = false): Builder
     {

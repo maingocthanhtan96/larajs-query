@@ -1,6 +1,6 @@
 {
     "name": "larajs/query",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "autoload": {
         "psr-4": {
             "LaraJS\\Query\\": "src/"
