@@ -38,7 +38,7 @@ class DateParserTest extends TestCase
             'column' => 'created_at',
             'value' => ['2024-01-01', '2024-12-01'],
         ];
-        $expect = [];
+        $expect = ['column' => '', 'value' => []];
 
         $this->assertSame($expect, $this->parser->parse($queryString, ['updated_at']));
     }

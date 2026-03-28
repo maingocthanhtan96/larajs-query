@@ -92,7 +92,7 @@ class FilterParser
         return $parsedArray;
     }
 
-    public function parseParametersForObjection($operator, $value): array
+    private function parseParametersForObjection($operator, $value): array
     {
         $isSpecialOperator = in_array(strtolower($operator), $this->specialOperatorsLower, true);
         $operator = $this->operatorMap[$operator] ?? $operator;
@@ -120,7 +120,7 @@ class FilterParser
         return $parameters;
     }
 
-    public function sortNestedFilters($filters, $isOr = false): array
+    private function sortNestedFilters($filters, $isOr = false): array
     {
         $filters = Arr::isAssoc($filters) ? [$filters] : $filters;
         $parsedArray = [];
@@ -138,7 +138,7 @@ class FilterParser
         return $parsedArray;
     }
 
-    public function getMethod(string $key): string
+    private function getMethod(string $key): string
     {
         if (isset($this->directMappingsMap[$key])) {
             return Method::fromName($key)->value;

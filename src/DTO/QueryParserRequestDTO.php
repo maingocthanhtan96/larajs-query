@@ -22,7 +22,7 @@ class QueryParserRequestDTO
     ) {}
 
     /**
-     * @param  array{select?: string, include?: array<string>, sort?: string, filter?: array<string>, search?: array<string>, date?: array<string>}  $data
+     * @param  array{select?: string, include?: array<string>, sort?: string, filter?: string, search?: array<string>, date?: array<string>}  $data
      * @return self
      */
     public static function fromArray(array $data): self

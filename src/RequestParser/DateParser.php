@@ -13,7 +13,7 @@ class DateParser
         $column = $queryString['column'] ?? '';
 
         if ($filterable && !in_array($column, $filterable, true)) {
-            return [];
+            return ['column' => '', 'value' => []];
         }
 
         return [

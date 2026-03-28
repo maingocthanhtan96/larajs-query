@@ -33,7 +33,7 @@ class BaseRepository implements ReadRepositoryInterface, WriteRepositoryInterfac
 
     /**
      * @param  QueryParserAllowDTO  $allow
-     * @param  array{limit: array{default: int, max: int}}  $options
+     * @param  array{limit?: array{default?: int, max?: int}}  $options
      * @return LengthAwarePaginator|CursorPaginator|Paginator|Collection<int, T>
      */
     public function findAll(QueryParserAllowDTO $allow, array $options = []): LengthAwarePaginator|CursorPaginator|Paginator|Collection
@@ -67,6 +67,16 @@ class BaseRepository implements ReadRepositoryInterface, WriteRepositoryInterfac
     public function query(): Builder
     {
         return $this->readRepository->query();
+    }
+
+    /**
+     * @param  QueryParserAllowDTO  $allow
+     * @param  bool  $clearFilter
+     * @return Builder<T>
+     */
+    public function laraJSQuery(QueryParserAllowDTO $allow, bool $clearFilter = false): Builder
+    {
+        return $this->readRepository->laraJSQuery($allow, $clearFilter);
     }
 
     /**

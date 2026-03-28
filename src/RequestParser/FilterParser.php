@@ -36,7 +36,7 @@ class FilterParser
         return $subResults ?? [];
     }
 
-    public function parseExpression(string $expression, array $filterable)
+    public function parseExpression(string $expression, array $filterable): ?array
     {
         $tokens = $this->tokenizeExpression($expression);
         $stack = [];

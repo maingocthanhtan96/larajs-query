@@ -31,7 +31,7 @@ class WriteRepository implements WriteRepositoryInterface
      * @param  array  $options
      * @return T
      */
-    public function update(string|Model $idOrModel, array $attributes, array $options = []): Model
+    public function update(string|Model $idOrModel, array $attributes, array $options = [])
     {
         $model = $this->resolveModel($idOrModel);
         $model->update($attributes, $options);

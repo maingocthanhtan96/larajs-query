@@ -9,6 +9,8 @@ class IncludeParser
 {
     private array $validAggregates = ['count', 'sum', 'avg', 'min', 'max', 'exists'];
 
+    private ?FilterParser $filterParser = null;
+
     public function parse(array $queryString, ?array $filterable): array
     {
         $includes = ['with' => [], 'filterWith' => []];
@@ -28,10 +30,11 @@ class IncludeParser
             }
 
             if ($args && !in_array(strtolower($args), $this->validAggregates, true)) {
+                $this->filterParser ??= new FilterParser;
                 $includes['filterWith'][] = [
                     SqlOperator::FILTER_RELATION->value => [
                         $relation,
-                        (new FilterParser)->parse($args, null),
+                        $this->filterParser->parse($args, null),
                     ],
                 ];
             } else {
