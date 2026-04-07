@@ -1,6 +1,6 @@
 {
     "name": "larajs/query",
-    "version": "1.3.0",
+    "version": "2.0.0",
     "autoload": {
         "psr-4": {
             "LaraJS\\Query\\": "src/"
@@ -27,8 +27,7 @@
         "illuminate/support": "^11.0|^12.0|^13.0",
         "illuminate/database": "^11.0|^12.0|^13.0",
         "illuminate/http": "^11.0|^12.0|^13.0",
-        "illuminate/pagination": "^11.0|^12.0|^13.0",
-        "aaronfrancis/fast-paginate": "^2.0"
+        "illuminate/pagination": "^11.0|^12.0|^13.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.3",

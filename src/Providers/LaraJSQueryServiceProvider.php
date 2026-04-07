@@ -218,11 +218,21 @@ class LaraJSQueryServiceProvider extends ServiceProvider
                     return $this->take($limit)->get();
                 }
 
-                return match ($request->input('pagination.type')) {
-                    'cursor' => $this->cursorPaginate(perPage: $limit, cursorName: 'pagination.cursor')->setCursorName('pagination[cursor]')->appends($request->except('pagination.cursor')),
-                    'simple' => $this->simpleFastPaginate(perPage: $limit, pageName: 'pagination.page')->setPageName('pagination[page]')->appends($request->except('pagination.page')),
-                    default => $this->fastPaginate(perPage: $limit, pageName: 'pagination.page')->setPageName('pagination[page]')->appends($request->except('pagination.page')),
-                };
+                $paginationType = $request->input('pagination.type');
+
+                if ($paginationType === 'cursor') {
+                    return $this->cursorPaginate(perPage: $limit, cursorName: 'pagination.cursor')
+                        ->setCursorName('pagination[cursor]')
+                        ->appends($request->except('pagination.cursor'));
+                }
+
+                $paginator = $paginationType === 'simple'
+                    ? $this->simplePaginate(perPage: $limit, pageName: 'pagination.page')
+                    : $this->paginate(perPage: $limit, pageName: 'pagination.page');
+
+                return $paginator
+                    ->setPageName('pagination[page]')
+                    ->appends($request->except('pagination.page'));
             });
         }
     }
