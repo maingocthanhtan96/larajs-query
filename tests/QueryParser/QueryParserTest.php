@@ -75,12 +75,12 @@ class QueryParserTest extends TestCase
         $allow = new QueryParserAllowDTO(null, null, null, null, null, null);
 
         $mockRequestParserResult = Mockery::mock(RequestParser::class);
-        $mockRequestParserResult->shouldReceive('getSelect')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getInclude')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getFilter')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getSearch')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getDate')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getSort')->andReturn([]);
+        $mockRequestParserResult->select = [];
+        $mockRequestParserResult->include = [];
+        $mockRequestParserResult->filter = [];
+        $mockRequestParserResult->search = [];
+        $mockRequestParserResult->date = [];
+        $mockRequestParserResult->sort = [];
 
         $this->requestParser->shouldReceive('parse')
             ->with($options, $allow)
@@ -109,12 +109,12 @@ class QueryParserTest extends TestCase
         $allow = new QueryParserAllowDTO(['name', 'email'], null, null, null, null, null);
 
         $mockRequestParserResult = Mockery::mock(RequestParser::class);
-        $mockRequestParserResult->shouldReceive('getSelect')->andReturn(['name', 'email']);
-        $mockRequestParserResult->shouldReceive('getInclude')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getFilter')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getSearch')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getDate')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getSort')->andReturn([]);
+        $mockRequestParserResult->select = ['name', 'email'];
+        $mockRequestParserResult->include = [];
+        $mockRequestParserResult->filter = [];
+        $mockRequestParserResult->search = [];
+        $mockRequestParserResult->date = [];
+        $mockRequestParserResult->sort = [];
 
         $this->requestParser->shouldReceive('parse')
             ->with($options, $allow)
@@ -160,12 +160,12 @@ class QueryParserTest extends TestCase
         $allow = new QueryParserAllowDTO(null, null, null, ['name'], null, null);
 
         $mockRequestParserResult = Mockery::mock(RequestParser::class);
-        $mockRequestParserResult->shouldReceive('getSelect')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getInclude')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getFilter')->andReturn(['=' => ['#name', 'John']]);
-        $mockRequestParserResult->shouldReceive('getSearch')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getDate')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getSort')->andReturn([]);
+        $mockRequestParserResult->select = [];
+        $mockRequestParserResult->include = [];
+        $mockRequestParserResult->filter = ['=' => ['#name', 'John']];
+        $mockRequestParserResult->search = [];
+        $mockRequestParserResult->date = [];
+        $mockRequestParserResult->sort = [];
 
         $this->requestParser->shouldReceive('parse')
             ->with($options, $allow)
@@ -211,12 +211,12 @@ class QueryParserTest extends TestCase
         $allow = new QueryParserAllowDTO(null, null, null, ['posts.title'], null, null);
 
         $mockRequestParserResult = Mockery::mock(RequestParser::class);
-        $mockRequestParserResult->shouldReceive('getSelect')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getInclude')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getFilter')->andReturn(['FILTER_RELATION_HAS' => ['posts', ['=' => ['#title', 'Test']]]]);
-        $mockRequestParserResult->shouldReceive('getSearch')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getDate')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getSort')->andReturn([]);
+        $mockRequestParserResult->select = [];
+        $mockRequestParserResult->include = [];
+        $mockRequestParserResult->filter = ['FILTER_RELATION_HAS' => ['posts', ['=' => ['#title', 'Test']]]];
+        $mockRequestParserResult->search = [];
+        $mockRequestParserResult->date = [];
+        $mockRequestParserResult->sort = [];
 
         $this->requestParser->shouldReceive('parse')
             ->with($options, $allow)
@@ -277,12 +277,12 @@ class QueryParserTest extends TestCase
         $allow = new QueryParserAllowDTO(null, ['posts'], null, null, null, null);
 
         $mockRequestParserResult = Mockery::mock(RequestParser::class);
-        $mockRequestParserResult->shouldReceive('getSelect')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getInclude')->andReturn(['posts']);
-        $mockRequestParserResult->shouldReceive('getFilter')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getSearch')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getDate')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getSort')->andReturn([]);
+        $mockRequestParserResult->select = [];
+        $mockRequestParserResult->include = ['posts'];
+        $mockRequestParserResult->filter = [];
+        $mockRequestParserResult->search = [];
+        $mockRequestParserResult->date = [];
+        $mockRequestParserResult->sort = [];
 
         $this->requestParser->shouldReceive('parse')
             ->with($options, $allow)
@@ -328,12 +328,12 @@ class QueryParserTest extends TestCase
         $allow = new QueryParserAllowDTO(null, ['posts'], null, ['posts.title'], null, null);
 
         $mockRequestParserResult = Mockery::mock(RequestParser::class);
-        $mockRequestParserResult->shouldReceive('getSelect')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getInclude')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getFilter')->andReturn(['FILTER_RELATION' => ['posts', ['=' => ['#title', 'Test']]]]);
-        $mockRequestParserResult->shouldReceive('getSearch')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getDate')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getSort')->andReturn([]);
+        $mockRequestParserResult->select = [];
+        $mockRequestParserResult->include = [];
+        $mockRequestParserResult->filter = ['FILTER_RELATION' => ['posts', ['=' => ['#title', 'Test']]]];
+        $mockRequestParserResult->search = [];
+        $mockRequestParserResult->date = [];
+        $mockRequestParserResult->sort = [];
 
         $this->requestParser->shouldReceive('parse')
             ->with($options, $allow)
@@ -414,12 +414,12 @@ class QueryParserTest extends TestCase
         );
 
         $mockRequestParserResult = Mockery::mock(RequestParser::class);
-        $mockRequestParserResult->shouldReceive('getSelect')->andReturn(['name', 'email']);
-        $mockRequestParserResult->shouldReceive('getInclude')->andReturn(['posts']);
-        $mockRequestParserResult->shouldReceive('getFilter')->andReturn(['=' => ['#status', 'active']]);
-        $mockRequestParserResult->shouldReceive('getSearch')->andReturn(['term' => 'search']);
-        $mockRequestParserResult->shouldReceive('getDate')->andReturn(['created_at' => ['start' => '2023-01-01', 'end' => '2023-12-31']]);
-        $mockRequestParserResult->shouldReceive('getSort')->andReturn(['name' => 'asc']);
+        $mockRequestParserResult->select = ['name', 'email'];
+        $mockRequestParserResult->include = ['posts'];
+        $mockRequestParserResult->filter = ['=' => ['#status', 'active']];
+        $mockRequestParserResult->search = ['term' => 'search'];
+        $mockRequestParserResult->date = ['created_at' => ['start' => '2023-01-01', 'end' => '2023-12-31']];
+        $mockRequestParserResult->sort = ['name' => 'asc'];
 
         $this->requestParser->shouldReceive('parse')
             ->with($options, $allow)
@@ -517,12 +517,12 @@ class QueryParserTest extends TestCase
         $allow = new QueryParserAllowDTO(null, null, null, ['comments.content'], null, null);
 
         $mockRequestParserResult = Mockery::mock(RequestParser::class);
-        $mockRequestParserResult->shouldReceive('getSelect')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getInclude')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getFilter')->andReturn(['HAS' => ['comments', ['=' => ['#content', 'Test']]]]);
-        $mockRequestParserResult->shouldReceive('getSearch')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getDate')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getSort')->andReturn([]);
+        $mockRequestParserResult->select = [];
+        $mockRequestParserResult->include = [];
+        $mockRequestParserResult->filter = ['HAS' => ['comments', ['=' => ['#content', 'Test']]]];
+        $mockRequestParserResult->search = [];
+        $mockRequestParserResult->date = [];
+        $mockRequestParserResult->sort = [];
 
         $this->requestParser->shouldReceive('parse')
             ->with($options, $allow)
@@ -582,12 +582,12 @@ class QueryParserTest extends TestCase
         $allow = new QueryParserAllowDTO(null, null, null, null, null, null);
 
         $mockRequestParserResult = Mockery::mock(RequestParser::class);
-        $mockRequestParserResult->shouldReceive('getSelect')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getInclude')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getFilter')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getSearch')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getDate')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getSort')->andReturn([]);
+        $mockRequestParserResult->select = [];
+        $mockRequestParserResult->include = [];
+        $mockRequestParserResult->filter = [];
+        $mockRequestParserResult->search = [];
+        $mockRequestParserResult->date = [];
+        $mockRequestParserResult->sort = [];
 
         $this->requestParser->shouldReceive('parse')
             ->with($options, $allow)
@@ -624,12 +624,12 @@ class QueryParserTest extends TestCase
         $allow = new QueryParserAllowDTO(null, null, null, null, null, null);
 
         $mockRequestParserResult = Mockery::mock(RequestParser::class);
-        $mockRequestParserResult->shouldReceive('getSelect')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getInclude')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getFilter')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getSearch')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getDate')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getSort')->andReturn([]);
+        $mockRequestParserResult->select = [];
+        $mockRequestParserResult->include = [];
+        $mockRequestParserResult->filter = [];
+        $mockRequestParserResult->search = [];
+        $mockRequestParserResult->date = [];
+        $mockRequestParserResult->sort = [];
 
         $this->requestParser->shouldReceive('parse')
             ->with($options, $allow)
@@ -689,12 +689,12 @@ class QueryParserTest extends TestCase
         $allow = new QueryParserAllowDTO(null, null, null, null, null, null);
 
         $mockRequestParserResult = Mockery::mock(RequestParser::class);
-        $mockRequestParserResult->shouldReceive('getSelect')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getInclude')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getFilter')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getSearch')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getDate')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getSort')->andReturn([]);
+        $mockRequestParserResult->select = [];
+        $mockRequestParserResult->include = [];
+        $mockRequestParserResult->filter = [];
+        $mockRequestParserResult->search = [];
+        $mockRequestParserResult->date = [];
+        $mockRequestParserResult->sort = [];
 
         $this->requestParser->shouldReceive('parse')
             ->with($options, $allow)
@@ -772,12 +772,12 @@ class QueryParserTest extends TestCase
         $allow = new QueryParserAllowDTO(null, null, null, null, null, null);
 
         $mockRequestParserResult = Mockery::mock(RequestParser::class);
-        $mockRequestParserResult->shouldReceive('getSelect')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getInclude')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getFilter')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getSearch')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getDate')->andReturn([]);
-        $mockRequestParserResult->shouldReceive('getSort')->andReturn([]);
+        $mockRequestParserResult->select = [];
+        $mockRequestParserResult->include = [];
+        $mockRequestParserResult->filter = [];
+        $mockRequestParserResult->search = [];
+        $mockRequestParserResult->date = [];
+        $mockRequestParserResult->sort = [];
 
         $this->requestParser->shouldReceive('parse')
             ->with($options, $allow)

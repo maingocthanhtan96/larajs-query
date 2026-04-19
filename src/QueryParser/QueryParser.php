@@ -25,12 +25,12 @@ class QueryParser implements QueryParserInterface
         $requestParser = $this->requestParser->parse($options, $allow);
 
         $queries = [
-            ...$this->selectParser->parse($requestParser->getSelect()),
-            ...$this->includeParser->parse($requestParser->getInclude()),
-            ...$this->filterParser->parse($requestParser->getFilter()),
-            ...$this->searchParser->parse($requestParser->getSearch()),
-            ...$this->dateParser->parse($requestParser->getDate()),
-            ...$this->sortParser->parse($requestParser->getSort()),
+            ...$this->selectParser->parse($requestParser->select),
+            ...$this->includeParser->parse($requestParser->include),
+            ...$this->filterParser->parse($requestParser->filter),
+            ...$this->searchParser->parse($requestParser->search),
+            ...$this->dateParser->parse($requestParser->date),
+            ...$this->sortParser->parse($requestParser->sort),
         ];
 
         return $this->handleQuery($query, $queries);

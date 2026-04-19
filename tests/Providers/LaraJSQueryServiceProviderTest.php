@@ -164,8 +164,8 @@ class LaraJSQueryServiceProviderTest extends TestCase
 
         $builder->shouldReceive('where')->with(Mockery::type('callable'))->andReturnUsing(function ($callback) use ($builder) {
             $subQuery = Mockery::mock(Builder::class);
-            $subQuery->shouldReceive('orWhere')->with('users.name', 'LIKE', '%john%')->andReturnSelf();
-            $subQuery->shouldReceive('orWhere')->with('users.email', 'LIKE', '%john%')->andReturnSelf();
+            $subQuery->shouldReceive('orWhereLike')->with('users.name', '%john%')->andReturnSelf();
+            $subQuery->shouldReceive('orWhereLike')->with('users.email', '%john%')->andReturnSelf();
             $subQuery->shouldReceive('orWhereHas')->with('posts', Mockery::type('callable'))->andReturnSelf();
 
             $callback($subQuery);
@@ -190,8 +190,8 @@ class LaraJSQueryServiceProviderTest extends TestCase
         $builder->shouldReceive('where')->with(Mockery::type('callable'))->andReturnUsing(function ($callback) use ($builder) {
             $subQuery = Mockery::mock(Builder::class);
             // Both attributes should be processed as strings
-            $subQuery->shouldReceive('orWhere')->with('users.123', 'LIKE', '%search%')->andReturnSelf();
-            $subQuery->shouldReceive('orWhere')->with('users.name', 'LIKE', '%search%')->andReturnSelf();
+            $subQuery->shouldReceive('orWhereLike')->with('users.123', '%search%')->andReturnSelf();
+            $subQuery->shouldReceive('orWhereLike')->with('users.name', '%search%')->andReturnSelf();
 
             $callback($subQuery);
 
@@ -369,8 +369,8 @@ class LaraJSQueryServiceProviderTest extends TestCase
 
         $builder->shouldReceive('where')->with(Mockery::type('callable'))->andReturnUsing(function ($callback) use ($builder) {
             $subQuery = Mockery::mock(Builder::class);
-            $subQuery->shouldReceive('orWhere')
-                ->with('users.name', 'LIKE', '%%') // Empty search term should still add wildcards
+            $subQuery->shouldReceive('orWhereLike')
+                ->with('users.name', '%%') // Empty search term should still add wildcards
                 ->andReturnSelf();
 
             $callback($subQuery);
@@ -394,8 +394,8 @@ class LaraJSQueryServiceProviderTest extends TestCase
 
         $builder->shouldReceive('where')->with(Mockery::type('callable'))->andReturnUsing(function ($callback) use ($builder) {
             $subQuery = Mockery::mock(Builder::class);
-            $subQuery->shouldReceive('orWhere')
-                ->with('users.name', 'LIKE', '%john@example.com%')
+            $subQuery->shouldReceive('orWhereLike')
+                ->with('users.name', '%john@example.com%')
                 ->andReturnSelf();
 
             $callback($subQuery);
@@ -527,7 +527,7 @@ class LaraJSQueryServiceProviderTest extends TestCase
         $builder->shouldReceive('where')->with(Mockery::type('callable'))->andReturnUsing(function ($callback) use ($builder) {
             $subQuery = Mockery::mock(Builder::class);
             // Null gets converted to empty string, so it will create a where clause
-            $subQuery->shouldReceive('orWhere')->with('users.', 'LIKE', '%search%')->andReturnSelf();
+            $subQuery->shouldReceive('orWhereLike')->with('users.', '%search%')->andReturnSelf();
             $callback($subQuery);
 
             return $builder;
@@ -728,8 +728,8 @@ class LaraJSQueryServiceProviderTest extends TestCase
 
         $builder->shouldReceive('where')->with(Mockery::type('callable'))->andReturnUsing(function ($callback) use ($builder) {
             $subQuery = Mockery::mock(Builder::class);
-            $subQuery->shouldReceive('orWhere')
-                ->with('users.name', 'LIKE', '%José%')
+            $subQuery->shouldReceive('orWhereLike')
+                ->with('users.name', '%José%')
                 ->andReturnSelf();
 
             $callback($subQuery);
@@ -754,8 +754,8 @@ class LaraJSQueryServiceProviderTest extends TestCase
         $builder->shouldReceive('where')->with(Mockery::type('callable'))->andReturnUsing(function ($callback) use ($builder) {
             $subQuery = Mockery::mock(Builder::class);
             // The macro should treat this as a literal string, not SQL
-            $subQuery->shouldReceive('orWhere')
-                ->with('users.name', 'LIKE', "%'; DROP TABLE users; --%")
+            $subQuery->shouldReceive('orWhereLike')
+                ->with('users.name', "%'; DROP TABLE users; --%")
                 ->andReturnSelf();
 
             $callback($subQuery);

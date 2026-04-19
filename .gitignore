@@ -2,3 +2,6 @@
 .vscode
 .phpunit.result.cache
 vendor
+CLAUDE.md
+.claude
+plans

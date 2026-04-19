@@ -44,254 +44,178 @@ head:
 
 # LaraJS Query
 
-## Introduction
+Dynamic HTTP query parameter builder for Laravel Eloquent. Filter, sort, search, include relationships, select fields, and paginate using a functional query syntax.
 
-LaraJS Query is a powerful package that simplifies querying Eloquent models by dynamically filtering, sorting, and including relationships based on incoming requests. It provides a flexible interface for client-side queries and streamlines the process of retrieving resources in your Laravel applications.
+## Installation
+
+```bash
+composer require larajs/query:^2.0
+```
+
+**Requirements**: PHP 8.3+, Laravel 11/12/13
 
 ## Quick Start
 
-Here's how to integrate the package with your Laravel controllers:
-
 ```php
-<?php
-
-use App\Models\Category;
+use App\Models\User;
 use LaraJS\Query\LaraJSQuery;
-use LaraJS\Query\DTO\QueryParserAllowDTO;
+use LaraJS\Query\DTO\{QueryParserAllowDTO, QueryParserRequestDTO};
 
-class CategoryController
+class UserController
 {
     use LaraJSQuery;
 
     public function index(Request $request)
     {
-        return $this->applyLaraJSQuery(Category::query(), QueryParserRequestDTO::fromArray($request->query()), QueryParserAllowDTO::fromArray([]))->get();
+        return User::query()
+            ->applyLaraJSQuery(
+                QueryParserRequestDTO::fromArray($request->query()),
+                QueryParserAllowDTO::fromArray([
+                    'filter' => ['name', 'email'],
+                    'include' => ['posts', 'roles'],
+                    'sort' => ['name', 'created_at'],
+                ])
+            )
+            ->get();
     }
 }
+```
+
+**Usage**:
+```http
+GET /api/users?filter=equals(name,'John')&sort=name&include[]=posts&pagination[limit]=10
 ```
 
 ## Filtering
 
-Easily filter resources by attributes using the `filter` query string parameter. The following operations are supported:
+Filter with functional IBM-style syntax. All filters support relationship variants (e.g., `equalsRelation`, `greaterThanRelation`).
 
-```http
-?filter=expression
-```
-
-| **Operation**                          | **Function**             | **Example**                                                               |
-| -------------------------------------- | ------------------------ | ------------------------------------------------------------------------- |
-| Equality                               | `equals`                 | `?filter=equals(name,'Smith')`                                            |
-| Equality relationship                  | `equalsRelation`         | `?filter=equalsRelation(articles, name,'Smith')`                          |
-| Less than                              | `lessThan`               | `?filter=lessThan(age,'25')`                                              |
-| Less than relationship                 | `lessThanRelation`       | `?filter=lessThanRelation(articles,age,'25')`                             |
-| Less than or equal                     | `lessOrEqual`            | `?filter=lessOrEqual(lastModified,'2001-01-01')`                          |
-| Less than or equal relationship        | `lessOrEqualRelation`    | `?filter=lessOrEqualRelation(articles,lastModified,'2001-01-01')`         |
-| Greater than                           | `greaterThan`            | `?filter=greaterThan(duration,'6:12:14')`                                 |
-| Greater than relationship              | `greaterThanRelation`    | `?filter=greaterThanRelation(articles,duration,'6:12:14')`                |
-| Greater or equal                       | `greaterOrEqual`         | `?filter=greaterOrEqual(percentage,'33.33')`                              |
-| Greater or equal relationship          | `greaterOrEqualRelation` | `?filter=greaterOrEqualRelation(articles,percentage,'33.33')`             |
-| Contains                               | `contains`               | `?filter=contains(description,'cooking')`                                 |
-| Contains relationship                  | `containsRelation`       | `?filter=containsRelation(articles,description,'cooking')`                |
-| Starts with                            | `startsWith`             | `?filter=startsWith(description,'The')`                                   |
-| Starts with relationship               | `startsWithRelation`     | `?filter=startsWithRelation(articles,description,'The')`                  |
-| Ends with                              | `endsWith`               | `?filter=endsWith(description,'End')`                                     |
-| Ends with Relationship                 | `endsWithRelation`       | `?filter=endsWithRelation(articles,description,'End')`                    |
-| Equals one value from set              | `any`                    | `?filter=any(chapter,'Intro','Summary','Conclusion')`                     |
-| Equals relationship one value from set | `anyRelation`            | `?filter=anyRelation(chapter,name,'Intro','Summary')`                     |
-| Filter between                         | `between`                | `?filter=between(updated_at,'2025-01-01 00:00:00','2025-01-15 23:59:59')` |
-| Filter between relationship            | `betweenRelation`        | `?filter=betweenRelation(articles,price,'10','20')`                       |
-| Filter relation                        | `relation`               | `?filter=relation(users,and(equals(name,'Smith'),greaterThan(age,'25')))` |
-| Negation                               | `not`                    | `?filter=not(equals(lastName,null))`                                      |
-| Existence of a relationship            | `has`                    | `?filter=has(articles,'2')`                                               |
-| Conditional logical OR                 | `or`                     | `?filter=or(has(orders,'1'),has(invoices,'1'))`                           |
-| Conditional logical AND                | `and`                    | `?filter=and(has(orders,'1'),has(invoices,'1'))`                          |
+| **Function** | **Example** |
+|---|---|
+| `equals` | `?filter=equals(name,'Smith')` |
+| `greaterThan` / `lessThan` | `?filter=greaterThan(age,'25')` |
+| `greaterOrEqual` / `lessOrEqual` | `?filter=greaterOrEqual(price,'100')` |
+| `contains` / `startsWith` / `endsWith` | `?filter=contains(title,'Laravel')` |
+| `any` | `?filter=any(status,'active','pending')` |
+| `between` | `?filter=between(created_at,'2025-01-01','2025-12-31')` |
+| `has` | `?filter=has(posts,'1')` |
+| `relation` | `?filter=relation(author,equals(country,'US'))` |
+| `and` / `or` / `not` | `?filter=and(equals(role,'admin'),greaterThan(age,'25'))` |
 
 ## Sorting
 
-You can sort resources by attributes using the `sort` query string parameter. The following operations are available:
+Sort by single/multiple columns, including relationships via BelongsToThrough.
 
-| **Operation**       | **Example**                       |
-| ------------------- | --------------------------------- |
-| Ascending           | `?sort=id`                        |
-| Descending          | `?sort=-id`                       |
-| Multiple attributes | `?sort=id,created_at,-updated_at` |
-| Relationships       | `?sort=roles.name`                |
-| Relationships Count | `?sort=roles_count`               |
-
-**Sort Relationships**
-
-We leverage the [BelongsToThrough](https://github.com/staudenmeir/belongs-to-through) package to manage complex relationships.
-
-`Comment` → belongs to → `Post` → belongs to → `User` → belongs to → `Country`
-
-Example:
-
-You can sort `Comment` records based on the `name` attribute of the related `Country` model by using the following query:
-
-```http
-{url}/comments?sort=country.name
-```
+| **Type** | **Example** |
+|---|---|
+| Ascending | `?sort=name` |
+| Descending | `?sort=-name` |
+| Multiple | `?sort=name,-created_at` |
+| Relationship | `?sort=author.name` |
+| Relationship Count | `?sort=posts_count` |
 
 ## Searching
 
-Perform searches across attributes using the `search` query string parameter,. The search will apply a `whereLike(attribute, '%value%')` query, performing a partial match on the specified value.
+LIKE-based search across columns and relationships.
 
-| **Operation**       | **Example**                                         |
-| ------------------- | --------------------------------------------------- |
-| An Attribute        | `?search[column]=name&search[value]=larajs`         |
-| Multiple attributes | `?search[column]=name,content&search[value]=larajs` |
-| Relationships       | `?search[column]=roles.name&search[value]=admin`    |
+| **Type** | **Example** |
+|---|---|
+| Single column | `?search[column]=name&search[value]=john` |
+| Multiple columns | `?search[column]=name,email&search[value]=john` |
+| Relationship | `?search[column]=author.name&search[value]=smith` |
 
 ## Including Relationships
 
-Include related models with the `include` query string parameter:
+Eager load relationships with nested support, aggregates, and filtering.
 
-| **Operation**                                  | **Example**                                                                                          |
-| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| An Attribute                                   | `?include[]=roles`                                                                                   |
-| Multiple Attributes                            | `?include[]=roles&include[]=roles.permissions`                                                       |
-| Nested Relationship                            | `?include[]=roles:id,name&include[]=roles.permissions&include[]=roles.permissions.users:id,username` |
-| Aggregates `count\|exists\|sum\|min\|max\|avg` | `?include[]=roles\|count&include[]=roles\|exists&include[]=permissions\|exists`                      |
-| Filter relationship                            | `?include[]=comments\|and(equals(user_id, '1'),equals(status, '1'))`                                 |
+| **Type** | **Example** |
+|---|---|
+| Single | `?include[]=posts` |
+| Multiple | `?include[]=posts&include[]=roles` |
+| Nested | `?include[]=posts.comments` |
+| Aggregates | `?include[]=posts\|count&include[]=roles\|exists` |
+| Filtered | `?include[]=posts\|and(equals(status,'published'))` |
+
+Supported aggregates: `count`, `exists`, `sum`, `min`, `max`, `avg`
 
 ## Selecting Fields
 
-Select specific fields using the select query string parameter:
+Project specific columns via select parameter.
 
-| **Operation** | **Example**                   |
-| ------------- | ----------------------------- |
-| Attributes    | `?select=id,name,description` |
+```
+?select=id,name,email
+```
 
 ## Date Filtering
 
-Filter resources by date attributes using either the `date` query string parameter or the `filter` function.
+Filter by date ranges. Auto-calculates startOfDay/endOfDay boundaries.
 
-The `date` parameter automatically calculates the `startOfDay` and `endOfDay` values.
-
-Both methods apply a `whereBetween(attribute, [startDate, endDate])` query.
-
-| **Operation**        | **Example**                                                                                 |
-| -------------------- | ------------------------------------------------------------------------------------------- |
-| Attribute (option 1) | `?date[column]=updated_at&date[value][0]=2024-10-01&date[value][1]=2024-10-15`              |
-| Attribute (option 2) | `?date[column]=updated_at&date[value][start]=2024-10-01&date[value][end]=2024-10-15`        |
-| Attribute (option 3) | `?filter=between(updated_at,'2025-01-01 00:00:00','2025-01-15 23:59:59')`                   |
-| Attribute (option 4) | `?filter=and(greaterOrEqual(start_date, '2025-01-01'),lessOrEqual(end_date, '2025-01-15'))` |
+| **Type** | **Example** |
+|---|---|
+| Array format | `?date[column]=created_at&date[value][0]=2025-01-01&date[value][1]=2025-12-31` |
+| Filter syntax | `?filter=between(created_at,'2025-01-01','2025-12-31')` |
 
 ## Pagination
 
-Paginate resources with the `pagination` query string parameter:
+Three pagination types with configurable limits (default 25, max 500).
 
-| **Operation** | **Example**                                                                                   |
-| ------------- | --------------------------------------------------------------------------------------------- |
-| `default`     | `?pagination[limit]=25&pagination[page]=1`                                                    |
-| `simple`      | `?pagination[type]=simple&pagination[limit]=25&pagination[page]=1`                            |
-| `cursor`      | `?pagination[type]=cursor&pagination[cursor]=eyJpZCI6MTUsIl9wb2ludHNUb05leHRJdGVtcyI6dHJ1ZX0` |
+| **Type** | **Example** |
+|---|---|
+| Default | `?pagination[limit]=25&pagination[page]=1` |
+| Simple | `?pagination[type]=simple&pagination[limit]=25&pagination[page]=1` |
+| Cursor | `?pagination[type]=cursor&pagination[cursor]=...` |
 
-## Allow Query (Recommend)
+## Security: Allow-List Whitelisting
 
-We recommend using allow query as soon as possible to control which fields are available for querying.
-By default, all fields in a model are available for querying. However, you can configure the system to exclude certain fields as necessary by overriding the `allowQueryParsers` method in your models.
+Control queryable fields for each endpoint. By default, nothing is exposed — explicitly whitelist what clients can query.
 
 ```php
-<?php
+$allow = QueryParserAllowDTO::fromArray([
+    ‘field’   => [‘id’, ‘name’, ‘email’],         // Projectable columns
+    ‘filter’  => [‘name’, ‘email’, ‘status’],     // Filterable fields
+    ‘sort’    => [‘name’, ‘created_at’],          // Sortable columns
+    ‘include’ => [‘posts’, ‘roles’],              // Includable relations
+    ‘search’  => [‘name’, ‘email’],               // Searchable fields
+    ‘date’    => [‘created_at’],                  // Date-filterable fields
+]);
+```
 
-use App\Models\Category;
-use LaraJS\Query\LaraJSQuery;
+## Repository Pattern
 
-class CategoryController
+Use repositories to separate business logic from HTTP concerns.
+
+```php
+// Repository
+class UserRepository extends ReadRepository
 {
-    use LaraJSQuery;
+    public function __construct()
+    {
+        parent::__construct(new User(), 25, 500);
+    }
+}
+
+// Controller
+class UserController
+{
+    public function __construct(private UserRepository $users) {}
 
     public function index(Request $request)
     {
-        return $this->applyLaraJSQuery(Category::query(), QueryParserRequestDTO::fromArray($request->query()), QueryParserAllowDTO::fromArray([
-            'field' => ['id', 'name', 'description'],
-            'include' => ['roles'],
-            'sort' => ['id', 'updated_at'],
-            'filter' => ['name', 'age'],
-            'search' => ['id', 'name', 'roles'],
-            'date' => ['updated_at'],
-        ]))->get();
+        return $this->users->findAll(
+            QueryParserAllowDTO::fromArray([...])
+        );
     }
 }
 ```
 
-## Repository Structure
+See `/docs/deployment-guide.md` for complete repository patterns.
 
-Here’s the structure of the repository and its core classes:
+## Documentation
 
-```txt
-.
-├── BaseLaraJSRepository.php
-├── ReadRepository.php
-├── ReadRepositoryInterface.php
-├── WriteRepository.php
-└── WriteRepositoryInterface.php
-```
-
-### BaseLaraJSRepository
-
-This abstract class defines the foundation for all repositories:
-
-```php
-<?php
-
-namespace LaraJS\Query\Repositories;
-
-abstract class BaseLaraJSRepository implements ReadRepositoryInterface, WriteRepositoryInterface
-{
-}
-
-```
-
-### ReadRepository
-
-This repository handles reading data from the database:
-
-```php
-<?php
-
-namespace LaraJS\Query\Repositories;
-
-use LaraJS\Query\LaraJSQuery;
-
-class ReadRepository implements ReadRepositoryInterface
-{
-    use LaraJSQuery;
-
-    public function __construct(protected readonly Model $model, protected readonly int $limit, protected readonly int $maxLimit) {}
-
-    public function findAll(QueryParserAllowDTO $allow): LengthAwarePaginator|CursorPaginator|Paginator|Collection;
-
-    public function find(int $id, QueryParserAllowDTO $allow);
-
-    public function findOrFail(int $id, QueryParserAllowDTO $allow);
-
-    public function query(): Builder;
-
-    public function laraJSQuery(QueryParserAllowDTO $allow, bool $clearFilter = false): Builder;
-}
-
-```
-
-### WriteRepository
-
-Handles the creation, updating, and deletion of data:
-
-```php
-<?php
-
-namespace LaraJS\Query\Repositories;
-
-class WriteRepository implements WriteRepositoryInterface
-{
-    public function __construct(protected readonly Model $model) {}
-
-    public function create(array $data);
-
-    public function update(int $id, array $data);
-
-    public function delete(int $id): bool;
-}
-
-```
+- **[Official Docs](https://docs.larajs.com/packages/larajs-query.html)** — Full online documentation
+- **[docs/project-overview-pdr.md](docs/project-overview-pdr.md)** — Project scope, requirements, architecture
+- **[docs/system-architecture.md](docs/system-architecture.md)** — Detailed request lifecycle, component interactions
+- **[docs/codebase-summary.md](docs/codebase-summary.md)** — File structure, data flow, algorithms
+- **[docs/code-standards.md](docs/code-standards.md)** — PHP 8.3 patterns, naming conventions, security
+- **[docs/deployment-guide.md](docs/deployment-guide.md)** — Installation, configuration, usage examples
+- **[docs/project-roadmap.md](docs/project-roadmap.md)** — v2.0.0 status, planned features, roadmap
