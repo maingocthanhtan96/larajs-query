@@ -38,7 +38,9 @@ class QueryParser implements QueryParserInterface
 
     private function handleQuery(Builder $builder, array $queries): Builder
     {
-        foreach ($queries as ['fx' => $fx, 'parameters' => $parameters, 'isNested' => $isNested]) {
+        foreach ($queries as $query) {
+            ['fx' => $fx, 'isNested' => $isNested] = $query;
+            $parameters = $query['parameters'] ?? null;
             if ($isNested) {
                 match ($fx) {
                     Method::WITH->value => $builder->{$fx}([$parameters[0] => fn($q) => $this->handleQuery($q, [$parameters[1]])]),

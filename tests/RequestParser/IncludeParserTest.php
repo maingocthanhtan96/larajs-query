@@ -189,6 +189,52 @@ class IncludeParserTest extends TestCase
         $this->assertSame($expect, $this->parser->parse($queryString, $filterable));
     }
 
+    public function test_parser_product_variants_nested_relations_no_filterable()
+    {
+        $queryString = ['productVariants', 'productVariants.attributeValues.attribute', 'category', 'productVariants.attributeValues'];
+        $expect = [
+            'with' => ['productVariants', 'productVariants.attributeValues.attribute', 'category', 'productVariants.attributeValues'],
+            'filterWith' => [],
+        ];
+
+        $this->assertSame($expect, $this->parser->parse($queryString, null));
+    }
+
+    public function test_parser_product_variants_nested_relations_with_filterable()
+    {
+        $queryString = ['productVariants', 'productVariants.attributeValues'];
+        $filterable = ['productVariants', 'productVariants.attributeValues.attribute', 'category'];
+        $expect = [
+            'with' => ['productVariants', 'productVariants.attributeValues'],
+            'filterWith' => [],
+        ];
+
+        $this->assertSame($expect, $this->parser->parse($queryString, $filterable));
+    }
+
+    public function test_parser_product_variants_nested_relations_filterable()
+    {
+        $queryString = ['productVariants', 'productVariants.attributeValues'];
+        $filterable = ['productVariants.attributeValues.attribute', 'category'];
+        $expect = [
+            'with' => ['productVariants', 'productVariants.attributeValues'],
+            'filterWith' => [],
+        ];
+
+        $this->assertSame($expect, $this->parser->parse($queryString, $filterable));
+    }
+
+    public function test_parser_product_variants_missing_nested_relation_throws_exception()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $queryString = ['productVariants', 'productVariants.attributeValues.attribute', 'category', 'productVariants.attributeValues'];
+        // filterable only has top-level relations, missing nested paths
+        $filterable = ['productVariants', 'category'];
+
+        $this->parser->parse($queryString, $filterable);
+    }
+
     public function test_parser_multiple_filter_relations()
     {
         $queryString = ["users|and(equals(name,'Smith'),greaterThan(age,'25'))", "categories|equals(user_id,'1')"];
@@ -231,4 +277,5 @@ class IncludeParserTest extends TestCase
 
         $this->assertSame($expect, $this->parser->parse($queryString, $filterable));
     }
+
 }

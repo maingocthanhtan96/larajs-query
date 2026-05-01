@@ -210,6 +210,43 @@ class IncludeParserTest extends TestCase
         $this->assertSame($expect, $this->parser->parse($queryString));
     }
 
+    public function test_parser_product_variants_nested_relations()
+    {
+        $queryString['with'] = ['productVariants', 'productVariants.attributeValues.attribute', 'category', 'productVariants.attributeValues'];
+        $queryString['filterWith'] = [];
+
+        $expect = [
+            [
+                'fx' => 'with',
+                'isNested' => false,
+                'parameters' => ['productVariants', 'productVariants.attributeValues.attribute', 'category', 'productVariants.attributeValues'],
+            ],
+        ];
+
+        $this->assertSame($expect, $this->parser->parse($queryString));
+    }
+
+    public function test_parser_product_variants_with_count_aggregate()
+    {
+        $queryString['with'] = ['productVariants|count', 'productVariants.attributeValues.attribute', 'category', 'productVariants.attributeValues'];
+        $queryString['filterWith'] = [];
+
+        $expect = [
+            [
+                'fx' => 'with',
+                'isNested' => false,
+                'parameters' => ['productVariants.attributeValues.attribute', 'category', 'productVariants.attributeValues'],
+            ],
+            [
+                'fx' => 'withAggregate',
+                'isNested' => false,
+                'parameters' => ['productVariants', '*', 'count'],
+            ],
+        ];
+
+        $this->assertSame($expect, $this->parser->parse($queryString));
+    }
+
     public function test_parser_assign_work_users()
     {
         $queryString['with'] = [];

@@ -50,8 +50,15 @@ class IncludeParser
         $filterableMap = [];
         foreach ($filterable as $item) {
             $relation = strtok($item, ':|');
-            if ($relation) {
-                $filterableMap[$relation] = $item;
+            if (!$relation) {
+                continue;
+            }
+            $filterableMap[$relation] = $item;
+            // Allow parent paths so e.g. 'a.b' is valid when 'a.b.c' is in filterable
+            $parts = explode('.', $relation);
+            for ($i = 1; $i < count($parts); $i++) {
+                $parent = implode('.', array_slice($parts, 0, $i));
+                $filterableMap[$parent] ??= $parent;
             }
         }
 
